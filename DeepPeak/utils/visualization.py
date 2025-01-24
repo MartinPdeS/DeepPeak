@@ -4,16 +4,50 @@ import matplotlib.pyplot as plt
 from tf_explain.core.grad_cam import GradCAM
 from tensorflow.keras.models import Model  # type: ignore
 from MPSPlots.styles import mps
-import matplotlib.pyplot as plt
-import numpy as np
 
+def plot_conv1D(model, input_signal, layer_name):
+    """
+    Plot activations for a Conv1D layer.
 
-def get_gaussian(amplitude, x, center, width):
-    return amplitude * np.exp(-((x - center) ** 2) / (2 * width ** 2))
+    Parameters
+    ----------
+    model : tensorflow.keras.Model
+        The full model containing the Conv1D layer.
+    input_signal : np.ndarray
+        A single input signal of shape (1, sequence_length, 1).
+    layer_name : str
+        The name of the Conv1D layer to visualize.
+
+    Returns
+    -------
+    None
+    """
+    # Create a submodel to output intermediate activations
+    activation_model = Model(inputs=model.input, outputs=model.get_layer(layer_name).output)
+
+    # Get the activations for the input signal
+    activations = activation_model.predict(input_signal)
+
+    # Get shape details
+    num_filters = activations.shape[-1]
+    sequence_length = activations.shape[1]
+
+    # Plot the activations
+    plt.figure(figsize=(12, 8))
+    for i in range(num_filters):
+        plt.plot(range(sequence_length), activations[0, :, i], label=f"Filter {i}")
+
+    plt.title(f"Activations for {layer_name}")
+    plt.xlabel("Sequence Index")
+    plt.ylabel("Activation Value")
+    plt.legend(bbox_to_anchor=(1.05, 1), loc="upper left")
+    plt.tight_layout()
+    plt.show()
+
 
 def plot_dense(model, input_signal, layer_name):
     """
-    Plot activations for a Dense layer.
+    Plot activations for a Dense layer using a step plot.
 
     Parameters
     ----------
@@ -34,14 +68,16 @@ def plot_dense(model, input_signal, layer_name):
     # Get the activations for the input signal
     activations = activation_model.predict(input_signal)
 
-    # Plot the activations
+    # Plot the activations using a step plot
     plt.figure(figsize=(12, 6))
-    plt.bar(range(len(activations[0])), activations[0], color="blue")
+    plt.step(range(len(activations[0])), activations[0], where="mid", color="blue", linewidth=2)
     plt.title(f"Activations for {layer_name}")
     plt.xlabel("Neuron Index")
     plt.ylabel("Activation Value")
+    plt.grid(True, linestyle="--", alpha=0.6)
     plt.tight_layout()
     plt.show()
+
 
 def plot_gradcam_with_signal(
     model: object,
@@ -81,7 +117,6 @@ def plot_gradcam_with_signal(
     """
     # Extract the specific signal and ground-truth output
     signal = signals[signal_index : signal_index + 1]
-    ground_truth_output = outputs[signal_index : signal_index + 1]
 
     # Compute Grad-CAM heatmaps
     explainer = GradCAM()
@@ -126,7 +161,7 @@ def plot_gradcam_with_signal(
     plt.tight_layout()
     plt.show()
 
-def plot_training_history(history, filtering: list = None):
+def plot_training_history(history, filtering: list = None, y_scale: str = 'log'):
     """
     Plot training and validation performance metrics (loss and accuracy).
 
@@ -137,8 +172,6 @@ def plot_training_history(history, filtering: list = None):
     filtering : list of str, optional
         List of wildcard patterns to filter the keys in the history dictionary. Use '*' as a wildcard.
     """
-    plt.close('all')
-
     # Convert wildcard patterns to regex patterns
     def wildcard_to_regex(pattern):
         return "^" + re.escape(pattern).replace("\\*", ".*") + "$"
@@ -170,22 +203,39 @@ def plot_training_history(history, filtering: list = None):
         ax.plot(value, label=key.replace('_', ' '))
         ax.legend(loc='upper left')
         ax.set_ylabel(key.replace('_', ' '))
+        ax.set_yscale(y_scale)
 
     axes.flatten()[-1].set_xlabel('Number of Epochs')
     figure.suptitle('Training History')
+
     plt.tight_layout()
     plt.show()
 
 
 
-def visualize_validation_cases(
-    model,
-    validation_data,
-    input_length: int,
-    num_examples: int = 5,
-    n_columns: int = 1,
-    ax_size: tuple = (3, 3)
-):
+def plot_gaussian_components(ax, x_values, positions, amplitudes, widths):
+    """
+    Plot individual Gaussian components on the provided axis.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        The axis to plot the Gaussians on.
+    x_values : np.ndarray
+        The x-values for plotting the Gaussian curves.
+    positions : np.ndarray
+        The positions of the Gaussian peaks.
+    amplitudes : np.ndarray
+        The amplitudes of the Gaussian peaks.
+    widths : np.ndarray
+        The widths of the Gaussian peaks.
+    """
+    for pos, amp, width in zip(positions, amplitudes, widths):
+        if pos != 0:  # Ignore placeholder positions
+            gaussian = amp * np.exp(-((x_values - pos)**2) / (2 * width**2))
+            ax.plot(x_values, gaussian, linestyle='--', color='green', linewidth=1, label='True Gaussian')
+
+def visualize_validation_cases(model, validation_data, sequence_length: int, num_examples: int = 5, n_columns: int = 1, unit_size: tuple = (3.5, 2.5), normalize_x: bool = True):
     """
     Visualize validation cases by comparing true and predicted values.
 
@@ -196,56 +246,66 @@ def visualize_validation_cases(
     validation_data : dict
         Dictionary containing validation data and labels:
         {'x': input signals, 'peak_count': ground truth peak counts, 'positions': peak positions, 'widths': peak widths, 'amplitudes': peak amplitudes}.
-    input_length : int
+    sequence_length : int
         Length of the input signal.
     num_examples : int, optional
         Number of validation cases to visualize. Default is 5.
     n_columns : int, optional
         Number of columns in the plot layout. Default is 1.
     """
-    # Close any previous plots
-    plt.close('all')
 
-    # Determine rows and columns for subplots
     n_rows = int(np.ceil(num_examples / n_columns))
-    fig, axes = plt.subplots(n_rows, n_columns, figsize=(ax_size[0] * n_columns, ax_size[1] * n_rows))
+    fig, axes = plt.subplots(n_rows, n_columns, sharex=True, sharey=True, figsize=(unit_size[0] * n_columns, unit_size[1] * n_rows))
     axes = np.atleast_1d(axes).ravel()
 
-    # Randomly sample indices to visualize
     indices = np.random.choice(len(validation_data['x']), num_examples, replace=False)
-    x_values = np.arange(input_length)
+
+    if normalize_x:
+        x_values = np.linspace(0, 1, sequence_length)
+    else:
+        x_values = np.arange(sequence_length)  # Shared x-axis for all sequences
 
     for ax, idx in zip(axes, indices):
-        # Extract input signal and true labels
         input_signal = validation_data['x'][idx, :, 0]
-        true_num_peaks = np.argmax(validation_data['peak_count'][idx])
-
-        true_positions = validation_data['positions'][idx][:true_num_peaks]
-        true_widths = validation_data['widths'][idx][:true_num_peaks]
-        true_amplitudes = validation_data['amplitudes'][idx][:true_num_peaks]
+        true_positions = validation_data['positions'][idx]
+        true_amplitudes = validation_data['amplitudes'][idx]
+        true_widths = validation_data['widths'][idx]
+        peak_count = np.argmax(validation_data['peak_count'][idx])
 
         # Predict peak positions
-        reshaped_signal = input_signal.reshape(1, input_length, 1)
-        predictions = model.predict(reshaped_signal, verbose=0)[0]
+        reshaped_signal = input_signal.reshape(1, sequence_length, 1)
+
 
         # Plot input signal
-        ax.plot(input_signal, label='Input Signal', color='blue')
+        ax.plot(x_values, input_signal, label='Input Signal', color='blue')
 
-        # Plot true peaks as dashed lines
-        for pos, amp, width in zip(true_positions, true_amplitudes, true_widths):
-            gaussian_curve = amp * np.exp(-((x_values - pos)**2) / (2 * width**2))
-            ax.plot(x_values, gaussian_curve, linestyle='--', color='green', linewidth=1, label='True Peak' if 'True Peak' not in ax.get_legend_handles_labels()[1] else None)
+        # Plot true Gaussian components
+        plot_gaussian_components(ax, x_values, true_positions, true_amplitudes, true_widths)
 
-        # Plot predicted peaks as dotted lines
-        for pred_pos in predictions:
-            ax.axvline(pred_pos, linestyle='dotted', color='red', linewidth=1, label='Predicted Peak' if 'Predicted Peak' not in ax.get_legend_handles_labels()[1] else None)
+        # Plot predicted positions as vertical lines
+
+        attributes_set = set(model.output_names)
+        if attributes_set == {'positions',}:
+            predictions = np.asarray(model.predict(reshaped_signal, verbose=0))[0]
+            for position in predictions:
+                ax.axvline(position, linestyle='dotted', color='red', linewidth=1, label='Predicted Position')
+
+        elif attributes_set == {'positions', 'amplitudes'}:
+            positions, amplitudes = np.asarray(model.predict(reshaped_signal, verbose=0))
+            for position, amplitude in zip(positions, amplitudes):
+                ax.scatter(position, amplitude, color='red', label='Predicted Peak')
 
         # Formatting
-        ax.set_title(f"Validation Case {idx} -- {true_num_peaks} peaks")
+        ax.set_title(f"Validation Case {idx} \n peak count: {peak_count}")
         ax.set_xlabel("Signal Index")
         ax.set_ylabel("Amplitude")
         ax.legend()
 
-    # Adjust layout
+    # Remove duplicate legend entries
+    for ax in axes:
+        handles, labels = ax.get_legend_handles_labels()
+        by_label = dict(zip(labels, handles))
+        ax.legend(by_label.values(), by_label.keys())
+
     plt.tight_layout()
     plt.show()
