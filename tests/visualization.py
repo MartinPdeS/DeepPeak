@@ -1,7 +1,6 @@
 import pytest
 import numpy as np
-from DeepPeak.utils import plot_dataset  # Replace 'your_module' with the actual module name
-import matplotlib.pyplot as plt
+from DeepPeak.utils.visualization import plot_dataset  # Replace 'your_module' with the actual module name
 from unittest.mock import patch
 
 def test_plot_dataset_valid_input():

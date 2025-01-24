@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from DeepPeak.data.data_generation import generate_gaussian_dataset, generate_point_peak_dataset, generate_square_peak_dataset
+from DeepPeak.data import generate_gaussian_dataset
 
 def test_get_gaussian_peaks():
     # Test parameters

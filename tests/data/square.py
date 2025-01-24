@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from DeepPeak.data.data_generation import generate_gaussian_dataset, generate_point_peak_dataset, generate_square_peak_dataset
+from DeepPeak.data import generate_square_dataset
 
 
 def test_generate_square_peak_dataset_shapes():
@@ -8,7 +8,7 @@ def test_generate_square_peak_dataset_shapes():
     sequence_length = 128
     peak_count = (2, 5)
 
-    signals, amplitudes, peak_counts, positions, widths, x_values = generate_square_peak_dataset(
+    signals, amplitudes, peak_counts, positions, widths, x_values = generate_square_dataset(
         sample_count=sample_count,
         sequence_length=sequence_length,
         peak_count=peak_count,
@@ -35,7 +35,7 @@ def test_generate_square_peak_dataset_peak_properties():
     sequence_length = 64
     peak_count = (3, 3)
 
-    signals, amplitudes, peak_counts, positions, widths, x_values = generate_square_peak_dataset(
+    signals, amplitudes, peak_counts, positions, widths, x_values = generate_square_dataset(
         sample_count=sample_count,
         sequence_length=sequence_length,
         peak_count=peak_count,
@@ -59,7 +59,7 @@ def test_generate_square_peak_dataset_normalization():
     sample_count = 3
     sequence_length = 32
 
-    signals, _, _, _, _, _ = generate_square_peak_dataset(
+    signals, _, _, _, _, _ = generate_square_dataset(
         sample_count=sample_count,
         sequence_length=sequence_length,
         peak_count=3,
@@ -83,7 +83,7 @@ def test_generate_square_peak_dataset_sorting():
     sequence_length = 50
     peak_count = 4
 
-    signals, amplitudes, _, positions, widths, _ = generate_square_peak_dataset(
+    signals, amplitudes, _, positions, widths, _ = generate_square_dataset(
         sample_count=sample_count,
         sequence_length=sequence_length,
         peak_count=peak_count,
