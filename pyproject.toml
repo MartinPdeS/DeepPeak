@@ -76,13 +76,13 @@ addopts = [
     '-v',
     '-rA',
     '-rw',
-    '--cov=FlowCyPy',
+    '--cov=DeepPeak',
     '--cov-report=html',
     '--cov-report=term'
 ]
 
 [tool.coverage.run]
-source = ['FlowCyPy']
+source = ['DeepPeak']
 omit = [
     '*/__init__.py',
     '*/_version.py',

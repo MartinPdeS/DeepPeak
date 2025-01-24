@@ -309,3 +309,83 @@ def visualize_validation_cases(model, validation_data, sequence_length: int, num
 
     plt.tight_layout()
     plt.show()
+
+def plot_dataset(
+    signals: np.ndarray,
+    amplitudes: np.ndarray = None,
+    positions: np.ndarray = None,
+    widths: np.ndarray = None,
+    x_values: np.ndarray = None,
+    num_samples: int = 5,
+    title: str = "Dataset Visualization"):
+    """
+    Plots a subset of sequences from the generated dataset.
+
+    Parameters
+    ----------
+    signals : np.ndarray
+        Array of shape (sample_count, sequence_length, 1) containing sequences with peaks.
+    amplitudes : np.ndarray, optional
+        Array of shape (sample_count, max_peaks) containing amplitudes of each peak.
+    positions : np.ndarray, optional
+        Array of shape (sample_count, max_peaks) containing positions of peaks.
+    widths : np.ndarray, optional
+        Array of shape (sample_count, max_peaks) containing widths of peaks.
+    x_values : np.ndarray, optional
+        The x-axis values, either normalized (0 to 1) or integer indices.
+    num_samples : int, optional
+        Number of samples to plot. Default is 5.
+    title : str, optional
+        Title of the plot. Default is "Dataset Visualization".
+
+    """
+    if len(signals.shape) != 3 or signals.shape[2] != 1:
+        raise ValueError("Signals must be a 3D array with shape (sample_count, sequence_length, 1).")
+
+    sample_count, sequence_length, _ = signals.shape
+    num_samples = min(num_samples, sample_count)
+
+    # Use default x_values if not provided
+    if x_values is None:
+        x_values = np.linspace(0, 1, sequence_length)
+
+    fig, axes = plt.subplots(num_samples, 1, figsize=(10, num_samples * 2), sharex=True)
+    if num_samples == 1:
+        axes = [axes]
+
+    for i, ax in enumerate(axes):
+        signal = signals[i, :, 0]
+        ax.plot(x_values, signal, label="Signal", linewidth=1.5)
+
+        if positions is not None and amplitudes is not None:
+            for pos, amp in zip(positions[i], amplitudes[i]):
+                if not np.isnan(pos):
+                    ax.plot(
+                        [x_values[int(pos)]] * 2,
+                        [0, amp],
+                        label=f"Peak at {pos:.1f}",
+                        linestyle="--",
+                        alpha=0.7
+                    )
+
+        if widths is not None and positions is not None:
+            for pos, width in zip(positions[i], widths[i]):
+                if not np.isnan(pos):
+                    start = max(0, int(pos - width // 2))
+                    end = min(sequence_length, int(pos + width // 2))
+                    ax.axvspan(
+                        x_values[start],
+                        x_values[end - 1],
+                        color="red",
+                        alpha=0.2,
+                        label="Peak Width" if i == 0 else None
+                    )
+
+        ax.set_ylabel(f"Sample {i + 1}")
+        ax.legend(loc="upper right")
+        ax.grid(True, linestyle="--", alpha=0.6)
+
+    axes[-1].set_xlabel("X-axis")
+    fig.suptitle(title, fontsize=16)
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.show()
