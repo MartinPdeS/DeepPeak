@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from DeepPeak.data import generate_square_dataset
+from DeepPeak.signals import generate_square_dataset
 
 
 def test_generate_square_peak_dataset_shapes():

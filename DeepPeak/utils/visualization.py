@@ -213,29 +213,75 @@ def plot_training_history(history, filtering: list = None, y_scale: str = 'log')
 
 
 
-def plot_gaussian_components(ax, x_values, positions, amplitudes, widths):
+def plot_peak_components(ax, x_values, positions, amplitudes, widths, model_type: str = 'gaussian'):
     """
-    Plot individual Gaussian components on the provided axis.
+    Plot individual peak components (Gaussian, square, or delta) on the provided axis.
 
     Parameters
     ----------
     ax : matplotlib.axes.Axes
-        The axis to plot the Gaussians on.
+        The axis to plot on.
     x_values : np.ndarray
-        The x-values for plotting the Gaussian curves.
+        The x-values for plotting the curves.
     positions : np.ndarray
-        The positions of the Gaussian peaks.
+        The positions of the peaks.
     amplitudes : np.ndarray
-        The amplitudes of the Gaussian peaks.
+        The amplitudes of the peaks.
     widths : np.ndarray
-        The widths of the Gaussian peaks.
+        The widths of the peaks.
+    model_type : {'gaussian', 'square', 'delta'}, optional
+        The shape of the peak to plot.
+        - 'gaussian' uses a standard Gaussian curve.
+        - 'square' uses a top-hat (square) shape.
+        - 'delta' plots vertical impulses (discrete spikes).
     """
-    for pos, amp, width in zip(positions, amplitudes, widths):
-        if pos != 0:  # Ignore placeholder positions
-            gaussian = amp * np.exp(-((x_values - pos)**2) / (2 * width**2))
-            ax.plot(x_values, gaussian, linestyle='--', color='green', linewidth=1, label='True Gaussian')
+    # Ensure model_type is valid
+    allowed_types = {'gaussian', 'square', 'delta'}
+    if model_type not in allowed_types:
+        raise ValueError(f"model_type must be one of {allowed_types}. Got '{model_type}'.")
 
-def visualize_validation_cases(model, validation_data, sequence_length: int, num_examples: int = 5, n_columns: int = 1, unit_size: tuple = (3.5, 2.5), normalize_x: bool = True):
+    for pos, amp, width in zip(positions, amplitudes, widths):
+        # Skip placeholder peaks (e.g., pos == 0 if that indicates "no peak")
+        # Adjust this condition if your data uses a different placeholder scheme.
+        if pos == 0 and amp == 0:
+            continue
+
+        if model_type == 'gaussian':
+            # Standard Gaussian
+            curve = amp * np.exp(-((x_values - pos) ** 2) / (2 * width ** 2))
+            ax.plot(x_values, curve, linestyle='--', color='green', linewidth=1, label='True Gaussian')
+
+        elif model_type == 'square':
+            # Simple top-hat function: 1 within +/- width/2 of pos, 0 outside
+            # amplitude = amp
+            # region_width = width
+            # shape: curve[i] = amp if pos - width/2 <= x_values[i] <= pos + width/2, else 0
+            curve = np.zeros_like(x_values)
+            left_edge  = pos - width / 2 * len(x_values)
+            right_edge = pos + width / 2 * len(x_values)
+
+            # Fill the region with amplitude
+            curve[(x_values >= left_edge) & (x_values <= right_edge)] = amp
+            ax.plot(x_values, curve, linestyle='--', color='green', linewidth=1, label='True Square')
+
+        elif model_type == 'delta':
+            # Delta (discrete spike). Two common ways to visualize:
+            #  1) A vertical line
+            #  2) A single point marker
+            # We'll draw a vertical line as an impulse, or scatter a point.
+            ax.axvline(pos, ymin=0, ymax=1, color='green', linestyle='--', linewidth=1, label='True Delta')
+            # Optionally, also mark amplitude as a point:
+            ax.scatter([pos], [amp], color='green', marker='o')
+
+def visualize_validation_cases(
+    model,
+    validation_data,
+    model_type: str,
+    sequence_length: int,
+    num_examples: int = 5,
+    n_columns: int = 1,
+    unit_size: tuple = (3.5, 2.5),
+    normalize_x: bool = True):
     """
     Visualize validation cases by comparing true and predicted values.
 
@@ -245,63 +291,84 @@ def visualize_validation_cases(model, validation_data, sequence_length: int, num
         The trained Keras model.
     validation_data : dict
         Dictionary containing validation data and labels:
-        {'x': input signals, 'peak_count': ground truth peak counts, 'positions': peak positions, 'widths': peak widths, 'amplitudes': peak amplitudes}.
+        {
+            'signals': np.ndarray of shape (N, sequence_length, 1),
+            'peak_counts': np.ndarray,
+            'positions': np.ndarray,
+            'widths': np.ndarray,
+            'amplitudes': np.ndarray
+        }
+    model_type : {'gaussian', 'square', 'delta'}
+        The shape of the peaks to visualize. Determines how the 'true' peaks
+        are plotted.
     sequence_length : int
-        Length of the input signal.
+        Length of each input signal.
     num_examples : int, optional
         Number of validation cases to visualize. Default is 5.
     n_columns : int, optional
-        Number of columns in the plot layout. Default is 1.
+        Number of subplot columns. Default is 1.
+    unit_size : tuple, optional
+        Figure size scaling. (width, height) in inches per subplot.
+    normalize_x : bool, optional
+        Whether to use normalized x-axis [0..1] or integer indices [0..sequence_length-1].
     """
 
     n_rows = int(np.ceil(num_examples / n_columns))
-    fig, axes = plt.subplots(n_rows, n_columns, sharex=True, sharey=True, figsize=(unit_size[0] * n_columns, unit_size[1] * n_rows))
+    fig, axes = plt.subplots(n_rows, n_columns,
+                             sharex=True, sharey=True,
+                             figsize=(unit_size[0] * n_columns, unit_size[1] * n_rows))
     axes = np.atleast_1d(axes).ravel()
 
-    indices = np.random.choice(len(validation_data['x']), num_examples, replace=False)
+    # Randomly pick validation indices
+    indices = np.random.choice(len(validation_data['signals']), num_examples, replace=False)
 
+    # Create x-values for plotting
     if normalize_x:
         x_values = np.linspace(0, 1, sequence_length)
     else:
-        x_values = np.arange(sequence_length)  # Shared x-axis for all sequences
+        x_values = np.arange(sequence_length)
 
     for ax, idx in zip(axes, indices):
-        input_signal = validation_data['x'][idx, :, 0]
-        true_positions = validation_data['positions'][idx]
+        input_signal    = validation_data['signals'][idx, :, 0]
+        true_positions  = validation_data['positions'][idx]
         true_amplitudes = validation_data['amplitudes'][idx]
-        true_widths = validation_data['widths'][idx]
-        peak_count = np.argmax(validation_data['peak_count'][idx])
+        true_widths     = validation_data['widths'][idx]
+        peak_count      = np.argmax(validation_data['peak_counts'][idx])
 
-        # Predict peak positions
-        reshaped_signal = input_signal.reshape(1, sequence_length, 1)
-
-
-        # Plot input signal
+        # Plot the input signal
         ax.plot(x_values, input_signal, label='Input Signal', color='blue')
 
-        # Plot true Gaussian components
-        plot_gaussian_components(ax, x_values, true_positions, true_amplitudes, true_widths)
+        # Plot the true components using the specified model_type
+        plot_peak_components(ax, x_values, true_positions, true_amplitudes, true_widths, model_type=model_type)
 
-        # Plot predicted positions as vertical lines
+        # Obtain predictions from the model
+        reshaped_signal = input_signal.reshape(1, sequence_length, 1)
+        predictions = model.predict(reshaped_signal, verbose=0)
 
         attributes_set = set(model.output_names)
         if attributes_set == {'positions',}:
-            predictions = np.asarray(model.predict(reshaped_signal, verbose=0))[0]
-            for position in predictions:
+            # If model outputs only positions
+            pred_positions = np.asarray(predictions)[0]
+            for position in pred_positions:
                 ax.axvline(position, linestyle='dotted', color='red', linewidth=1, label='Predicted Position')
 
         elif attributes_set == {'positions', 'amplitudes'}:
-            positions, amplitudes = np.asarray(model.predict(reshaped_signal, verbose=0))
-            for position, amplitude in zip(positions, amplitudes):
+            # If model outputs positions & amplitudes
+            pred_positions, pred_amplitudes = np.asarray(predictions)
+            # They often come out as arrays: shape (1, num_peaks) each
+            pred_positions  = pred_positions[0]
+            pred_amplitudes = pred_amplitudes[0]
+            for position, amplitude in zip(pred_positions, pred_amplitudes):
                 ax.scatter(position, amplitude, color='red', label='Predicted Peak')
 
-        # Formatting
-        ax.set_title(f"Validation Case {idx} \n peak count: {peak_count}")
+        # Additional multi-output scenarios can be handled similarly.
+
+        ax.set_title(f"Validation Case {idx}\nPeak Count: {peak_count}")
         ax.set_xlabel("Signal Index")
         ax.set_ylabel("Amplitude")
         ax.legend()
 
-    # Remove duplicate legend entries
+    # Remove duplicate legend entries in each subplot
     for ax in axes:
         handles, labels = ax.get_legend_handles_labels()
         by_label = dict(zip(labels, handles))

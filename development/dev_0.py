@@ -1,5 +1,5 @@
 from DeepPeak import models
-from DeepPeak.data.data_generation import generate_gaussian_dataset
+from DeepPeak.DeepPeak.data.square import generate_gaussian_dataset
 from DeepPeak.utils.visualization import plot_training_history, visualize_validation_cases
 from DeepPeak.utils.training_utils import dataset_split
 from tensorflow.keras.callbacks import ModelCheckpoint # type: ignore

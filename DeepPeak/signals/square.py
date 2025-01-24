@@ -8,7 +8,7 @@ def generate_square_dataset(
     peak_count: tuple | int = (1, 5),
     amplitude_range: tuple | float = (1, 5),
     center_range: tuple | float = (0, 1),
-    width_range: tuple | float = (5, 20),
+    width_range: tuple | float = (0.1, 0.1),
     noise_std: float = 0.0,
     normalize: bool = True,
     normalize_x: bool = True,
@@ -41,7 +41,7 @@ def generate_square_dataset(
         Whether to normalize each sequence after noise addition.
     normalize_x : bool
         Whether to use a normalized x-axis (0 to 1) or integer indices (0 to sequence_length-1)
-        in the returned x_values array.
+        in the returned x_values array. If True, widths are also normalized.
     nan_values : float
         Fill value for unused array entries (e.g., if you have max_peaks but actual < max_peaks).
     sort_peak : {'position', 'amplitude', 'width'}
@@ -81,6 +81,7 @@ def generate_square_dataset(
 
     if normalize_x:
         x_values = np.linspace(0, 1, sequence_length)
+        width_range = tuple(w / sequence_length for w in width_range)  # Normalize widths
     else:
         x_values = np.arange(sequence_length)
 
@@ -94,16 +95,26 @@ def generate_square_dataset(
         current_peak_count = np.random.randint(min_peaks, max_peaks + 1)
 
         current_amplitudes = np.random.uniform(amplitude_range[0], amplitude_range[1], size=current_peak_count)
-        low_position = max(0, int(center_range[0]))
-        high_position = min(sequence_length - 1, int(center_range[1]))
-        current_centers = np.random.randint(low_position, high_position + 1, size=current_peak_count)
-        current_widths = np.random.uniform(width_range[0], width_range[1], size=current_peak_count).astype(int)
+        low_position = max(0, center_range[0])
+        high_position = min(1 if normalize_x else sequence_length - 1, center_range[1])
+        current_centers = np.random.uniform(low_position, high_position, size=current_peak_count)
+        current_widths = np.random.uniform(width_range[0], width_range[1], size=current_peak_count)
+
+        if normalize_x:
+            _current_widths = current_widths * sequence_length
+        else:
+            _current_widths = current_widths
 
         signal = np.zeros(sequence_length)
-        for amp, pos, width in zip(current_amplitudes, current_centers, current_widths):
-            start = max(0, pos - width // 2)
-            end = min(sequence_length, pos + width // 2)
-            signal[start:end] += amp
+        for amp, pos, width in zip(current_amplitudes, current_centers, _current_widths):
+            if normalize_x:
+                start_idx = int(max(0, (pos - width / 2) * sequence_length))
+                end_idx = int(min(sequence_length, (pos + width / 2) * sequence_length))
+            else:
+                start_idx = int(max(0, pos - width / 2))
+                end_idx = int(min(sequence_length, pos + width / 2))
+
+            signal[start_idx:end_idx] += amp
 
         if noise_std > 0:
             signal += np.random.normal(0, noise_std, sequence_length)

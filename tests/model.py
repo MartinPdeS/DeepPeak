@@ -1,6 +1,6 @@
 import pytest
 from DeepPeak.models import get_position_model
-from DeepPeak.data import generate_gaussian_dataset
+from DeepPeak.signals import generate_gaussian_dataset
 from DeepPeak.utils.visualization import visualize_validation_cases
 from DeepPeak.utils.training_utils import dataset_split
 from unittest.mock import patch

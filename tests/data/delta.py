@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from DeepPeak.data import generate_delta_dataset
+from DeepPeak.signals import generate_delta_dataset
 
 def test_generate_point_peak_dataset_sorting():
     sample_count = 3

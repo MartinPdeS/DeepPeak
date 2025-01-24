@@ -6,7 +6,7 @@ def generate_gaussian_dataset(
     sample_count: int,
     sequence_length: int,
     peak_count: tuple | int = (1, 5),
-    amplitude_range: tuple | float=(1, 5),
+    amplitude_range: tuple | float = (1, 5),
     center_range: tuple | float = (0, 1),
     width_range: tuple | float = (5, 20),
     noise_std: float = 0.0,
@@ -14,7 +14,8 @@ def generate_gaussian_dataset(
     normalize_x: bool = True,
     nan_values: float = 0,
     sort_peak: str = 'position',
-    categorical_peak_count: bool = True) -> Tuple:
+    categorical_peak_count: bool = True,
+    probability_range: tuple = (1.0, 1.0)) -> Tuple:
     """
     Generate a dataset of Gaussian curves with optional Gaussian noise.
 
@@ -36,6 +37,8 @@ def generate_gaussian_dataset(
         Standard deviation of Gaussian noise added to each sequence.
     normalize : bool
         Whether to normalize each sequence.
+    probability_range : tuple of float
+        Defines the range multiplier for acceptable widths (e.g., (0.5, 1.5)).
 
     Returns
     -------
@@ -49,6 +52,8 @@ def generate_gaussian_dataset(
         Positions of peaks, shape (sample_count, max_peaks).
     peak_widths : numpy.ndarray
         Widths of peaks, shape (sample_count, max_peaks).
+    labels : numpy.ndarray
+        Binary mask labels for peak regions, shape (sample_count, sequence_length, 1).
     """
     if isinstance(peak_count, tuple):
         min_peaks, max_peaks = peak_count
@@ -76,6 +81,7 @@ def generate_gaussian_dataset(
     positions = np.zeros((sample_count, max_peaks)) * nan_values
     widths = np.zeros((sample_count, max_peaks)) * nan_values
     peak_counts = np.zeros((sample_count), dtype=int)
+    labels = np.zeros_like(signals)
 
     # Generate Gaussian parameters
     for i in range(sample_count):
@@ -103,6 +109,14 @@ def generate_gaussian_dataset(
         widths[i, :current_peak_count] = current_widths
         peak_counts[i] = current_peak_count
 
+        # Generate labels based on probability_range
+        for pos, width in zip(current_centers, current_widths):
+            if not np.isnan(pos):
+                adjusted_width = width * np.random.uniform(probability_range[0], probability_range[1])
+                start = max(0, int((pos - adjusted_width / 2) * sequence_length))
+                end = min(sequence_length, int((pos + adjusted_width / 2) * sequence_length))
+                labels[i, start:end, 0] = 1
+
     # Sort peaks by positions
     match sort_peak:
         case 'position':
@@ -119,4 +133,4 @@ def generate_gaussian_dataset(
     if categorical_peak_count:
         peak_counts = to_categorical(peak_counts, max_peaks + 1)
 
-    return signals, amplitudes, peak_counts, positions, widths, x_values
+    return signals, amplitudes, peak_counts, positions, widths, x_values, labels

@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from DeepPeak.data import generate_gaussian_dataset
+from DeepPeak.signals import generate_gaussian_dataset
 
 def test_get_gaussian_peaks():
     # Test parameters
@@ -13,7 +13,7 @@ def test_get_gaussian_peaks():
     noise_amplitude = 0.1
 
     # Call the function
-    X_train, amplitudes, num_peaks, peak_positions, peak_widths, _ = generate_gaussian_dataset(
+    X_train, amplitudes, num_peaks, peak_positions, peak_widths, _, labels = generate_gaussian_dataset(
         sample_count=num_samples,
         sequence_length=input_length,
         peak_count=num_gaussian,
