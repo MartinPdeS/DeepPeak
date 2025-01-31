@@ -2,135 +2,156 @@ from typing import Tuple
 import numpy as np
 from tensorflow.keras.utils import to_categorical  # type: ignore
 
-def generate_gaussian_dataset(
-    sample_count: int,
-    sequence_length: int,
-    peak_count: tuple | int = (1, 5),
-    amplitude_range: tuple | float = (1, 5),
-    center_range: tuple | float = (0, 1),
-    width_range: tuple | float = (5, 20),
-    noise_std: float = 0.0,
-    normalize: bool = True,
-    normalize_x: bool = True,
-    nan_values: float = 0,
-    sort_peak: str = 'position',
-    categorical_peak_count: bool = True,
-    probability_range: tuple = (1.0, 1.0)) -> Tuple:
+import numpy as np
+from typing import Tuple
+
+def interpret_input(*inputs):
     """
-    Generate a dataset of Gaussian curves with optional Gaussian noise.
+    Decorator to interpret certain function parameters as tuples if given as scalars.
+    If a parameter in `inputs` is passed as an int or float, it is converted
+    to a tuple of the form (value, value).
 
     Parameters
     ----------
-    sample_count : int
-        Number of sequences to generate.
-    sequence_length : int
-        Length of each sequence.
-    peak_count : int or tuple of int
-        Number of Gaussian peaks per sequence (fixed or random range).
-    amplitude_range : tuple of float or float
-        Range or fixed value for amplitudes of Gaussian peaks.
-    center_range : tuple of int or int
-        Range or fixed value for center positions of Gaussian peaks.
-    width_range : tuple of float or float
-        Range or fixed value for standard deviations (widths) of Gaussian peaks.
-    noise_std : float
-        Standard deviation of Gaussian noise added to each sequence.
-    normalize : bool
-        Whether to normalize each sequence.
-    probability_range : tuple of float
-        Defines the range multiplier for acceptable widths (e.g., (0.5, 1.5)).
+    inputs : str
+        One or more parameter names that should be interpreted this way.
 
     Returns
     -------
-    signals : numpy.ndarray
-        Array of sequences with Gaussian peaks and added noise, shape (sample_count, sequence_length, 1).
-    amplitudes : numpy.ndarray
-        Array of amplitudes for each peak, shape (sample_count, max_peaks).
-    peak_counts : numpy.ndarray
-        Number of peaks per sequence, shape (sample_count,).
-    peak_positions : numpy.ndarray
-        Positions of peaks, shape (sample_count, max_peaks).
-    peak_widths : numpy.ndarray
-        Widths of peaks, shape (sample_count, max_peaks).
-    labels : numpy.ndarray
-        Binary mask labels for peak regions, shape (sample_count, sequence_length, 1).
+    Callable
+        A decorator function that can be applied to another function.
     """
-    if isinstance(peak_count, tuple):
-        min_peaks, max_peaks = peak_count
-    else:
-        min_peaks = max_peaks = peak_count
+    def _interpret_input(function):
+        def wrapper(**kwargs):
+            kwargs = {
+                k: (v, v) if k in inputs and isinstance(v, (float, int)) else v
+                for k, v in kwargs.items()
+            }
+            return function(**kwargs)
+        return wrapper
+    return _interpret_input
 
-    if isinstance(amplitude_range, (int, float)):
-        amplitude_range = (amplitude_range, amplitude_range)
+@interpret_input('width', 'position', 'amplitude')
+def generate_gaussian_dataset(
+    n_samples: int,
+    sequence_length: int,
+    n_peaks: Tuple[int, int],
+    amplitude: Tuple[float, float] = (1.0, 2.0),
+    position: Tuple[float, float] = (0.0, 50.0),
+    width: Tuple[float, float] = (0.03, 0.03),
+    seed: int = None,
+    noise_std: float = 0.01,
+    categorical_peak_count: bool = False
+):
+    """
+    Generate a set of 1D signals with a specified range of possible Gaussian peaks.
 
-    if isinstance(center_range, (int, float)):
-        center_range = (center_range, center_range)
+    Each generated signal can contain between `n_peaks[0]` and `n_peaks[1]`
+    Gaussian peaks (inclusive). Parameters controlling each peak (amplitude,
+    position, width) are drawn from their respective ranges. Additionally,
+    random Gaussian noise can be added if desired.
 
-    if isinstance(width_range, (int, float)):
-        width_range = (width_range, width_range)
+    Parameters
+    ----------
+    n_samples : int
+        The number of signals to generate.
+    sequence_length : int
+        The length (number of points) of each generated signal.
+    n_peaks : tuple of int
+        A tuple (min_peaks, max_peaks) specifying the range of possible peaks
+        in any generated signal.
+    amplitude : tuple of float, optional
+        A tuple (min_amplitude, max_amplitude) from which peak amplitudes are sampled.
+        Defaults to (1.0, 2.0).
+    position : tuple of float, optional
+        A tuple (min_position, max_position) specifying where peak centers can lie
+        in the domain [0..sequence_length]. Defaults to (0.0, 50.0).
+    width : tuple of float, optional
+        A tuple (min_width, max_width) defining the standard deviation of the Gaussian peaks.
+        Defaults to (0.03, 0.03), meaning all peaks use the same width.
+    seed : int, optional
+        Random seed for reproducibility. Defaults to None.
+    noise_std : float, optional
+        The standard deviation of the added Gaussian noise. Defaults to 0.01.
+    categorical_peak_count : bool, optional
+        If True, convert the count of peaks for each sample into a categorical format.
+        Defaults to False.
 
-    max_peaks = max(max_peaks, 1)  # Ensure at least one peak
-    if normalize_x:
-        x_values = np.linspace(0, 1, sequence_length)
-    else:
-        x_values = np.arange(sequence_length)  # Shared x-axis for all sequences
+    Returns
+    -------
+    signals : numpy.ndarray of shape (n_samples, sequence_length)
+        The generated signals, each being a sum of zero or more Gaussian peaks.
+    amplitudes : numpy.ndarray of shape (n_samples, max_peaks)
+        The amplitude for each potential peak in a signal. Peaks beyond the actual
+        count are zero-padded.
+    positions : numpy.ndarray of shape (n_samples, max_peaks)
+        The center positions for each potential peak in a signal. Unused positions
+        (for signals with fewer peaks) remain valid but their corresponding amplitudes
+        are zeroed out.
+    widths : numpy.ndarray of shape (n_samples, max_peaks)
+        The standard deviations of each Gaussian peak. Unused peaks in a signal have
+        corresponding amplitudes of zero, but this array remains fully populated.
+    x_values : numpy.ndarray of shape (sequence_length,)
+        The x-axis positions spanning from 0 to 1 (for plotting or further analysis).
+    num_peaks : numpy.ndarray of shape (n_samples,)
+        The actual number of peaks used in each signal. Each entry lies between
+        n_peaks[0] and n_peaks[1], inclusive.
 
-    # Preallocate arrays
-    signals = np.zeros((sample_count, sequence_length, 1))
-    amplitudes = np.zeros((sample_count, max_peaks)) * nan_values
-    positions = np.zeros((sample_count, max_peaks)) * nan_values
-    widths = np.zeros((sample_count, max_peaks)) * nan_values
-    peak_counts = np.zeros((sample_count), dtype=int)
-    labels = np.zeros_like(signals)
+    Notes
+    -----
+    - If `noise_std` is greater than 0, random Gaussian noise is added to each signal.
+    - If `categorical_peak_count` is set to True, the returned `num_peaks` may be converted
+      to a one-hot or similar categorical representation (not fully implemented in this snippet).
 
-    # Generate Gaussian parameters
-    for i in range(sample_count):
-        current_peak_count = np.random.randint(min_peaks, max_peaks + 1)
+    Examples
+    --------
+    >>> signals, amps, pos, widths, x_vals, num_pk = generate_gaussian_signals(
+    ...     n_samples=10, sequence_length=50, n_peaks=(1, 3), seed=42
+    ... )
+    >>> signals.shape
+    (10, 50)
+    >>> amps.shape
+    (10, 3)
+    >>> x_vals.shape
+    (50,)
 
-        current_amplitudes = np.random.uniform(amplitude_range[0], amplitude_range[1], size=current_peak_count)
-        current_centers = np.random.uniform(center_range[0], center_range[1], size=current_peak_count)
-        current_widths = np.random.uniform(width_range[0], width_range[1], size=current_peak_count)
+    """
+    if seed is not None:
+        np.random.seed(seed)
 
-        # Compute Gaussian curves in vectorized form
-        gaussians = current_amplitudes[:, None] * np.exp(-((x_values - current_centers[:, None])**2) / (2 * current_widths[:, None]**2))
-        combined_curve = np.sum(gaussians, axis=0)
+    min_peaks, max_peaks = n_peaks
 
-        # Add Gaussian noise if applicable
-        if noise_std > 0:
-            combined_curve += np.random.normal(0, noise_std, sequence_length)
+    # Randomly decide how many peaks each sample actually has
+    num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
 
-        if normalize:
-            combined_curve = (combined_curve - np.mean(combined_curve)) / np.std(combined_curve)
+    # Generate random amplitudes, positions, and widths
+    amplitudes = np.random.uniform(*amplitude, size=(n_samples, max_peaks))
+    positions = np.random.uniform(*position, size=(n_samples, max_peaks))
+    widths = np.random.uniform(*width, size=(n_samples, max_peaks))
 
-        # Store results
-        signals[i, :, 0] = combined_curve
-        amplitudes[i, :current_peak_count] = current_amplitudes
-        positions[i, :current_peak_count] = current_centers
-        widths[i, :current_peak_count] = current_widths
-        peak_counts[i] = current_peak_count
+    # Mask out "non-existing" peaks by zeroing out amplitudes
+    peak_indices = np.arange(max_peaks)  # shape (max_peaks,)
+    mask = peak_indices < num_peaks[:, None]  # shape (n_samples, max_peaks)
+    amplitudes *= mask
 
-        # Generate labels based on probability_range
-        for pos, width in zip(current_centers, current_widths):
-            if not np.isnan(pos):
-                adjusted_width = width * np.random.uniform(probability_range[0], probability_range[1])
-                start = max(0, int((pos - adjusted_width / 2) * sequence_length))
-                end = min(sequence_length, int((pos + adjusted_width / 2) * sequence_length))
-                labels[i, start:end, 0] = 1
+    # Create x-values from 0 to 1
+    x_values = np.linspace(0, 1, sequence_length)
 
-    # Sort peaks by positions
-    match sort_peak:
-        case 'position':
-            sorted_indices = np.argsort(positions, axis=1)
-        case 'amplitude':
-            sorted_indices = np.argsort(amplitudes, axis=1)
-        case 'width':
-            sorted_indices = np.argsort(widths, axis=1)
+    # Build signals by summing Gaussian contributions
+    x_ = x_values.reshape(1, 1, -1)   # shape: (1, 1, sequence_length)
+    pos_ = positions[..., np.newaxis] # shape: (n_samples, max_peaks, 1)
+    wid_ = widths[...,   np.newaxis]  # shape: (n_samples, max_peaks, 1)
+    amp_ = amplitudes[..., np.newaxis] # shape: (n_samples, max_peaks, 1)
 
-    amplitudes = np.take_along_axis(amplitudes, sorted_indices, axis=1)
-    widths = np.take_along_axis(widths, sorted_indices, axis=1)
-    positions = np.take_along_axis(positions, sorted_indices, axis=1)
+    gaussians = amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_)**2)
+    signals = np.sum(gaussians, axis=1)  # shape: (n_samples, sequence_length)
 
+    # Add optional noise
+    if noise_std > 0:
+        signals += np.random.normal(0, noise_std, signals.shape)
+
+    # Convert num_peaks to a categorical representation if needed (not fully implemented)
     if categorical_peak_count:
-        peak_counts = to_categorical(peak_counts, max_peaks + 1)
+        peak_counts = to_categorical(peak_counts, n_peaks[1] + 1)
 
-    return signals, amplitudes, peak_counts, positions, widths, x_values, labels
+    return signals, amplitudes, positions, widths, x_values, num_peaks

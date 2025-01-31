@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from tf_explain.core.grad_cam import GradCAM
 from tensorflow.keras.models import Model  # type: ignore
 from MPSPlots.styles import mps
+# from DeepPeak.utils.ROI import get_peak_rois_for_sample
+
 
 def plot_conv1D(model, input_signal, layer_name):
     """
@@ -161,7 +163,7 @@ def plot_gradcam_with_signal(
     plt.tight_layout()
     plt.show()
 
-def plot_training_history(history, filtering: list = None, y_scale: str = 'log'):
+def plot_training_history(*histories, filtering: list = None, y_scale: str = 'log'):
     """
     Plot training and validation performance metrics (loss and accuracy).
 
@@ -176,34 +178,35 @@ def plot_training_history(history, filtering: list = None, y_scale: str = 'log')
     def wildcard_to_regex(pattern):
         return "^" + re.escape(pattern).replace("\\*", ".*") + "$"
 
-    # Filter the history dictionary based on converted patterns
-    if filtering is not None:
-        regex_patterns = [wildcard_to_regex(pattern) for pattern in filtering]
-        history_dict = {
-            k: v for k, v in history.history.items()
-            if any(re.fullmatch(regex, k) for regex in regex_patterns)
-        }
-    else:
-        history_dict = history.history
-
-    if not history_dict:
-        print("No matching keys found for the provided filtering patterns.")
-        return
-
     with plt.style.context(mps):
         figure, axes = plt.subplots(
-            nrows=len(history_dict),
+            nrows=len(histories),
             ncols=1,
             sharex=True,
             squeeze=False,
-            figsize=(8, 3 * len(history_dict))
+            figsize=(8, 3 * len(histories))
         )
 
-    for ax, (key, value) in zip(axes.flatten(), history_dict.items()):
-        ax.plot(value, label=key.replace('_', ' '))
-        ax.legend(loc='upper left')
-        ax.set_ylabel(key.replace('_', ' '))
-        ax.set_yscale(y_scale)
+    for history in histories:
+        # Filter the history dictionary based on converted patterns
+        if filtering is not None:
+            regex_patterns = [wildcard_to_regex(pattern) for pattern in filtering]
+            history_dict = {
+                k: v for k, v in history.history.items()
+                if any(re.fullmatch(regex, k) for regex in regex_patterns)
+            }
+        else:
+            history_dict = history.history
+
+        if not history_dict:
+            print("No matching keys found for the provided filtering patterns.")
+            return
+
+        for ax, (key, value) in zip(axes.flatten(), history_dict.items()):
+            ax.plot(value, label=history.params['epochs'])
+            ax.legend(loc='upper left')
+            ax.set_ylabel(key.replace('_', ' '))
+            ax.set_yscale(y_scale)
 
     axes.flatten()[-1].set_xlabel('Number of Epochs')
     figure.suptitle('Training History')
@@ -213,246 +216,341 @@ def plot_training_history(history, filtering: list = None, y_scale: str = 'log')
 
 
 
-def plot_peak_components(ax, x_values, positions, amplitudes, widths, model_type: str = 'gaussian'):
+import numpy as np
+import matplotlib.pyplot as plt
+
+class SignalPlotter:
     """
-    Plot individual peak components (Gaussian, square, or delta) on the provided axis.
+    A class for plotting multiple 1D signals, including optional
+    peak positions, amplitudes, ROI masks, and custom function-based curves.
 
-    Parameters
-    ----------
-    ax : matplotlib.axes.Axes
-        The axis to plot on.
-    x_values : np.ndarray
-        The x-values for plotting the curves.
-    positions : np.ndarray
-        The positions of the peaks.
-    amplitudes : np.ndarray
-        The amplitudes of the peaks.
-    widths : np.ndarray
-        The widths of the peaks.
-    model_type : {'gaussian', 'square', 'delta'}, optional
-        The shape of the peak to plot.
-        - 'gaussian' uses a standard Gaussian curve.
-        - 'square' uses a top-hat (square) shape.
-        - 'delta' plots vertical impulses (discrete spikes).
-    """
-    # Ensure model_type is valid
-    allowed_types = {'gaussian', 'square', 'delta'}
-    if model_type not in allowed_types:
-        raise ValueError(f"model_type must be one of {allowed_types}. Got '{model_type}'.")
+    Key Features:
+    -------------
+    - add_signals(...): Store main signals (2D).
+    - add_positions(...)/add_amplitudes(...): For peak scatter.
+    - add_roi(...): For binary ROI shading.
+    - add_custom_curves(...): Plot multiple curves per sample using a callable
+      that takes kwargs, each of which is a 2D array of shape (n_samples, n_curves).
+    - plot(...): Creates subplots, handles sample selection (manual, random),
+      and overlays everything.
 
-    for pos, amp, width in zip(positions, amplitudes, widths):
-        # Skip placeholder peaks (e.g., pos == 0 if that indicates "no peak")
-        # Adjust this condition if your data uses a different placeholder scheme.
-        if pos == 0 and amp == 0:
-            continue
+    Example for custom curves:
+    --------------------------
+        def gaussian_curve(x, pos, width, amp):
+            return amp * np.exp(-0.5 * ((x - pos)/width)**2)
 
-        if model_type == 'gaussian':
-            # Standard Gaussian
-            curve = amp * np.exp(-((x_values - pos) ** 2) / (2 * width ** 2))
-            ax.plot(x_values, curve, linestyle='--', color='green', linewidth=1, label='True Gaussian')
+        # Suppose:
+        #   positions.shape = widths.shape = amps.shape = (n_samples, n_curves)
+        # Then for each sample i, each j in range(n_curves),
+        # we call gaussian_curve(x, pos=positions[i,j], width=..., amp=...).
 
-        elif model_type == 'square':
-            # Simple top-hat function: 1 within +/- width/2 of pos, 0 outside
-            # amplitude = amp
-            # region_width = width
-            # shape: curve[i] = amp if pos - width/2 <= x_values[i] <= pos + width/2, else 0
-            curve = np.zeros_like(x_values)
-            left_edge  = pos - width / 2 * len(x_values)
-            right_edge = pos + width / 2 * len(x_values)
-
-            # Fill the region with amplitude
-            curve[(x_values >= left_edge) & (x_values <= right_edge)] = amp
-            ax.plot(x_values, curve, linestyle='--', color='green', linewidth=1, label='True Square')
-
-        elif model_type == 'delta':
-            # Delta (discrete spike). Two common ways to visualize:
-            #  1) A vertical line
-            #  2) A single point marker
-            # We'll draw a vertical line as an impulse, or scatter a point.
-            ax.axvline(pos, ymin=0, ymax=1, color='green', linestyle='--', linewidth=1, label='True Delta')
-            # Optionally, also mark amplitude as a point:
-            ax.scatter([pos], [amp], color='green', marker='o')
-
-def visualize_validation_cases(
-    model,
-    validation_data,
-    model_type: str,
-    sequence_length: int,
-    num_examples: int = 5,
-    n_columns: int = 1,
-    unit_size: tuple = (3.5, 2.5),
-    normalize_x: bool = True):
-    """
-    Visualize validation cases by comparing true and predicted values.
-
-    Parameters
-    ----------
-    model : tensorflow.keras.Model
-        The trained Keras model.
-    validation_data : dict
-        Dictionary containing validation data and labels:
-        {
-            'signals': np.ndarray of shape (N, sequence_length, 1),
-            'peak_counts': np.ndarray,
-            'positions': np.ndarray,
-            'widths': np.ndarray,
-            'amplitudes': np.ndarray
-        }
-    model_type : {'gaussian', 'square', 'delta'}
-        The shape of the peaks to visualize. Determines how the 'true' peaks
-        are plotted.
-    sequence_length : int
-        Length of each input signal.
-    num_examples : int, optional
-        Number of validation cases to visualize. Default is 5.
-    n_columns : int, optional
-        Number of subplot columns. Default is 1.
-    unit_size : tuple, optional
-        Figure size scaling. (width, height) in inches per subplot.
-    normalize_x : bool, optional
-        Whether to use normalized x-axis [0..1] or integer indices [0..sequence_length-1].
+        plotter.add_custom_curves(
+            curve_function=gaussian_curve,
+            label="Gaussians",
+            color="magenta",
+            style="--",
+            positions=positions_array,
+            widths=widths_array,
+            amp=amplitudes_array_for_curve
+        )
     """
 
-    n_rows = int(np.ceil(num_examples / n_columns))
-    fig, axes = plt.subplots(n_rows, n_columns,
-                             sharex=True, sharey=True,
-                             figsize=(unit_size[0] * n_columns, unit_size[1] * n_rows))
-    axes = np.atleast_1d(axes).ravel()
+    def __init__(self):
+        # Internal storage
+        self.signals = None            # shape (n_samples, seq_length)
+        self.x_values = None           # shape (seq_length,) or None => infer
+        self.positions = None          # shape (n_samples, n_peaks)
+        self.amplitudes = None         # shape (n_samples, n_peaks)
+        self.roi = None                # shape (n_samples, seq_length), binary (optional)
 
-    # Randomly pick validation indices
-    indices = np.random.choice(len(validation_data['signals']), num_examples, replace=False)
+        # Plot toggles
+        self.show_peaks = True
+        self.show_amplitudes = True
+        self.show_roi = True
 
-    # Create x-values for plotting
-    if normalize_x:
-        x_values = np.linspace(0, 1, sequence_length)
-    else:
-        x_values = np.arange(sequence_length)
+        # Optional figure title
+        self.title = None
 
-    for ax, idx in zip(axes, indices):
-        input_signal    = validation_data['signals'][idx, :, 0]
-        true_positions  = validation_data['positions'][idx]
-        true_amplitudes = validation_data['amplitudes'][idx]
-        true_widths     = validation_data['widths'][idx]
-        peak_count      = np.argmax(validation_data['peak_counts'][idx])
+        # Custom curves: a list of dicts, each describing how to plot them
+        #   {
+        #       "curve_func": <callable>,
+        #       "label": str,
+        #       "color": str,
+        #       "style": str,
+        #       "kwargs_arrays": {
+        #           "param1": <array shape (n_samples, n_curves)>,
+        #           "param2": <...>,
+        #           ...
+        #       }
+        #   }
+        self._custom_curves = []
 
-        # Plot the input signal
-        ax.plot(x_values, input_signal, label='Input Signal', color='blue')
+    ###########################################################################
+    # "Add" methods (fluent interface)
+    ###########################################################################
 
-        # Plot the true components using the specified model_type
-        plot_peak_components(ax, x_values, true_positions, true_amplitudes, true_widths, model_type=model_type)
+    def add_signals(self, signals: np.ndarray, x_values: np.ndarray = None):
+        """
+        Store the 1D signals (shape (n_samples, sequence_length)) and optionally
+        the x_values array (shape (sequence_length,)).
 
-        # Obtain predictions from the model
-        reshaped_signal = input_signal.reshape(1, sequence_length, 1)
-        predictions = model.predict(reshaped_signal, verbose=0)
+        If x_values is None, it defaults to linspace(0,1,...).
+        """
+        signals = np.asarray(signals)
+        if signals.ndim != 2:
+            raise ValueError("signals must be 2D of shape (n_samples, sequence_length).")
+        self.signals = signals
 
-        attributes_set = set(model.output_names)
-        if attributes_set == {'positions',}:
-            # If model outputs only positions
-            pred_positions = np.asarray(predictions)[0]
-            for position in pred_positions:
-                ax.axvline(position, linestyle='dotted', color='red', linewidth=1, label='Predicted Position')
+        if x_values is not None:
+            x_values = np.asarray(x_values)
+            if x_values.shape[0] != signals.shape[1]:
+                raise ValueError("x_values length must match signals.shape[1].")
+            self.x_values = x_values
+        else:
+            seq_length = signals.shape[1]
+            self.x_values = np.linspace(0, 1, seq_length)
 
-        elif attributes_set == {'positions', 'amplitudes'}:
-            # If model outputs positions & amplitudes
-            pred_positions, pred_amplitudes = np.asarray(predictions)
-            # They often come out as arrays: shape (1, num_peaks) each
-            pred_positions  = pred_positions[0]
-            pred_amplitudes = pred_amplitudes[0]
-            for position, amplitude in zip(pred_positions, pred_amplitudes):
-                ax.scatter(position, amplitude, color='red', label='Predicted Peak')
+        return self
 
-        # Additional multi-output scenarios can be handled similarly.
+    def add_positions(self, positions: np.ndarray):
+        """
+        Store the peak positions array (n_samples, n_peaks).
+        Used for scattering points if show_peaks=True.
+        """
+        self.positions = np.asarray(positions)
+        return self
 
-        ax.set_title(f"Validation Case {idx}\nPeak Count: {peak_count}")
-        ax.set_xlabel("Signal Index")
-        ax.set_ylabel("Amplitude")
-        ax.legend()
+    def add_amplitudes(self, amplitudes: np.ndarray):
+        """
+        Store the peak amplitudes array (n_samples, n_peaks).
+        Used for scattering (pos, amp) if show_peaks=True.
+        """
+        self.amplitudes = np.asarray(amplitudes)
+        return self
 
-    # Remove duplicate legend entries in each subplot
-    for ax in axes:
-        handles, labels = ax.get_legend_handles_labels()
-        by_label = dict(zip(labels, handles))
-        ax.legend(by_label.values(), by_label.keys())
+    def add_roi(self, roi_array: np.ndarray, show_roi: bool = True):
+        """
+        Store a binary (0/1) ROI array of shape (n_samples, sequence_length).
+        The ROI is shaded if show_roi=True.
+        """
+        roi_array = np.asarray(roi_array)
+        if roi_array.ndim != 2:
+            raise ValueError("ROI array must be 2D of shape (n_samples, sequence_length).")
+        if self.signals is not None and roi_array.shape != self.signals.shape:
+            raise ValueError(
+                "ROI array shape must match signals shape: "
+                f"{roi_array.shape} vs {self.signals.shape}."
+            )
+        self.roi = roi_array
+        self.show_roi = show_roi
+        return self
 
-    plt.tight_layout()
-    plt.show()
+    def configure_display(self, show_peaks: bool = True, show_amplitudes: bool = True, show_roi: bool = True):
+        """
+        Quick method to enable/disable certain display features.
+        """
+        self.show_peaks = show_peaks
+        self.show_amplitudes = show_amplitudes
+        self.show_roi = show_roi
+        return self
 
-def plot_dataset(
-    signals: np.ndarray,
-    amplitudes: np.ndarray = None,
-    positions: np.ndarray = None,
-    widths: np.ndarray = None,
-    x_values: np.ndarray = None,
-    num_samples: int = 5,
-    title: str = "Dataset Visualization"):
-    """
-    Plots a subset of sequences from the generated dataset.
+    def set_title(self, title: str):
+        """
+        Set a title for the final plot(s).
+        """
+        self.title = title
+        return self
 
-    Parameters
-    ----------
-    signals : np.ndarray
-        Array of shape (sample_count, sequence_length, 1) containing sequences with peaks.
-    amplitudes : np.ndarray, optional
-        Array of shape (sample_count, max_peaks) containing amplitudes of each peak.
-    positions : np.ndarray, optional
-        Array of shape (sample_count, max_peaks) containing positions of peaks.
-    widths : np.ndarray, optional
-        Array of shape (sample_count, max_peaks) containing widths of peaks.
-    x_values : np.ndarray, optional
-        The x-axis values, either normalized (0 to 1) or integer indices.
-    num_samples : int, optional
-        Number of samples to plot. Default is 5.
-    title : str, optional
-        Title of the plot. Default is "Dataset Visualization".
+    def add_custom_curves(
+        self,
+        curve_function: callable,
+        label: str = "CustomCurves",
+        color: str = "green",
+        style: str = "--",
+        **kwargs_arrays
+    ):
+        """
+        Adds a function-based set of curves to be plotted for each sample, possibly multiple curves per sample.
 
-    """
-    if len(signals.shape) != 3 or signals.shape[2] != 1:
-        raise ValueError("Signals must be a 3D array with shape (sample_count, sequence_length, 1).")
+        Parameters
+        ----------
+        curve_function : callable
+            A function with signature: curve_function(x_values, **param_dict) -> 1D array.
+        label : str
+            Plot label for the legend.
+        color : str
+            Plot color for the curves.
+        style : str
+            Linestyle, e.g. '--' or '-.' or ':'.
+        **kwargs_arrays : dict of np.ndarray
+            Each array must have shape (n_samples, n_curves), so for sample i,
+            we have 'n_curves' sets of parameter values. We'll iterate over each
+            curve index j for that sample.
 
-    sample_count, sequence_length, _ = signals.shape
-    num_samples = min(num_samples, sample_count)
+        Example
+        -------
+        def gaussian_curve(x, pos, width, amp):
+            return amp * np.exp(-0.5 * ((x - pos)/width)**2)
 
-    # Use default x_values if not provided
-    if x_values is None:
-        x_values = np.linspace(0, 1, sequence_length)
+        # positions.shape = widths.shape = amps.shape = (n_samples, n_curves)
+        # usage:
+        # plotter.add_custom_curves(
+        #     gaussian_curve, label="Gaussians", color="magenta", style="--",
+        #     pos=positions, width=widths, amp=amps
+        # )
+        """
+        # Basic shape checks
+        # All arrays in kwargs_arrays should have the same shape => (n_samples, n_curves).
+        shapes = [arr.shape for arr in kwargs_arrays.values()]
+        if len(set(shapes)) > 1:
+            raise ValueError(
+                f"All keyword arrays must have the same shape. Got shapes: {shapes}"
+            )
 
-    fig, axes = plt.subplots(num_samples, 1, figsize=(10, num_samples * 2), sharex=True)
-    if num_samples == 1:
-        axes = [axes]
+        # Optionally, check that shape[0] == n_samples (if signals is known)
+        if self.signals is not None:
+            n_samples = self.signals.shape[0]
+            for name, arr in kwargs_arrays.items():
+                if arr.shape[0] != n_samples:
+                    raise ValueError(
+                        f"{name}.shape[0] = {arr.shape[0]} != n_samples={n_samples}"
+                    )
 
-    for i, ax in enumerate(axes):
-        signal = signals[i, :, 0]
-        ax.plot(x_values, signal, label="Signal", linewidth=1.5)
+        self._custom_curves.append({
+            "curve_func": curve_function,
+            "label": label,
+            "color": color,
+            "style": style,
+            "kwargs_arrays": kwargs_arrays
+        })
+        return self
 
-        if positions is not None and amplitudes is not None:
-            for pos, amp in zip(positions[i], amplitudes[i]):
-                if not np.isnan(pos):
+    ###########################################################################
+    # The main plot method
+    ###########################################################################
+
+    def plot(
+        self,
+        sample_indices: list = None,
+        n_examples: int = 4,
+        n_columns: int = 2,
+        random_select: bool = False
+    ):
+        """
+        Display multiple signals in a grid of subplots. Optionally,
+        show peaks (positions, amplitudes) and ROI or custom curves.
+
+        Parameters
+        ----------
+        sample_indices : list of int, optional
+            Which signal indices to plot. If None, we auto-select.
+        n_examples : int, optional
+            How many total signals to plot (if sample_indices is None).
+        n_columns : int, optional
+            How many columns in the subplot grid.
+        random_select : bool, optional
+            If True, and sample_indices is None, randomly select signals to plot.
+        """
+        if self.signals is None:
+            raise ValueError("No signals to plot. Please call add_signals(...) first.")
+
+        n_samples, sequence_length = self.signals.shape
+        x_vals = self.x_values
+
+        # 1) Decide which samples to plot
+        if sample_indices is None:
+            if random_select:
+                sample_indices = np.random.choice(n_samples, size=min(n_examples, n_samples), replace=False)
+            else:
+                sample_indices = np.arange(min(n_examples, n_samples))
+        else:
+            sample_indices = sample_indices[:n_examples]
+
+        # 2) Create subplots
+        n_actual = len(sample_indices)
+        n_rows = int(np.ceil(n_actual / n_columns))
+        fig, axes = plt.subplots(n_rows, n_columns, figsize=(5*n_columns, 4*n_rows), squeeze=False)
+
+        # 3) Iterate over chosen samples
+        for i, idx in enumerate(sample_indices):
+            row = i // n_columns
+            col = i % n_columns
+            ax = axes[row, col]
+
+            # Plot the main signal
+            ax.plot(x_vals, self.signals[idx], label=f"Signal #{idx}", color='blue')
+
+            # If we have a binary ROI array, shade it where ROI=1
+            if (self.roi is not None) and self.show_roi:
+                roi_mask = self.roi[idx]
+                ax.fill_between(
+                    x_vals,
+                    0,
+                    1,
+                    where=(roi_mask > 0),
+                    color='green',
+                    alpha=0.2,
+                    transform=ax.get_xaxis_transform(),
+                    label="ROI"
+                )
+
+            # Optionally plot peaks
+            if self.show_peaks and (self.positions is not None) and (self.amplitudes is not None):
+                for (px, py) in zip(self.positions[idx], self.amplitudes[idx]):
+                    if py <= 0:
+                        continue  # skip "inactive" peaks
+                    ax.scatter(px, py, color='red', s=40, alpha=0.8, marker='o')
+                    if self.show_amplitudes:
+                        ax.text(px, py, f"{py:.2f}", fontsize=8, ha='left', va='bottom', color='red')
+
+            # Plot custom curves
+            for curve_info in self._custom_curves:
+                curve_func = curve_info["curve_func"]
+                label = curve_info["label"]
+                color = curve_info["color"]
+                style = curve_info["style"]
+                kwargs_arrays = curve_info["kwargs_arrays"]
+
+                # All arrays in kwargs_arrays have shape (n_samples, n_curves).
+                # We'll plot n_curves curves for this sample i.
+                # For each j, gather param_j = {k: v[i, j] for (k,v) in kwargs_arrays.items()}
+                shapes = [
+                    arr.shape for arr in kwargs_arrays.values()
+                ]
+                # e.g. (n_samples, n_curves) => shape[1] is n_curves
+                n_curves_sample = shapes[0][1]  # second dimension
+
+                for j in range(n_curves_sample):
+                    # Build dict of param => scalar value for sample i, curve j
+                    param_dict = {
+                        k: v[idx, j] for k, v in kwargs_arrays.items()
+                    }
+                    y_curve = curve_func(x_vals, **param_dict)
+                    # Label only the first curve
+                    curve_label = label if j == 0 else None
                     ax.plot(
-                        [x_values[int(pos)]] * 2,
-                        [0, amp],
-                        label=f"Peak at {pos:.1f}",
-                        linestyle="--",
-                        alpha=0.7
+                        x_vals,
+                        y_curve,
+                        style,
+                        color=color,
+                        label=curve_label
                     )
 
-        if widths is not None and positions is not None:
-            for pos, width in zip(positions[i], widths[i]):
-                if not np.isnan(pos):
-                    start = max(0, int(pos - width // 2))
-                    end = min(sequence_length, int(pos + width // 2))
-                    ax.axvspan(
-                        x_values[start],
-                        x_values[end - 1],
-                        color="red",
-                        alpha=0.2,
-                        label="Peak Width" if i == 0 else None
-                    )
+            ax.set_xlabel("x-values")
+            ax.set_ylabel("Signal amplitude")
+            ax.set_title(f"Signal #{idx}")
+            ax.legend()
 
-        ax.set_ylabel(f"Sample {i + 1}")
-        ax.legend(loc="upper right")
-        ax.grid(True, linestyle="--", alpha=0.6)
+        # Hide any unused subplots
+        total_axes = n_rows * n_columns
+        if n_actual < total_axes:
+            for j in range(n_actual, total_axes):
+                row_j = j // n_columns
+                col_j = j % n_columns
+                axes[row_j, col_j].axis("off")
 
-    axes[-1].set_xlabel("X-axis")
-    fig.suptitle(title, fontsize=16)
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.show()
+        if self.title:
+            fig.suptitle(self.title, fontsize=14)
+        plt.tight_layout()
+        plt.show()
+        return self

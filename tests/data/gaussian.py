@@ -2,56 +2,86 @@ import pytest
 import numpy as np
 from DeepPeak.signals import generate_gaussian_dataset
 
-def test_get_gaussian_peaks():
-    # Test parameters
-    num_samples = 10
-    input_length = 128
-    num_gaussian = (4, 4)
-    amplitude_range = (1, 5)
-    center_range = (32, 96)
-    width_range = (5, 20)
-    noise_amplitude = 0.1
 
-    # Call the function
-    X_train, amplitudes, num_peaks, peak_positions, peak_widths, _, labels = generate_gaussian_dataset(
-        sample_count=num_samples,
-        sequence_length=input_length,
-        peak_count=num_gaussian,
-        amplitude_range=amplitude_range,
-        center_range=center_range,
-        width_range=width_range,
-        noise_std=noise_amplitude,
-        categorical_peak_count=False,
-        normalize=True
+@pytest.mark.parametrize("n_peaks", [(0, 3), (1, 5)])
+def test_basic_shapes(n_peaks):
+    n_samples = 10
+    sequence_length = 50
+    signals, amps, pos, widths, x_vals, num_peaks = generate_gaussian_dataset(
+        n_samples=n_samples,
+        sequence_length=sequence_length,
+        n_peaks=n_peaks,
+        seed=42,
+        noise_std=0.0  # No noise for easier checking
     )
 
-    # Check shapes of outputs
-    assert X_train.shape == (num_samples, input_length, 1), "X_train shape mismatch"
-    assert amplitudes.shape == (num_samples, max(num_gaussian)), "Amplitudes shape mismatch"
-    assert num_peaks.shape == (num_samples,), "Num peaks shape mismatch"
-    assert peak_positions.shape == (num_samples, max(num_gaussian)), "Peak positions shape mismatch"
-    assert peak_widths.shape == (num_samples, max(num_gaussian)), "Peak widths shape mismatch"
+    min_peaks, max_peaks = n_peaks
 
-    # Check that peak counts are within the specified range
-    assert np.all(num_peaks >= num_gaussian[0]) and np.all(num_peaks <= num_gaussian[1]), "Num peaks out of range"
+    # Shape checks
+    assert signals.shape == (n_samples, sequence_length)
+    assert amps.shape == (n_samples, max_peaks)
+    assert pos.shape == (n_samples, max_peaks)
+    assert widths.shape == (n_samples, max_peaks)
+    assert x_vals.shape == (sequence_length,)
+    assert num_peaks.shape == (n_samples,)
 
-    # Check that peak positions are within the specified range
-    assert np.all(peak_positions >= center_range[0]) and np.all(peak_positions <= center_range[1]), "Peak positions out of range"
+    # Values are in expected range
+    assert np.all((num_peaks >= min_peaks) & (num_peaks <= max_peaks))
 
-    # Check that amplitudes are within the specified range
-    assert np.all(amplitudes >= amplitude_range[0]) and np.all(amplitudes <= amplitude_range[1]), "Amplitudes out of range"
+@pytest.mark.parametrize("n_peaks, amplitude, position, width", [
+    ((0, 3), (1.0, 2.0), (10.0, 20.0), (0.01, 0.05)),
+    ((1, 1), (5.0, 5.0), (0.0, 50.0), (0.03, 0.03))
+])
+def test_parameter_ranges(n_peaks, amplitude, position, width):
+    """Check if generated amplitudes, positions, and widths fall within expected ranges."""
+    n_samples = 5
+    sequence_length = 10
+    signals, amps, pos, wid, x_vals, num_pk = generate_gaussian_dataset(
+        n_samples=n_samples,
+        sequence_length=sequence_length,
+        n_peaks=n_peaks,
+        amplitude=amplitude,
+        position=position,
+        width=width,
+        noise_std=0.0,
+        seed=123
+    )
 
-    # Check that widths are within the specified range
-    assert np.all(peak_widths >= width_range[0]) and np.all(peak_widths <= width_range[1]), "Widths out of range"
+    min_peaks, max_peaks = n_peaks
+    min_amp, max_amp = amplitude
+    min_pos, max_pos = position
+    min_wid, max_wid = width
 
-    # Verify normalization (mean close to 0 and std close to 1)
-    assert np.allclose(np.mean(X_train, axis=1), 0, atol=1e-1), "Normalization mean mismatch"
-    assert np.allclose(np.std(X_train, axis=1), 1, atol=1e-1), "Normalization std mismatch"
+    # Check amplitude range (non-zero only for valid peaks)
+    valid_mask = np.arange(max_peaks) < num_pk[:, None]
+    valid_amps = amps[valid_mask]
+    assert np.all(valid_amps >= min_amp)
+    assert np.all(valid_amps <= max_amp)
 
-    # Verify peaks are sorted by positions
-    for i in range(num_samples):
-        sorted_positions = np.sort(peak_positions[i, :num_peaks[i]])
-        assert np.allclose(peak_positions[i, :num_peaks[i]], sorted_positions), "Peak positions not sorted"
+    # Check position and width range
+    valid_pos = pos[valid_mask]
+    valid_wid = wid[valid_mask]
+    assert np.all(valid_pos >= min_pos)
+    assert np.all(valid_pos <= max_pos)
+    assert np.all(valid_wid >= min_wid)
+    assert np.all(valid_wid <= max_wid)
+
+def test_zero_peaks():
+    """Verify that signals with zero peaks are actually zero."""
+    n_samples = 3
+    sequence_length = 10
+    # n_peaks range starts with 0
+    signals, amps, pos, wid, x_vals, num_pk = generate_gaussian_dataset(
+        n_samples=n_samples,
+        sequence_length=sequence_length,
+        n_peaks=(0, 0),
+        noise_std=0.0,
+        seed=42
+    )
+    # All signals should be zero
+    assert np.allclose(signals, 0.0)
+    # Check no peaks
+    assert np.all(num_pk == 0)
 
 if __name__ == "__main__":
     pytest.main(["-W error", __file__])

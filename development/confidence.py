@@ -27,7 +27,7 @@ def plot_predictions(signals, labels, predictions, sample_count=5):
 
         signal = signals[i].squeeze()
         label = labels[i].squeeze()
-        prediction = predictions[i].squeeze()
+        prediction = predictions['ROI'][i].squeeze()
 
         # Plot the signal
         ax.plot(signal, label='Signal', color='blue')
@@ -70,8 +70,8 @@ def plot_predictions(signals, labels, predictions, sample_count=5):
     plt.show()
 
 
-def build_peak_detection_model(input_shape):
-    inputs = tf.keras.Input(shape=input_shape)
+def build_peak_detection_model(sequence_length):
+    inputs = tf.keras.Input(shape=(sequence_length, 1))
 
     # Encoder
     x = layers.Conv1D(32, kernel_size=3, activation='relu', padding='same')(inputs)
@@ -89,9 +89,12 @@ def build_peak_detection_model(input_shape):
     x = layers.Conv1D(32, kernel_size=3, activation='relu', padding='same')(x)
 
     # Output Layer
-    outputs = layers.Conv1D(1, kernel_size=1, activation='sigmoid')(x)
+    ROI = layers.Conv1D(1, kernel_size=1, activation='sigmoid', name='ROI')(x)
 
-    model = models.Model(inputs, outputs)
+    model = models.Model(inputs, outputs={'ROI': ROI})
+
+    model.compile(optimizer='adam', loss={'ROI': 'binary_crossentropy'}, metrics=['accuracy'])
+
     return model
 
 
@@ -103,12 +106,12 @@ peak_count = (1, 4)
 amplitude_range = (1, 150)
 center_range = (0.1, 0.9)
 width_range = 0.04
-noise_std = 0.1
+noise_std = 0.3
 normalize = False
 normalize_x = True
 
 # Generate the dataset
-signals, amplitudes, peak_counts, positions, widths, x_values, labels = generate_gaussian_dataset(
+signals, amplitudes, peak_counts, positions, widths, x_values, ROI = generate_gaussian_dataset(
     sample_count=sample_count,
     sequence_length=sequence_length,
     peak_count=peak_count,
@@ -131,23 +134,50 @@ dataset = dataset_split(
     positions=positions,
     amplitudes=amplitudes,
     peak_counts=peak_counts,
-    labels=labels,
+    ROI=ROI,
     widths=widths,
     test_size=0.2,
     random_state=None,
 )
 
 # Build the model
-model = build_peak_detection_model((sequence_length, 1))
-model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+model = build_peak_detection_model(sequence_length=sequence_length)
 
 # Train the model
 history = model.fit(
-    dataset['train']['signals'], dataset['train']['labels'],
-    validation_data=(dataset['test']['signals'], dataset['test']['labels']),
+    dataset['train']['signals'], dataset['train']['ROI'],
+    validation_data=(dataset['test']['signals'], dataset['test']['ROI']),
     epochs=30,
     batch_size=32
 )
 predictions = model.predict(dataset['test']['signals'])
 
-plot_predictions(dataset['test']['signals'], dataset['test']['labels'], predictions, sample_count=10)
+from DeepPeak.utils.visualization import visualize_validation_cases, PredictionVisualizer
+
+# plot_training_history(history, filtering=['*loss*'])
+
+predictions = model.predict(dataset['test']['signals'], verbose=0)
+
+visualizer = PredictionVisualizer(
+    sequence_length=128,
+    signal_type='gaussian',
+    n_columns=3
+)
+
+visualizer.visualize_validation_cases(
+    predictions=predictions,
+    validation_data=dataset['test'],
+)
+
+
+# print(predictions)
+# visualize_validation_cases(
+#     predictions=predictions,
+#     validation_data=dataset['test'],
+#     model_type='gaussian',
+#     sequence_length=128,
+#     num_examples=9,
+#     n_columns=3,
+#     unit_size=(5.5, 2.5),
+#     normalize_x=True
+# )
