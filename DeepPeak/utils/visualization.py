@@ -203,7 +203,7 @@ def plot_training_history(*histories, filtering: list = None, y_scale: str = 'lo
             return
 
         for ax, (key, value) in zip(axes.flatten(), history_dict.items()):
-            ax.plot(value, label=history.params['epochs'])
+            ax.plot(value, label=history.name if hasattr(history, 'name') else '')
             ax.legend(loc='upper left')
             ax.set_ylabel(key.replace('_', ' '))
             ax.set_yscale(y_scale)

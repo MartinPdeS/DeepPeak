@@ -2,9 +2,10 @@ from .position_model import get_position_model
 from .count_model import get_count_model
 from .position_amplitude_model import get_position_amplitude_model
 from .position_amplitude_width_model import get_position_amplitude_width_model
-from .ROI_model import build_ROI_model
+from .ROI_model import build_ROI_model, filter_predictions
 from tensorflow import keras
 import tensorflow as tf
+
 
 @keras.utils.register_keras_serializable()
 def permutation_invariant_loss(y_true, y_pred):

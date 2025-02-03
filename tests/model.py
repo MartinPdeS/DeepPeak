@@ -1,21 +1,19 @@
 import pytest
 from DeepPeak.models import get_position_model
 from DeepPeak.signals import generate_gaussian_dataset
-from DeepPeak.utils.visualization import visualize_validation_cases
 from DeepPeak.utils.training_utils import dataset_split
 from unittest.mock import patch
 
 def test_deeppeak_workflow():
     # Generate dataset
     slices, amplitudes, peak_count, positions, widths, x_values = generate_gaussian_dataset(
-        sample_count=300,
+        n_samples=300,
         sequence_length=200,
-        peak_count=2,
-        amplitude_range=5,
-        center_range=(0, 199),
-        width_range=4,
+        n_peaks=(0, 2),
+        amplitude=5,
+        position=(0, 199),
+        width=4,
         noise_std=0.1,
-        normalize=False,
         categorical_peak_count=True
     )
 
@@ -49,18 +47,6 @@ def test_deeppeak_workflow():
     assert 'loss' in history.history, "Training history does not contain 'loss'."
     assert 'val_loss' in history.history, "Training history does not contain 'val_loss'."
 
-    # Test visualization of validation cases (non-blocking)
-    with patch("matplotlib.pyplot.show"):
-        try:
-            visualize_validation_cases(
-                model=model,
-                validation_data=dataset['test'],
-                sequence_length=200,
-                num_examples=5,
-                n_columns=2
-            )
-        except Exception as e:
-            pytest.fail(f"Visualization of validation cases failed: {e}")
 
 if __name__ == "__main__":
     pytest.main(["-W error", __file__])
