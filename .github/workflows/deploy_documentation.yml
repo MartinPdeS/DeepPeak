@@ -3,11 +3,11 @@ name: Deploy documentation to github page
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     tags:
       - '*'
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
