@@ -70,10 +70,12 @@ def build_ROI_model(sequence_length: int, dropout_rate: float = 0.3) -> models.M
     return model
 
 
-def filter_predictions(model: models.Model,
-                       signals: np.ndarray,
-                       n_samples: int = 30,
-                       threshold: float = 0.9) -> np.ndarray:
+def filter_predictions(
+        model: models.Model,
+        signals: np.ndarray,
+        n_samples: int = 30,
+        threshold: float = 0.9,
+        std_threshold: float = 0.1) -> np.ndarray:
     """
     Estimate a binarized ROI mask using Monte Carlo dropout sampling.
 
@@ -128,11 +130,17 @@ def filter_predictions(model: models.Model,
     mean_prediction[mean_prediction < threshold] = 0
     mean_prediction[mean_prediction >= threshold] = 1
 
+    std_mask = np.zeros_like(uncertainty)
+    std_mask[uncertainty < std_threshold] = 1
+
+    mean_prediction *= std_mask
+
     return mean_prediction.squeeze(), uncertainty.squeeze()
 
-def mc_dropout_prediction(model: models.Model,
-                          signals: np.ndarray,
-                          num_samples: int = 30) -> tuple[np.ndarray, np.ndarray]:
+def mc_dropout_prediction(
+        model: models.Model,
+        signals: np.ndarray,
+        num_samples: int = 30) -> tuple[np.ndarray, np.ndarray]:
     """
     Perform Monte Carlo (MC) dropout to estimate the mean and uncertainty of ROI predictions.
 
