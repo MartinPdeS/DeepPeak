@@ -271,18 +271,6 @@ class SignalPlotter:
         # Optional figure title
         self.title = None
 
-        # Custom curves: a list of dicts, each describing how to plot them
-        #   {
-        #       "curve_func": <callable>,
-        #       "label": str,
-        #       "color": str,
-        #       "style": str,
-        #       "kwargs_arrays": {
-        #           "param1": <array shape (n_samples, n_curves)>,
-        #           "param2": <...>,
-        #           ...
-        #       }
-        #   }
         self._custom_curves = []
 
     ###########################################################################
@@ -469,7 +457,16 @@ class SignalPlotter:
         # 2) Create subplots
         n_actual = len(sample_indices)
         n_rows = int(np.ceil(n_actual / n_columns))
-        fig, axes = plt.subplots(n_rows, n_columns, figsize=(5*n_columns, 4*n_rows), squeeze=False)
+
+        with plt.style.context(mps):
+            self.figure, axes = plt.subplots(
+                nrows=n_rows,
+                ncols=n_columns,
+                figsize=(5*n_columns, 4*n_rows),
+                squeeze=False,
+                sharex=True,
+                sharey=True,
+            )
 
         # 3) Iterate over chosen samples
         for i, idx in enumerate(sample_indices):
@@ -485,11 +482,11 @@ class SignalPlotter:
                 roi_mask = self.roi[idx]
                 ax.fill_between(
                     x_vals,
-                    0,
-                    1,
+                    y1=0,
+                    y2=1,
                     where=(roi_mask > 0),
                     color='green',
-                    alpha=0.2,
+                    alpha=0.6,
                     transform=ax.get_xaxis_transform(),
                     label="ROI"
                 )
@@ -535,12 +532,11 @@ class SignalPlotter:
                         color=color,
                         label=curve_label
                     )
-
-            ax.set_xlabel("x-values")
-            ax.set_ylabel("Signal amplitude")
             ax.set_title(f"Signal #{idx}")
             ax.legend()
 
+        self.figure.supxlabel('X-values')
+        self.figure.supylabel('Signal amplitude')
         # Hide any unused subplots
         total_axes = n_rows * n_columns
         if n_actual < total_axes:
@@ -550,7 +546,7 @@ class SignalPlotter:
                 axes[row_j, col_j].axis("off")
 
         if self.title:
-            fig.suptitle(self.title, fontsize=14)
+            self.figure.suptitle(self.title, fontsize=14)
         plt.tight_layout()
         plt.show()
         return self
