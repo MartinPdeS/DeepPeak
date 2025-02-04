@@ -3,11 +3,11 @@ name: Deploy coverage
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "master" ]
     tags:
       - '*'
   pull_request:
-    branches: [ "main" ]
+    branches: [ "master" ]
 
 
 # Sets permissions of the  GITHUB_TOKEN to allow deployment to GitHub Pages
