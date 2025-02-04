@@ -1,4 +1,4 @@
-from typing import Tuple, Callable, Optional
+from typing import Tuple, Callable, Optional, Dict
 import numpy as np
 from tensorflow.keras.utils import to_categorical  # type: ignore
 
@@ -22,6 +22,7 @@ def generate_signal_dataset(
     sequence_length: int,
     n_peaks: Tuple[int, int],
     signal_type: str = 'gaussian',
+    extra_kwargs: Optional[Dict] = None,
     amplitude: Tuple[float, float] = (1.0, 2.0),
     position: Tuple[float, float] = (0.0, 50.0),
     width: Tuple[float, float] = (0.03, 0.03),
@@ -31,7 +32,7 @@ def generate_signal_dataset(
     kernel: Optional[np.ndarray] = None
 ):
     """
-    Generate 1D signals with different types of peaks: Gaussian, Lorentzian, Bessel, or Dirac pulses.
+    Generate 1D signals with different types of peaks: Gaussian, Lorentzian, Bessel, Square, Asymmetrical Gaussian, or Dirac pulses.
 
     Parameters
     ----------
@@ -42,7 +43,9 @@ def generate_signal_dataset(
     n_peaks : tuple of int
         Min and max number of peaks per signal.
     signal_type : str
-        Type of signal to generate: 'gaussian', 'lorentzian', 'bessel', 'dirac'.
+        Type of signal to generate: 'gaussian', 'lorentzian', 'bessel', 'square', 'asym_gaussian', 'dirac'.
+    extra_kwargs : dict, optional
+        Additional parameters specific to the chosen signal type.
     amplitude : tuple of float, optional
         Range for peak amplitudes.
     position : tuple of float, optional
@@ -72,6 +75,9 @@ def generate_signal_dataset(
     if seed is not None:
         np.random.seed(seed)
 
+    if extra_kwargs is None:
+        extra_kwargs = {}
+
     min_peaks, max_peaks = n_peaks
     num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
     amplitudes = np.random.uniform(*amplitude, size=(n_samples, max_peaks))
@@ -94,6 +100,12 @@ def generate_signal_dataset(
         peaks = amp_ / (1 + ((x_ - pos_) / wid_)**2)
     elif signal_type == 'bessel':
         peaks = amp_ * np.abs(np.sin((x_ - pos_) / wid_)) / ((x_ - pos_) / wid_ + 1e-6)
+    elif signal_type == 'square':
+        peaks = amp_ * ((np.abs(x_ - pos_) < wid_) * 1.0)
+    elif signal_type == 'asym_gaussian':
+        separation = extra_kwargs.get('separation', 0.1)
+        second_peak_ratio = extra_kwargs.get('second_peak_ratio', 0.5)
+        peaks = amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_)**2) + (amp_ * second_peak_ratio * np.exp(-0.5 * ((x_ - (pos_ + separation)) / (wid_ * 0.5))**2))
     elif signal_type == 'dirac':
         signals = np.zeros((n_samples, sequence_length))
         for i in range(n_samples):
@@ -104,7 +116,7 @@ def generate_signal_dataset(
                 signal = np.convolve(signal, kernel, mode='same')
             signals[i] = signal
     else:
-        raise ValueError("Invalid signal type. Choose from 'gaussian', 'lorentzian', 'bessel', 'dirac'.")
+        raise ValueError("Invalid signal type. Choose from 'gaussian', 'lorentzian', 'bessel', 'square', 'asym_gaussian', 'dirac'.")
 
     if signal_type != 'dirac':
         signals = np.sum(peaks, axis=1)
