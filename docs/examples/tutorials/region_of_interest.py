@@ -9,7 +9,7 @@ This example demonstrates how to:
   4. Visualize both the ground-truth and predicted ROIs, overlaid on the signals.
 
 We use:
-  - ``generate_gaussian_dataset`` to create the signals and peak metadata.
+  - ``generate_signals_dataset`` to create the signals and peak metadata.
   - ``compute_rois_from_signals`` to convert peak positions into binary ROI masks.
   - ``build_ROI_model`` (a simple autoencoder-like CNN) to learn the ROI detection.
   - ``SignalPlotter`` to visualize signals, peaks, and ROI masks.
@@ -22,7 +22,7 @@ the predicted ROI aligns with the true peaks.
 # Imports
 # -------
 import numpy as np
-from DeepPeak.signals import generate_gaussian_dataset
+from DeepPeak.signals import generate_signal_dataset
 from DeepPeak.utils.visualization import plot_training_history, SignalPlotter
 from DeepPeak.models import build_ROI_model, filter_predictions
 from DeepPeak.utils.ROI import compute_rois_from_signals
@@ -44,7 +44,7 @@ from DeepPeak.utils.ROI import compute_rois_from_signals
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-signals, amplitudes, positions, widths, x_values, num_peaks = generate_gaussian_dataset(
+signals, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
     n_samples=6000,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
@@ -115,7 +115,7 @@ _ = plot_training_history(history, filtering=['*loss*'])
 #
 # We predict on the entire dataset for demonstration. We then threshold at 0.9
 # to obtain a binary mask.
-signals, amplitudes, positions, _, _, _ = generate_gaussian_dataset(
+signals, amplitudes, positions, _, _, _ = generate_signals_dataset(
     n_samples=100,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
