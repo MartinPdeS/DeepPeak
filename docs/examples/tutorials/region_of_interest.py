@@ -115,7 +115,7 @@ _ = plot_training_history(history, filtering=['*loss*'])
 #
 # We predict on the entire dataset for demonstration. We then threshold at 0.9
 # to obtain a binary mask.
-signals, amplitudes, positions, _, _, _ = generate_signals_dataset(
+signals, amplitudes, positions, _, _, _ = generate_signal_dataset(
     n_samples=100,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
