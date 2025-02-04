@@ -105,3 +105,48 @@ def get_positions_amplitudes(signals, ROIs):
         amplitudes[i, :len(segment_indices)] = signals[i, segment_indices]  # Correct broadcasting here
 
     return positions, amplitudes
+
+def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -> dict:
+    """
+    Compute segmentation metrics between the predicted and ground truth ROI masks.
+
+    Parameters
+    ----------
+    pred_mask : np.ndarray
+        Predicted binary ROI mask. Expected shape is (n_samples, sequence_length) (or any shape,
+        as long as it matches true_mask).
+    true_mask : np.ndarray
+        Ground truth binary ROI mask. Must have the same shape as pred_mask.
+
+    Returns
+    -------
+    metrics : dict
+        Dictionary with the following keys:
+          - "precision": The precision (positive predictive value).
+          - "recall": The recall (sensitivity).
+          - "f1_score": The harmonic mean of precision and recall.
+          - "iou": Intersection-over-Union metric.
+          - "dice": Dice coefficient.
+    """
+    # Flatten the arrays so that each pixel is a sample
+    pred_flat = pred_mask.flatten()
+    true_flat = true_mask.flatten()
+
+    # Compute precision, recall, and F1 score.
+    precision, recall, f1, _ = precision_recall_fscore_support(true_flat, pred_flat, average='binary')
+
+    # Compute Intersection over Union (IoU)
+    intersection = np.logical_and(true_flat, pred_flat).sum()
+    union = np.logical_or(true_flat, pred_flat).sum()
+    iou = intersection / union if union > 0 else 0.0
+
+    # Compute Dice coefficient: (2 * Intersection) / (Total area of both masks)
+    dice = (2 * intersection) / (true_flat.sum() + pred_flat.sum()) if (true_flat.sum() + pred_flat.sum()) > 0 else 0.0
+
+    return {
+        "precision": precision,
+        "recall": recall,
+        "f1_score": f1,
+        "iou": iou,
+        "dice": dice
+    }

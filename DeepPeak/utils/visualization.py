@@ -1,10 +1,12 @@
+from typing import Callable, Optional, Union
+
 import numpy as np
 import re
 import matplotlib.pyplot as plt
 from tf_explain.core.grad_cam import GradCAM
 from tensorflow.keras.models import Model  # type: ignore
 from MPSPlots.styles import mps
-# from DeepPeak.utils.ROI import get_peak_rois_for_sample
+
 
 
 def plot_conv1D(model, input_signal, layer_name):
@@ -215,74 +217,70 @@ def plot_training_history(*histories, filtering: list = None, y_scale: str = 'lo
     plt.show()
 
 
-
-import numpy as np
-import matplotlib.pyplot as plt
-
 class SignalPlotter:
     """
-    A class for plotting multiple 1D signals, including optional
-    peak positions, amplitudes, ROI masks, and custom function-based curves.
+    A class for plotting multiple 1D signals with additional overlays such as
+    scatter markers, vertical lines, horizontal lines, ROI masks, and custom function-based curves.
 
-    Key Features:
+    Key Features
     -------------
-    - add_signals(...): Store main signals (2D).
-    - add_positions(...)/add_amplitudes(...): For peak scatter.
-    - add_roi(...): For binary ROI shading.
-    - add_custom_curves(...): Plot multiple curves per sample using a callable
-      that takes kwargs, each of which is a 2D array of shape (n_samples, n_curves).
-    - plot(...): Creates subplots, handles sample selection (manual, random),
-      and overlays everything.
+    - add_signals(...): Stores the main signals and optionally the x-axis values.
+    - add_scatter(...): Accumulates scatter overlays (e.g., peak markers with optional amplitude annotations).
+    - add_vline(...): Accumulates vertical line overlays.
+    - add_hline(...): Accumulates horizontal line overlays.
+    - add_roi(...): Accumulates ROI masks along with plotting parameters (color, label, alpha).
+    - add_custom_curves(...): Accumulates custom curves (function-based) to overlay on each signal.
+    - plot(...): Creates a grid of subplots, handles sample selection, and overlays all stored elements.
 
-    Example for custom curves:
-    --------------------------
-        def gaussian_curve(x, pos, width, amp):
-            return amp * np.exp(-0.5 * ((x - pos)/width)**2)
-
-        # Suppose:
-        #   positions.shape = widths.shape = amps.shape = (n_samples, n_curves)
-        # Then for each sample i, each j in range(n_curves),
-        # we call gaussian_curve(x, pos=positions[i,j], width=..., amp=...).
-
-        plotter.add_custom_curves(
-            curve_function=gaussian_curve,
-            label="Gaussians",
-            color="magenta",
-            style="--",
-            positions=positions_array,
-            widths=widths_array,
-            amp=amplitudes_array_for_curve
-        )
+    Examples
+    --------
+    >>> plotter = SignalPlotter()
+    >>> plotter.add_signals(signals_array)
+    >>> plotter.add_scatter(scatter_x=positions_array, scatter_y=amplitudes_array, color='red', label='Peak', marker='o', alpha=0.8)
+    >>> plotter.add_vline(x=0.5, color='magenta', label='vline', linestyle='--')
+    >>> plotter.add_hline(y=0.2, color='orange', label='hline', linestyle='-.')
+    >>> plotter.add_roi(roi_array, color='green', label='ROI', alpha=0.6)
+    >>> plotter.add_custom_curves(curve_function=my_curve_func, label="Curve", color="blue", style="--", pos=pos_array, width=width_array, amp=amp_array)
+    >>> plotter.set_title("Demo Plot")
+    >>> plotter.plot(n_examples=6, n_columns=3, random_select=False)
     """
 
     def __init__(self):
-        # Internal storage
-        self.signals = None            # shape (n_samples, seq_length)
-        self.x_values = None           # shape (seq_length,) or None => infer
-        self.positions = None          # shape (n_samples, n_peaks)
-        self.amplitudes = None         # shape (n_samples, n_peaks)
-        self.roi = None                # shape (n_samples, seq_length), binary (optional)
+        # Internal storage for required signals and overlays.
+        self.signals = None            # 2D array of shape (n_samples, sequence_length)
+        self.x_values = None           # 1D array of shape (sequence_length,), inferred if not provided
 
-        # Plot toggles
-        self.show_peaks = True
-        self.show_amplitudes = True
+        # Accumulate overlays in lists
+        self._scatter = []           # List of scatter dictionaries: keys: scatter_x, scatter_y, color, marker, label, alpha.
+        self._vlines = []            # List of vertical line dictionaries: keys: x, color, linestyle, label, linewidth, alpha.
+        self._hlines = []            # List of horizontal line dictionaries: keys: y, color, linestyle, label, linewidth, alpha.
+        self._rois = []              # List of ROI overlay dictionaries: keys: roi_array, color, label, alpha.
+        self._custom_curves = []     # List of custom curve dictionaries: keys: curve_func, label, color, style, kwargs_arrays.
+
+        # Display toggles
+        self.show_scatter = True
+        self.show_vlines = True
+        self.show_hlines = True
         self.show_roi = True
 
         # Optional figure title
         self.title = None
 
-        self._custom_curves = []
-
-    ###########################################################################
-    # "Add" methods (fluent interface)
-    ###########################################################################
-
-    def add_signals(self, signals: np.ndarray, x_values: np.ndarray = None):
+    def add_signals(self, signals: np.ndarray, x_values: Optional[np.ndarray] = None):
         """
-        Store the 1D signals (shape (n_samples, sequence_length)) and optionally
-        the x_values array (shape (sequence_length,)).
+        Store the main 1D signals and optionally the x-axis values.
 
-        If x_values is None, it defaults to linspace(0,1,...).
+        Parameters
+        ----------
+        signals : numpy.ndarray
+            2D array of shape (n_samples, sequence_length) containing the signals.
+        x_values : numpy.ndarray, optional
+            1D array of shape (sequence_length,). If None, defaults to linspace(0,1,sequence_length).
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
         """
         signals = np.asarray(signals)
         if signals.ndim != 2:
@@ -297,113 +295,267 @@ class SignalPlotter:
         else:
             seq_length = signals.shape[1]
             self.x_values = np.linspace(0, 1, seq_length)
-
         return self
 
-    def add_positions(self, positions: np.ndarray):
+    def add_scatter(self,
+                    scatter_x: np.ndarray,
+                    scatter_y: np.ndarray,
+                    color: str = "red",
+                    marker: str = "o",
+                    label: str = "Scatter",
+                    alpha: float = 0.8):
         """
-        Store the peak positions array (n_samples, n_peaks).
-        Used for scattering points if show_peaks=True.
+        Accumulate scatter overlay points (e.g., for peak markers).
+
+        Parameters
+        ----------
+        scatter_x : numpy.ndarray
+            2D array of shape (n_samples, n_points) for x-coordinates.
+        scatter_y : numpy.ndarray
+            2D array of shape (n_samples, n_points) for y-coordinates.
+        color : str, optional
+            Color of the scatter points. Default is "red".
+        marker : str, optional
+            Marker style. Default is "o".
+        label : str, optional
+            Legend label for these points. Default is "Scatter".
+        alpha : float, optional
+            Opacity of the points. Default is 0.8.
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
         """
-        self.positions = np.asarray(positions)
+        scatter_x = np.asarray(scatter_x)
+        scatter_y = np.asarray(scatter_y)
+        if scatter_x.shape != scatter_y.shape:
+            raise ValueError("scatter_x and scatter_y must have the same shape.")
+        self._scatter.append({
+            "scatter_x": scatter_x,
+            "scatter_y": scatter_y,
+            "color": color,
+            "marker": marker,
+            "label": label,
+            "alpha": alpha
+        })
         return self
 
-    def add_amplitudes(self, amplitudes: np.ndarray):
+    def add_vline(self, x: Union[float, np.ndarray],
+                  color: str = "magenta",
+                  linestyle: str = "--",
+                  label: str = "vline",
+                  linewidth: float = 1.0,
+                  alpha: float = 1.0):
         """
-        Store the peak amplitudes array (n_samples, n_peaks).
-        Used for scattering (pos, amp) if show_peaks=True.
+        Accumulate vertical line overlay(s).
+
+        Parameters
+        ----------
+        x : float or numpy.ndarray
+            x-coordinate(s) at which to draw vertical line(s). If an array is provided,
+            it should be 1D and of length equal to the number of points per signal or a single value per sample.
+        color : str, optional
+            Color of the vertical line(s). Default is "magenta".
+        linestyle : str, optional
+            Linestyle for the vertical line(s) (e.g., '--', '-.', ':'). Default is "--".
+        label : str, optional
+            Legend label for the vertical line(s). Default is "vline".
+        linewidth : float, optional
+            Width of the line(s). Default is 1.0.
+        alpha : float, optional
+            Opacity of the line(s). Default is 1.0.
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
         """
-        self.amplitudes = np.asarray(amplitudes)
+        # Convert x to numpy array if scalar.
+        if np.isscalar(x):
+            x = np.array([x])
+        else:
+            x = np.asarray(x)
+        self._vlines.append({
+            "x": x,
+            "color": color,
+            "linestyle": linestyle,
+            "label": label,
+            "linewidth": linewidth,
+            "alpha": alpha
+        })
         return self
 
-    def add_roi(self, roi_array: np.ndarray, show_roi: bool = True):
+    def add_hline(self, y: Union[float, np.ndarray],
+                  color: str = "cyan",
+                  linestyle: str = "-.",
+                  label: str = "hline",
+                  linewidth: float = 1.0,
+                  alpha: float = 1.0):
         """
-        Store a binary (0/1) ROI array of shape (n_samples, sequence_length).
-        The ROI is shaded if show_roi=True.
+        Accumulate horizontal line overlay(s).
+
+        Parameters
+        ----------
+        y : float or numpy.ndarray
+            y-coordinate(s) at which to draw horizontal line(s). If an array is provided,
+            it should be 1D and of length equal to the number of points per signal or a single value per sample.
+        color : str, optional
+            Color of the horizontal line(s). Default is "cyan".
+        linestyle : str, optional
+            Linestyle for the horizontal line(s) (e.g., '--', '-.', ':'). Default is "-.".
+        label : str, optional
+            Legend label for the horizontal line(s). Default is "hline".
+        linewidth : float, optional
+            Width of the line(s). Default is 1.0.
+        alpha : float, optional
+            Opacity of the line(s). Default is 1.0.
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
         """
-        roi_array = np.asarray(roi_array)
-        if roi_array.ndim != 2:
-            raise ValueError("ROI array must be 2D of shape (n_samples, sequence_length).")
-        if self.signals is not None and roi_array.shape != self.signals.shape:
-            raise ValueError(
-                "ROI array shape must match signals shape: "
-                f"{roi_array.shape} vs {self.signals.shape}."
-            )
-        self.roi = roi_array
-        self.show_roi = show_roi
+        if np.isscalar(y):
+            y = np.array([y])
+        else:
+            y = np.asarray(y)
+        self._hlines.append({
+            "y": y,
+            "color": color,
+            "linestyle": linestyle,
+            "label": label,
+            "linewidth": linewidth,
+            "alpha": alpha
+        })
         return self
 
-    def configure_display(self, show_peaks: bool = True, show_amplitudes: bool = True, show_roi: bool = True):
+    def configure_display(self, show_scatter: bool = True, show_vlines: bool = True, show_hlines: bool = True, show_roi: bool = True):
         """
-        Quick method to enable/disable certain display features.
+        Configure display options for overlays.
+
+        Parameters
+        ----------
+        show_scatter : bool, optional
+            Whether to display scatter overlays. Default is True.
+        show_vlines : bool, optional
+            Whether to display vertical line overlays. Default is True.
+        show_hlines : bool, optional
+            Whether to display horizontal line overlays. Default is True.
+        show_roi : bool, optional
+            Whether to display ROI overlays. Default is True.
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
         """
-        self.show_peaks = show_peaks
-        self.show_amplitudes = show_amplitudes
+        self.show_scatter = show_scatter
+        self.show_vlines = show_vlines
+        self.show_hlines = show_hlines
         self.show_roi = show_roi
         return self
 
     def set_title(self, title: str):
         """
-        Set a title for the final plot(s).
+        Set a title for the plot.
+
+        Parameters
+        ----------
+        title : str
+            The title text for the figure.
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
         """
         self.title = title
         return self
 
+    def add_roi(self, roi_array: np.ndarray, color: str = 'green', label: str = 'ROI', alpha: float = 0.6):
+        """
+        Add an ROI mask overlay along with plotting parameters. Multiple ROI overlays
+        can be added and will all be plotted.
+
+        Parameters
+        ----------
+        roi_array : numpy.ndarray
+            Binary (0/1) 2D array of shape (n_samples, sequence_length) representing the ROI mask.
+        color : str, optional
+            Color used to shade the ROI. Default is 'green'.
+        label : str, optional
+            Legend label for the ROI. Default is 'ROI'.
+        alpha : float, optional
+            Transparency of the ROI shading. Default is 0.6.
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
+
+        Raises
+        ------
+        ValueError
+            If roi_array is not 2D or its shape does not match the signals (if signals are set).
+        """
+        roi_array = np.asarray(roi_array)
+        if roi_array.ndim != 2:
+            raise ValueError("ROI array must be 2D of shape (n_samples, sequence_length).")
+        if self.signals is not None and roi_array.shape != self.signals.shape:
+            raise ValueError(f"ROI array shape must match signals shape: {roi_array.shape} vs {self.signals.shape}.")
+        self._rois.append({
+            "roi_array": roi_array,
+            "color": color,
+            "label": label,
+            "alpha": alpha
+        })
+        return self
+
     def add_custom_curves(
         self,
-        curve_function: callable,
+        curve_function: Callable,
         label: str = "CustomCurves",
         color: str = "green",
         style: str = "--",
         **kwargs_arrays
     ):
         """
-        Adds a function-based set of curves to be plotted for each sample, possibly multiple curves per sample.
+        Add one or more custom curves to overlay on each signal. Each keyword argument
+        must be a numpy.ndarray of shape (n_samples, n_curves) representing a parameter
+        for the curve function.
 
         Parameters
         ----------
         curve_function : callable
             A function with signature: curve_function(x_values, **param_dict) -> 1D array.
-        label : str
-            Plot label for the legend.
-        color : str
-            Plot color for the curves.
-        style : str
-            Linestyle, e.g. '--' or '-.' or ':'.
-        **kwargs_arrays : dict of np.ndarray
-            Each array must have shape (n_samples, n_curves), so for sample i,
-            we have 'n_curves' sets of parameter values. We'll iterate over each
-            curve index j for that sample.
+        label : str, optional
+            Legend label for the curves (only the first curve per sample is labeled). Default is "CustomCurves".
+        color : str, optional
+            Color for the curve lines. Default is "green".
+        style : str, optional
+            Linestyle (e.g., "--", "-.", ":"). Default is "--".
+        **kwargs_arrays : dict
+            Keyword arguments where each value is a 2D array of shape (n_samples, n_curves).
 
-        Example
+        Returns
         -------
-        def gaussian_curve(x, pos, width, amp):
-            return amp * np.exp(-0.5 * ((x - pos)/width)**2)
+        self : SignalPlotter
+            The current instance (for method chaining).
 
-        # positions.shape = widths.shape = amps.shape = (n_samples, n_curves)
-        # usage:
-        # plotter.add_custom_curves(
-        #     gaussian_curve, label="Gaussians", color="magenta", style="--",
-        #     pos=positions, width=widths, amp=amps
-        # )
+        Raises
+        ------
+        ValueError
+            If the provided keyword arrays do not have matching shapes.
         """
-        # Basic shape checks
-        # All arrays in kwargs_arrays should have the same shape => (n_samples, n_curves).
         shapes = [arr.shape for arr in kwargs_arrays.values()]
         if len(set(shapes)) > 1:
-            raise ValueError(
-                f"All keyword arrays must have the same shape. Got shapes: {shapes}"
-            )
-
-        # Optionally, check that shape[0] == n_samples (if signals is known)
+            raise ValueError(f"All keyword arrays must have the same shape. Got shapes: {shapes}")
         if self.signals is not None:
             n_samples = self.signals.shape[0]
             for name, arr in kwargs_arrays.items():
                 if arr.shape[0] != n_samples:
-                    raise ValueError(
-                        f"{name}.shape[0] = {arr.shape[0]} != n_samples={n_samples}"
-                    )
-
+                    raise ValueError(f"{name}.shape[0] = {arr.shape[0]} != n_samples={n_samples}")
         self._custom_curves.append({
             "curve_func": curve_function,
             "label": label,
@@ -413,31 +565,36 @@ class SignalPlotter:
         })
         return self
 
-    ###########################################################################
-    # The main plot method
-    ###########################################################################
-
     def plot(
         self,
-        sample_indices: list = None,
+        sample_indices: Optional[list] = None,
         n_examples: int = 4,
         n_columns: int = 2,
         random_select: bool = False
     ):
         """
-        Display multiple signals in a grid of subplots. Optionally,
-        show peaks (positions, amplitudes) and ROI or custom curves.
+        Plot the signals with all overlays (ROI, scatter, vertical/horizontal lines, custom curves).
 
         Parameters
         ----------
         sample_indices : list of int, optional
-            Which signal indices to plot. If None, we auto-select.
+            List of signal indices to plot. If None, a subset of n_examples is auto-selected.
         n_examples : int, optional
-            How many total signals to plot (if sample_indices is None).
+            Number of signals to plot if sample_indices is not provided. Default is 4.
         n_columns : int, optional
-            How many columns in the subplot grid.
+            Number of columns in the subplot grid. Default is 2.
         random_select : bool, optional
-            If True, and sample_indices is None, randomly select signals to plot.
+            If True and sample_indices is None, randomly select n_examples signals.
+
+        Returns
+        -------
+        self : SignalPlotter
+            The current instance (for method chaining).
+
+        Raises
+        ------
+        ValueError
+            If no signals have been added.
         """
         if self.signals is None:
             raise ValueError("No signals to plot. Please call add_signals(...) first.")
@@ -445,7 +602,7 @@ class SignalPlotter:
         n_samples, sequence_length = self.signals.shape
         x_vals = self.x_values
 
-        # 1) Decide which samples to plot
+        # Determine sample indices
         if sample_indices is None:
             if random_select:
                 sample_indices = np.random.choice(n_samples, size=min(n_examples, n_samples), replace=False)
@@ -454,21 +611,17 @@ class SignalPlotter:
         else:
             sample_indices = sample_indices[:n_examples]
 
-        # 2) Create subplots
         n_actual = len(sample_indices)
         n_rows = int(np.ceil(n_actual / n_columns))
+        fig, axes = plt.subplots(
+            nrows=n_rows, ncols=n_columns,
+            figsize=(5 * n_columns, 4 * n_rows),
+            squeeze=False,
+            sharex=True,
+            sharey=True
+        )
 
-        with plt.style.context(mps):
-            self.figure, axes = plt.subplots(
-                nrows=n_rows,
-                ncols=n_columns,
-                figsize=(5*n_columns, 4*n_rows),
-                squeeze=False,
-                sharex=True,
-                sharey=True,
-            )
-
-        # 3) Iterate over chosen samples
+        # Iterate over selected samples
         for i, idx in enumerate(sample_indices):
             row = i // n_columns
             col = i % n_columns
@@ -477,67 +630,80 @@ class SignalPlotter:
             # Plot the main signal
             ax.plot(x_vals, self.signals[idx], label=f"Signal #{idx}", color='blue')
 
-            # If we have a binary ROI array, shade it where ROI=1
-            if (self.roi is not None) and self.show_roi:
-                roi_mask = self.roi[idx]
-                ax.fill_between(
-                    x_vals,
-                    y1=0,
-                    y2=1,
-                    where=(roi_mask > 0),
-                    color='green',
-                    alpha=0.6,
-                    transform=ax.get_xaxis_transform(),
-                    label="ROI"
-                )
+            # Plot ROI overlays
+            if self._rois and self.show_roi:
+                for roi_info in self._rois:
+                    roi_mask = roi_info["roi_array"][idx]
+                    ax.fill_between(
+                        x_vals,
+                        0,
+                        1,
+                        where=(roi_mask > 0),
+                        color=roi_info["color"],
+                        alpha=roi_info.get("alpha", 0.6),
+                        transform=ax.get_xaxis_transform(),
+                        label=roi_info["label"]
+                    )
 
-            # Optionally plot peaks
-            if self.show_peaks and (self.positions is not None) and (self.amplitudes is not None):
-                for (px, py) in zip(self.positions[idx], self.amplitudes[idx]):
-                    if py <= 0:
-                        continue  # skip "inactive" peaks
-                    ax.scatter(px, py, color='red', s=40, alpha=0.8, marker='o')
-                    if self.show_amplitudes:
-                        ax.text(px, py, f"{py:.2f}", fontsize=8, ha='left', va='bottom', color='red')
+            # Plot scatter overlays
+            if self._scatter and self.show_scatter:
+                for scatter_info in self._scatter:
+                    scatter_x = scatter_info["scatter_x"][idx]
+                    scatter_y = scatter_info["scatter_y"][idx]
+                    ax.scatter(
+                        scatter_x, scatter_y,
+                        color=scatter_info["color"],
+                        marker=scatter_info["marker"],
+                        alpha=scatter_info["alpha"],
+                        label=scatter_info["label"]
+                    )
 
-            # Plot custom curves
+            # Plot vertical line overlays
+            if self._vlines and self.show_vlines:
+                for vline_info in self._vlines:
+                    # vline_info["x"] can be an array; iterate over values
+                    ax.vlines(
+                        x=vline_info["x"][idx],
+                        color=vline_info["color"],
+                        linestyle=vline_info["linestyle"],
+                        linewidth=vline_info["linewidth"],
+                        alpha=vline_info["alpha"],
+                        label=vline_info["label"],
+                        transform=ax.get_yaxis_transform(),
+                        ymin=0, ymax=1
+                    )
+            # Plot horizontal line overlays
+            if self._hlines and self.show_hlines:
+                for hline_info in self._hlines:
+                    ax.hlines(
+                        y=hline_info["y"][idx],
+                        color=hline_info["color"],
+                        linestyle=hline_info["linestyle"],
+                        linewidth=hline_info["linewidth"],
+                        alpha=hline_info["alpha"],
+                        label=hline_info["label"],
+                        transform=ax.get_yaxis_transform(),
+                        xmin=0, xmax=1
+                    )
+
+            # Plot custom curves overlays
             for curve_info in self._custom_curves:
                 curve_func = curve_info["curve_func"]
                 label = curve_info["label"]
                 color = curve_info["color"]
                 style = curve_info["style"]
                 kwargs_arrays = curve_info["kwargs_arrays"]
-
-                # All arrays in kwargs_arrays have shape (n_samples, n_curves).
-                # We'll plot n_curves curves for this sample i.
-                # For each j, gather param_j = {k: v[i, j] for (k,v) in kwargs_arrays.items()}
-                shapes = [
-                    arr.shape for arr in kwargs_arrays.values()
-                ]
-                # e.g. (n_samples, n_curves) => shape[1] is n_curves
-                n_curves_sample = shapes[0][1]  # second dimension
-
+                # Assume each keyword array has shape (n_samples, n_curves)
+                n_curves_sample = list(kwargs_arrays.values())[0].shape[1]
                 for j in range(n_curves_sample):
-                    # Build dict of param => scalar value for sample i, curve j
-                    param_dict = {
-                        k: v[idx, j] for k, v in kwargs_arrays.items()
-                    }
+                    param_dict = {k: v[idx, j] for k, v in kwargs_arrays.items()}
                     y_curve = curve_func(x_vals, **param_dict)
-                    # Label only the first curve
                     curve_label = label if j == 0 else None
-                    ax.plot(
-                        x_vals,
-                        y_curve,
-                        style,
-                        color=color,
-                        label=curve_label
-                    )
+                    ax.plot(x_vals, y_curve, style, color=color, label=curve_label)
+
             ax.set_title(f"Signal #{idx}")
             ax.legend()
 
-        self.figure.supxlabel('X-values')
-        self.figure.supylabel('Signal amplitude')
-        # Hide any unused subplots
         total_axes = n_rows * n_columns
         if n_actual < total_axes:
             for j in range(n_actual, total_axes):
@@ -546,7 +712,7 @@ class SignalPlotter:
                 axes[row_j, col_j].axis("off")
 
         if self.title:
-            self.figure.suptitle(self.title, fontsize=14)
+            fig.suptitle(self.title, fontsize=14)
         plt.tight_layout()
         plt.show()
         return self
