@@ -26,7 +26,8 @@ dependencies = [
     "numpy >=1.26,<3.0",
     'matplotlib',
     'tensorflow',
-    'scikit-learn'
+    'scikit-learn',
+    'tf_explain'
 ]
 
 [project.urls]
