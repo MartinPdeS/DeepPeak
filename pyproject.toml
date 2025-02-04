@@ -27,6 +27,7 @@ dependencies = [
     'matplotlib',
     'tensorflow',
     'scikit-learn',
+    'MPSPlots',
     'opencv-python',
     'tf_explain'
 ]
