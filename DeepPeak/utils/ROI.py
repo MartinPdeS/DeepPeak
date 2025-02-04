@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics import precision_recall_fscore_support
 
 def compute_rois_from_signals(
     signals: np.ndarray,
@@ -150,3 +151,87 @@ def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -
         "iou": iou,
         "dice": dice
     }
+
+def roi_containment_metric(roi_pred: np.ndarray, roi_gt: np.ndarray) -> dict:
+    """
+    Compute the ROI containment metric, which quantifies the fraction of the predicted
+    ROI that lies within the ground truth ROI.
+
+    This metric is useful when you wish to evaluate whether the predicted ROI regions
+    are completely within the ground truth regions. It is defined as:
+
+        containment_ratio = (# predicted ROI pixels that are within ground truth) /
+                            (# predicted ROI pixels)
+
+    A complementary misfit ratio is defined as:
+
+        misfit_ratio = 1 - containment_ratio
+
+    Parameters
+    ----------
+    roi_pred : numpy.ndarray
+        A binary (0/1) numpy array of predicted ROI mask. Shape can be (H, W) or any
+        shape as long as it matches roi_gt.
+    roi_gt : numpy.ndarray
+        A binary (0/1) numpy array of the ground truth ROI mask, of the same shape as roi_pred.
+
+    Returns
+    -------
+    metrics : dict
+        A dictionary containing:
+            - 'containment_ratio': float
+                  The fraction of predicted ROI pixels that are within the ground truth ROI.
+            - 'misfit_ratio': float
+                  The complement of the containment ratio (i.e., fraction of predicted ROI pixels
+                  that are outside the ground truth ROI).
+            - 'n_pred': int
+                  The total number of predicted ROI pixels.
+            - 'n_intersection': int
+                  The number of predicted ROI pixels that lie within the ground truth ROI.
+
+    Notes
+    -----
+    - If there are no predicted ROI pixels (i.e. roi_pred.sum() == 0), the function returns
+      a containment ratio of 0 and misfit ratio of 1.
+    - This metric only considers the predicted ROI pixels. It does not penalize missed ROI pixels
+      in the ground truth (for that you might combine with recall-based metrics or IoU).
+
+    Examples
+    --------
+    >>> roi_pred = np.array([[0, 1, 1], [0, 1, 0]])
+    >>> roi_gt   = np.array([[0, 1, 0], [0, 1, 0]])
+    >>> metrics = roi_containment_metric(roi_pred, roi_gt)
+    >>> print(metrics['containment_ratio'])
+    0.6666666666666666
+    """
+    # Ensure inputs are binary arrays
+    roi_pred = (roi_pred > 0).astype(np.uint8)
+    roi_gt = (roi_gt > 0).astype(np.uint8)
+
+    # Total number of predicted ROI pixels
+    n_pred = roi_pred.sum()
+
+    if n_pred == 0:
+        # If no ROI is predicted, we define containment as 0 (or you could define it as 1 by convention)
+        return {
+            "containment_ratio": 0.0,
+            "misfit_ratio": 1.0,
+            "n_pred": 0,
+            "n_intersection": 0
+        }
+
+    # Intersection of predicted ROI with ground truth ROI
+    intersection = np.logical_and(roi_pred, roi_gt).astype(np.uint8)
+    n_intersection = intersection.sum()
+
+    # Compute metrics
+    containment_ratio = n_intersection / n_pred
+    misfit_ratio = 1 - containment_ratio
+
+    return {
+        "containment_ratio": containment_ratio,
+        "misfit_ratio": misfit_ratio,
+        "n_pred": int(n_pred),
+        "n_intersection": int(n_intersection)
+    }
+
