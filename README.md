@@ -10,10 +10,10 @@
 | DeepPeak/models/position\_amplitude\_width\_model.py |       13 |       13 |     0% |      1-14 |
 | DeepPeak/models/position\_model.py                   |       18 |       18 |     0% |      2-73 |
 | DeepPeak/signals.py                                  |       58 |       58 |     0% |     1-130 |
-| DeepPeak/utils/ROI.py                                |       36 |       36 |     0% |     1-107 |
+| DeepPeak/utils/ROI.py                                |       75 |       75 |     0% |     1-281 |
 | DeepPeak/utils/training\_utils.py                    |       17 |       17 |     0% |      1-28 |
-| DeepPeak/utils/visualization.py                      |      193 |      193 |     0% |     1-552 |
-|                                            **TOTAL** |  **400** |  **400** | **0%** |           |
+| DeepPeak/utils/visualization.py                      |      209 |      209 |     0% |     1-725 |
+|                                            **TOTAL** |  **455** |  **455** | **0%** |           |
 
 
 ## Setup coverage badge
