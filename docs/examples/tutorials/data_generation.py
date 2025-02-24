@@ -73,8 +73,8 @@ ROI = compute_rois_from_signals(
 
 plotter = SignalPlotter()
 plotter.add_signals(signals)
-plotter.add_positions(positions)
-plotter.add_amplitudes(amplitudes)
+plotter.add_vline(positions)
+plotter.add_hline(amplitudes)
 plotter.add_roi(ROI)
 plotter.set_title("Demo: Signals + Peaks + ROI")
 

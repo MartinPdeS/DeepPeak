@@ -42,10 +42,11 @@ from DeepPeak.utils.ROI import compute_rois_from_signals
 #
 
 NUM_PEAKS = 3
-SEQUENCE_LENGTH = 200
+SEQUENCE_LENGTH = 64 * 2
 
 signals, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
-    n_samples=6000,
+    kernel='gaussian',
+    n_samples=1000,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
     amplitude=(1, 20),
@@ -79,8 +80,7 @@ ROI = compute_rois_from_signals(
 
 plotter = SignalPlotter()
 plotter.add_signals(signals)
-plotter.add_vline(positions)
-plotter.add_hline(amplitudes)
+plotter.add_scatter(positions, amplitudes)
 plotter.add_roi(ROI)
 plotter.set_title("Demo: Signals + Peaks + ROI")
 _ = plotter.plot(n_examples=6, n_columns=3, random_select=False)
@@ -101,6 +101,9 @@ history = roi_model.fit(
     batch_size=32
 )
 
+from DeepPeak.directories import weights_path
+roi_model.save(weights_path / "ROI_Model_128.keras")
+
 # %%
 # Plot Training History
 # ---------------------
@@ -108,44 +111,3 @@ history = roi_model.fit(
 # We can then check how the loss evolves over epochs.
 
 _ = plot_training_history(history, filtering=['*loss*'])
-
-# %%
-# ROI Inference
-# -------------
-#
-# We predict on the entire dataset for demonstration. We then threshold at 0.9
-# to obtain a binary mask.
-signals, amplitudes, positions, _, _, _ = generate_signal_dataset(
-    n_samples=100,
-    sequence_length=SEQUENCE_LENGTH,
-    n_peaks=(1, NUM_PEAKS),
-    amplitude=(1, 20),
-    position=(0.1, 0.9),
-    width=(0.03, 0.05),
-    noise_std=0.1,
-    categorical_peak_count=False,
-)
-
-predictions, uncertainty = filter_predictions(
-    signals=signals,
-    model=roi_model,
-    n_samples=30,
-    threshold=0.9
-)
-
-
-# %%
-# Compare Predicted ROI with Original Signals
-# -------------------------------------------
-#
-# We overlay the predicted ROI mask on the signals, and also draw the
-# individual Gaussians using a custom curve function.
-
-plotter = SignalPlotter()
-plotter.add_signals(signals)
-plotter.add_vline(positions)
-plotter.add_hline(amplitudes)
-plotter.add_roi(predictions)
-
-plotter.set_title("Demo: Signals + Peaks + ROI")
-_ = plotter.plot(n_examples=6, n_columns=3, random_select=True)

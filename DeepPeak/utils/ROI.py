@@ -60,6 +60,54 @@ def compute_rois_from_signals(
 
     return rois
 
+
+def find_middle_indices(ROIs, pad_width=5, fill_value=0):
+    """
+    Finds the middle indices of contiguous regions of ones in a 2D binary NumPy array.
+    Optionally pads the output to a fixed number of elements per row.
+
+    Parameters:
+    - binary_matrix (np.ndarray): 2D array of shape (num_arrays, length_of_arrays), containing 0s and 1s.
+    - pad_width (int): The fixed size of each row in the output. Defaults to 5.
+    - fill_value (int or float): Value to pad with (0 or np.nan).
+
+    Returns:
+    - np.ndarray: 2D array of shape (num_arrays, pad_width), containing middle indices (padded).
+    """
+    if not isinstance(ROIs, np.ndarray):
+        raise ValueError("Input must be a NumPy array")
+
+    if ROIs.ndim != 2:
+        raise ValueError("Input must be a 2D array")
+
+    # Detect transitions from 0 → 1 (start of ones) and 1 → 0 (end of ones)
+    padded = np.pad(ROIs, ((0, 0), (1, 1)), mode='constant')  # Pad for edge detection
+    diff = np.diff(padded, axis=1)
+
+    start_indices = np.where(diff == 1)  # (row_indices, start positions)
+    end_indices = np.where(diff == -1)  # (row_indices, end positions +1)
+
+    # Compute middle indices using vectorized floor division
+    middle_indices = (start_indices[1] + (end_indices[1] - 1)) // 2
+
+    # Group by rows
+    row_indices = start_indices[0]
+    unique_rows, row_counts = np.unique(row_indices, return_counts=True)
+
+    # Convert to fixed-size padded output
+    padded_output = np.full((ROIs.shape[0], pad_width), fill_value, dtype=float)  # Default fill
+
+    # Split indices per row
+    split_indices = np.split(middle_indices, np.cumsum(row_counts)[:-1])
+
+    # Assign values row-wise
+    for i, row_idx in enumerate(unique_rows):
+        num_values = len(split_indices[i])
+        padded_output[row_idx, :num_values] = split_indices[i][:pad_width]  # Pad to max width
+
+    return padded_output
+
+
 def get_positions_amplitudes(signals, ROIs):
     """
     Compute positions and amplitudes for ROIs in a fully vectorized way.
@@ -107,6 +155,7 @@ def get_positions_amplitudes(signals, ROIs):
 
     return positions, amplitudes
 
+
 def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -> dict:
     """
     Compute segmentation metrics between the predicted and ground truth ROI masks.
@@ -151,6 +200,7 @@ def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -
         "iou": iou,
         "dice": dice
     }
+
 
 def roi_containment_metric(roi_pred: np.ndarray, roi_gt: np.ndarray) -> dict:
     """

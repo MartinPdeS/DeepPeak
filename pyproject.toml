@@ -24,7 +24,6 @@ keywords = ["refracive index", "optics", "microbeads", "Mie scattering"]
 
 dependencies = [
     "numpy >=1.26,<3.0",
-    'matplotlib',
     'tensorflow',
     'scikit-learn',
     'MPSPlots',

@@ -297,13 +297,15 @@ class SignalPlotter:
             self.x_values = np.linspace(0, 1, seq_length)
         return self
 
-    def add_scatter(self,
-                    scatter_x: np.ndarray,
-                    scatter_y: np.ndarray,
-                    color: str = "red",
-                    marker: str = "o",
-                    label: str = "Scatter",
-                    alpha: float = 0.8):
+    def add_scatter(
+        self,
+        scatter_x: np.ndarray,
+        scatter_y: np.ndarray,
+        color: str = "red",
+        marker: str = "o",
+        label: str = "Scatter",
+        alpha: float = 0.8
+    ):
         """
         Accumulate scatter overlay points (e.g., for peak markers).
 
@@ -341,12 +343,15 @@ class SignalPlotter:
         })
         return self
 
-    def add_vline(self, x: Union[float, np.ndarray],
-                  color: str = "magenta",
-                  linestyle: str = "--",
-                  label: str = "vline",
-                  linewidth: float = 1.0,
-                  alpha: float = 1.0):
+    def add_vline(
+        self,
+        x: Union[float, np.ndarray],
+        color: str = "magenta",
+        linestyle: str = "--",
+        label: str = "vline",
+        linewidth: float = 1.0,
+        alpha: float = 1.0
+    ):
         """
         Accumulate vertical line overlay(s).
 
@@ -613,13 +618,15 @@ class SignalPlotter:
 
         n_actual = len(sample_indices)
         n_rows = int(np.ceil(n_actual / n_columns))
-        fig, axes = plt.subplots(
-            nrows=n_rows, ncols=n_columns,
-            figsize=(5 * n_columns, 4 * n_rows),
-            squeeze=False,
-            sharex=True,
-            sharey=True
-        )
+
+        with plt.style.context(mps):
+            fig, axes = plt.subplots(
+                nrows=n_rows, ncols=n_columns,
+                figsize=(5 * n_columns, 4 * n_rows),
+                squeeze=False,
+                sharex=True,
+                sharey=True
+            )
 
         # Iterate over selected samples
         for i, idx in enumerate(sample_indices):
@@ -669,7 +676,7 @@ class SignalPlotter:
                         linewidth=vline_info["linewidth"],
                         alpha=vline_info["alpha"],
                         label=vline_info["label"],
-                        transform=ax.get_yaxis_transform(),
+                        transform=ax.get_xaxis_transform(),
                         ymin=0, ymax=1
                     )
             # Plot horizontal line overlays

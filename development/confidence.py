@@ -1,5 +1,5 @@
 import numpy as np
-from DeepPeak.signals import generate_gaussian_dataset
+from DeepPeak._signals import generate_gaussian_dataset
 from DeepPeak.utils.training_utils import dataset_split
 import tensorflow as tf
 import matplotlib.pyplot as plt

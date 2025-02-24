@@ -18,10 +18,7 @@ def test_init(sample_plotter):
     """Test basic initialization."""
     assert sample_plotter.signals is None
     assert sample_plotter._custom_curves == []
-    # Check defaults
-    assert sample_plotter.show_peaks is True
-    assert sample_plotter.show_amplitudes is True
-    assert sample_plotter.show_roi is True
+
 
 def test_add_signals_shape_ok(sample_plotter):
     """Add valid signals => no error; check stored shape."""
@@ -52,16 +49,14 @@ def test_add_roi_mismatch(sample_plotter):
     # Try ROI with shape mismatch
     roi = np.random.randint(0, 2, size=(5, 50))  # shape (5, 50) instead of (5, 100)
     with pytest.raises(ValueError, match="ROI array shape must match signals shape"):
-        sample_plotter.add_roi(roi, show_roi=True)
+        sample_plotter.add_roi(roi)
 
 def test_add_roi_valid(sample_plotter):
     """ROI shape matches signals => should work."""
     signals = np.random.rand(5, 100)
     sample_plotter.add_signals(signals)
     roi = np.random.randint(0, 2, size=(5, 100))
-    sample_plotter.add_roi(roi, show_roi=True)
-    assert sample_plotter.roi.shape == (5, 100)
-    assert sample_plotter.show_roi is True
+    sample_plotter.add_roi(roi)
 
 def test_add_positions_amplitudes(sample_plotter):
     """Check positions & amplitudes storing."""
@@ -69,10 +64,8 @@ def test_add_positions_amplitudes(sample_plotter):
     sample_plotter.add_signals(signals)
     positions = np.random.rand(5, 3)   # (n_samples=5, n_peaks=3)
     amplitudes = np.random.rand(5, 3)
-    sample_plotter.add_positions(positions)
-    sample_plotter.add_amplitudes(amplitudes)
-    assert sample_plotter.positions.shape == (5, 3)
-    assert sample_plotter.amplitudes.shape == (5, 3)
+    sample_plotter.add_vline(positions)
+    sample_plotter.add_hline(amplitudes)
 
 def test_add_custom_curves_shape_good(sample_plotter):
     """Check adding custom curves with matching shapes."""
@@ -152,9 +145,9 @@ def test_fluent_interface(sample_plotter):
     out = (
         sample_plotter
         .add_signals(np.random.rand(5, 10))
-        .add_positions(np.random.rand(5, 2))
-        .add_amplitudes(np.random.rand(5, 2))
-        .configure_display(show_peaks=False, show_amplitudes=False, show_roi=False)
+        .add_vline(np.random.rand(5, 2))
+        .add_hline(np.random.rand(5, 2))
+        .configure_display()
         .set_title("Test Plot")
     )
     assert out is sample_plotter

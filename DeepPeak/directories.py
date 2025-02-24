@@ -17,6 +17,8 @@ root_path = Path(DeepPeak.__path__[0])
 
 project_path =  root_path.parents[0]
 
+weights_path = root_path.joinpath('weights')
+
 example_directory = root_path.joinpath('examples')
 
 doc_path = project_path.joinpath('docs')
