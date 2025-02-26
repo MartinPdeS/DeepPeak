@@ -1,52 +1,70 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from DeepPeak.data import generate_square_dataset  # Replace with actual module name
+from DeepPeak.signals import generate_signal_dataset
+from DeepPeak.visualization import plot_training_history, SignalPlotter
+from DeepPeak.classifier.model import build_ROI_model
+from DeepPeak.classifier.utils import compute_rois_from_signals, filter_predictions
 
-# def showcase_plot_normalized_widths():
-#     # Parameters for dataset generation
-#     sample_count = 3
-#     sequence_length = 128
-#     peak_count = (1, 4)
-#     amplitude_range = (1, 1)
-#     center_range = (0, 1)
-#     width_range = 0.1
-#     normalize_x = True
+NUM_PEAKS = 3
+SEQUENCE_LENGTH = 200
 
-#     # Generate the dataset
-#     signals, amplitudes, peak_counts, positions, widths, x_values = generate_square_dataset(
-#         sample_count=sample_count,
-#         sequence_length=sequence_length,
-#         peak_count=peak_count,
-#         amplitude_range=amplitude_range,
-#         center_range=center_range,
-#         width_range=width_range,
-#         noise_std=0.0,
-#         normalize_x=normalize_x,
-#         normalize=True,
-#         nan_values=0,
-#         sort_peak='position',
-#         categorical_peak_count=False
-#     )
+signals, labels, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
+    n_samples=6000,
+    sequence_length=SEQUENCE_LENGTH,
+    n_peaks=(1, NUM_PEAKS),
+    amplitude=(1, 20),
+    position=(0.1, 0.9),
+    width=(0.03, 0.05),
+    noise_std=0.1,
+    categorical_peak_count=False,
+)
 
-#     # Plot the result
-#     plt.figure(figsize=(10, 5))
-#     signal = signals[0, :, 0]
-#     plt.plot(x_values, signal, label="Signal", linewidth=2)
+ROI = compute_rois_from_signals(
+    signals=signals,
+    positions=positions,
+    width_in_pixels=3,
+    amplitudes=amplitudes
+)
 
-#     for pos, width, amp in zip(positions[0], widths[0], amplitudes[0]):
-#         if not np.isnan(pos):
-#             start = max(0, pos - width / 2)
-#             end = min(1, pos + width / 2)
-#             plt.axvspan(start, end, color="red", alpha=0.3, label="Peak Width")
-#             plt.scatter([pos], [amp], color="blue", label="Peak Center", zorder=3)
+plotter = SignalPlotter()
+plotter.add_signals(signals)
+plotter.add_vline(positions)
+plotter.add_hline(amplitudes)
+plotter.add_roi(ROI)
+plotter.set_title("Demo: Signals + Peaks + ROI")
+_ = plotter.plot(n_examples=6, n_columns=3, random_select=False)
 
-#     plt.title("Normalized Widths with Normalized X-Values")
-#     plt.xlabel("X-axis (normalized)")
-#     plt.ylabel("Signal Amplitude")
-#     plt.legend()
-#     plt.grid(True, linestyle="--", alpha=0.7)
-#     plt.tight_layout()
-#     plt.show()
+roi_model = build_ROI_model(SEQUENCE_LENGTH)
 
-# # Showcase the plot
-# showcase_plot_normalized_widths()
+history = roi_model.fit(
+    signals, ROI,
+    validation_split=0.2,
+    epochs=20,
+    batch_size=32
+)
+
+_ = plot_training_history(history, filtering=['*loss*'])
+
+signals, _, amplitudes, positions, _, _, _ = generate_signal_dataset(
+    n_samples=100,
+    sequence_length=SEQUENCE_LENGTH,
+    n_peaks=(1, NUM_PEAKS),
+    amplitude=(1, 20),
+    position=(0.1, 0.9),
+    width=(0.03, 0.05),
+    noise_std=0.1,
+    categorical_peak_count=False,
+)
+
+predictions, uncertainty = filter_predictions(
+    signals=signals,
+    model=roi_model,
+    n_samples=30,
+    threshold=0.9
+)
+
+plotter = SignalPlotter()
+plotter.add_signals(signals)
+plotter.add_vline(positions)
+plotter.add_roi(predictions)
+
+plotter.set_title("Demo: Signals + Peaks + ROI")
+_ = plotter.plot(n_examples=6, n_columns=3, random_select=True)

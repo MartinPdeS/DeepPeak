@@ -1,12 +1,10 @@
 import pytest
-from DeepPeak.models import get_position_model
+from DeepPeak.locator.model import get_position_model
 from DeepPeak.signals import generate_signal_dataset
-from DeepPeak.utils.training_utils import dataset_split
-from unittest.mock import patch
 
 def test_deeppeak_workflow():
     # Generate dataset
-    signals, _, _, positions, _, _ = generate_signal_dataset(
+    signals, _, _, _, positions, _, _ = generate_signal_dataset(
         n_samples=300,
         sequence_length=200,
         n_peaks=(0, 2),

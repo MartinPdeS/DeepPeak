@@ -21,11 +21,10 @@ the predicted ROI aligns with the true peaks.
 # %%
 # Imports
 # -------
-import numpy as np
 from DeepPeak.signals import generate_signal_dataset
-from DeepPeak.utils.visualization import plot_training_history, SignalPlotter
-from DeepPeak.models import build_ROI_model, filter_predictions
-from DeepPeak.utils.ROI import compute_rois_from_signals
+from DeepPeak.visualization import plot_training_history, SignalPlotter
+from DeepPeak.classifier.model import build_ROI_model
+from DeepPeak.classifier.utils import compute_rois_from_signals, filter_predictions
 
 # %%
 # Generate Synthetic Data
@@ -44,7 +43,7 @@ from DeepPeak.utils.ROI import compute_rois_from_signals
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-signals, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
+signals, labels, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
     n_samples=6000,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
@@ -115,7 +114,7 @@ _ = plot_training_history(history, filtering=['*loss*'])
 #
 # We predict on the entire dataset for demonstration. We then threshold at 0.9
 # to obtain a binary mask.
-signals, amplitudes, positions, _, _, _ = generate_signal_dataset(
+signals, _, amplitudes, positions, _, _, _ = generate_signal_dataset(
     n_samples=100,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
@@ -144,7 +143,7 @@ predictions, uncertainty = filter_predictions(
 plotter = SignalPlotter()
 plotter.add_signals(signals)
 plotter.add_vline(positions)
-plotter.add_hline(amplitudes)
+# plotter.add_hline(amplitudes)
 plotter.add_roi(predictions)
 
 plotter.set_title("Demo: Signals + Peaks + ROI")

@@ -7,7 +7,7 @@ import matplotlib
 matplotlib.use('Agg')  # To avoid opening windows during tests
 import matplotlib.pyplot as plt
 
-from DeepPeak.utils.visualization import SignalPlotter
+from DeepPeak.visualization import SignalPlotter
 
 @pytest.fixture
 def sample_plotter():

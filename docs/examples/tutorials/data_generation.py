@@ -18,8 +18,8 @@ We use:
 # Imports
 # -------
 from DeepPeak.signals import generate_signal_dataset
-from DeepPeak.utils.visualization import SignalPlotter
-from DeepPeak.utils.ROI import compute_rois_from_signals
+from DeepPeak.visualization import SignalPlotter
+from DeepPeak.classifier.utils import compute_rois_from_signals
 
 # %%
 # Generate Synthetic Signal Dataset
@@ -33,7 +33,7 @@ NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 sample_count = 6000
 
-signals, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
+signals, labels, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
     n_samples=sample_count,
     signal_type='gaussian',
     sequence_length=SEQUENCE_LENGTH,
