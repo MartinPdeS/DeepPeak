@@ -30,46 +30,42 @@ def dataset_split(test_size: float, random_state: float, **kwargs) -> dict:
     return output
 
 
-def filter_with_wavelet_transform(signal: np.ndarray, low_boundary: int, high_boundary: int, kernel: str = 'mexh') -> np.ndarray:
+def filter_with_wavelet_transform(signals: np.ndarray, low_boundary: int, high_boundary: int, kernel: str = 'mexh') -> tuple[np.ndarray, np.ndarray]:
     """
-    Filters a signal using continuous wavelet transform (CWT) with a Mexican hat kernel.
+    Efficient filtering of multiple signals using CWT, with minimal looping.
 
     Parameters
     ----------
-    signal : np.ndarray
-        The input signal to be filtered.
+    signals : np.ndarray
+        2D array of shape (n_signals, n_samples).
     low_boundary : int
-        The lower boundary of the scale range to keep.
+        Lower bound of the scale range.
     high_boundary : int
-        The upper boundary of the scale range to keep.
+        Upper bound of the scale range.
     kernel : str, optional
-        The wavelet kernel to use for the CWT. Default is 'mexh' (Mexican hat).
+        Name of the wavelet kernel. Default is 'mexh'.
 
     Returns
     -------
-    np.ndarray
-        The filtered signal reconstructed from the specified scale range.
-
-    Notes
-    -----
-    This function performs a continuous wavelet transform on the input signal using the specified kernel,
-    filters the coefficients to keep only those within the specified scale range, and reconstructs the signal
-    from the filtered coefficients. The Mexican hat wavelet is commonly used for this purpose.
-    The function assumes that the input signal is a 1D numpy array.
+    filtered_signals : np.ndarray
+        Filtered signals of shape (n_signals, n_samples).
+    all_coeffs : np.ndarray
+        All CWT coefficients of shape (n_signals, n_scales, n_samples).
     """
+    signals = np.atleast_2d(signals)
+    n_signals, n_samples = signals.shape
 
-    # Define all scales and the desired scale range for filtering
+    # Define scales and mask
     all_scales = np.arange(1, 100)
-
-    # Perform continuous wavelet transform (CWT) with Mexican hat
-    coefficients, _ = pywt.cwt(signal, all_scales, 'mexh')
-
-    # Zero-out unwanted scales
-    filtered_coeffs = np.zeros_like(coefficients)
     scale_mask = (all_scales >= low_boundary) & (all_scales <= high_boundary)
-    filtered_coeffs[scale_mask, :] = coefficients[scale_mask, :]
+    n_selected_scales = np.sum(scale_mask)
 
-    # Approximate signal reconstruction from selected scales
-    reconstructed_signal = np.sum(filtered_coeffs, axis=0) / np.sqrt(np.sum(scale_mask)) / abs(high_boundary - low_boundary)
+    # Perform CWT individually (CWT must be done per-signal due to PyWavelets)
+    coeffs_list = [pywt.cwt(signals[i], all_scales, kernel)[0] for i in range(n_signals)]
+    coeffs = np.stack(coeffs_list, axis=0)  # Shape: (n_signals, n_scales, n_samples)
 
-    return reconstructed_signal
+    # Apply mask and reconstruct using broadcasting
+    filtered_coeffs = coeffs * scale_mask[:, np.newaxis]  # scale_mask: (n_scales, 1)
+    filtered_signals = np.sum(filtered_coeffs, axis=1) / np.sqrt(n_selected_scales) / abs(high_boundary - low_boundary)
+
+    return filtered_signals, coeffs

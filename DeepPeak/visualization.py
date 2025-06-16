@@ -165,7 +165,7 @@ def plot_gradcam_with_signal(
     plt.tight_layout()
     plt.show()
 
-def plot_training_history(*histories, filtering: list = None, y_scale: str = 'log'):
+def plot_training_history(*histories, filtering: list = None, y_scale: str = 'log', show: bool = True) -> plt.Figure:
     """
     Plot training and validation performance metrics (loss and accuracy).
 
@@ -214,7 +214,11 @@ def plot_training_history(*histories, filtering: list = None, y_scale: str = 'lo
     figure.suptitle('Training History')
 
     plt.tight_layout()
-    plt.show()
+
+    if show:
+        plt.show()
+
+    return figure
 
 
 class SignalPlotter:
