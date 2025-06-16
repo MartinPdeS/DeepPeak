@@ -16,6 +16,7 @@ requirements:
     - wheel
     - setuptools-scm >=8.0
   run:
+    - pywavelets
     - tensorflow
     - tf_explain
     - opencv-python

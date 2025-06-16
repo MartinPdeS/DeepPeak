@@ -103,19 +103,26 @@ def build_dense_layers(sequence_length: int) -> tf.keras.Model:
     x = layers.Conv1D(128, kernel_size=3, dilation_rate=4, activation="relu", padding="same")(x)
 
     # Output for per-time-step classification (1 if peak, 0 if not)
-    peak_output = layers.Conv1D(1, kernel_size=1, activation="sigmoid", padding="same", name="peak_output")(x)
+    ROI = layers.Conv1D(1, kernel_size=1, activation="sigmoid", padding="same", name="ROI")(x)
 
-    # Auxiliary output: Predict the total number of peaks (Regression)
-    count_output = layers.GlobalAveragePooling1D()(x)
-    count_output = layers.Dense(1, activation="relu", name="count_output")(count_output)  # Ensures non-negative count
-
-    # Create model with two outputs
-    model = models.Model(inputs, [peak_output, count_output])
+    model = models.Model(inputs, outputs={'ROI': ROI})
     model.compile(
         optimizer="adam",
-        loss={"peak_output": "binary_crossentropy", "count_output": "mean_squared_error"},  # MSE for peak count regression
-        metrics={"peak_output": "accuracy", "count_output": "mae"}
+        loss={"ROI": "binary_crossentropy",},  # MSE for peak count regression
+        metrics={"ROI": "accuracy"}
     )
+
+    # Auxiliary output: Predict the total number of peaks (Regression)
+    # count_output = layers.GlobalAveragePooling1D()(x)
+    # count_output = layers.Dense(1, activation="relu", name="count_output")(count_output)  # Ensures non-negative count
+
+    # Create model with two outputs
+    # model = models.Model(inputs, [peak_output, count_output])
+    # model.compile(
+    #     optimizer="adam",
+    #     loss={"peak_output": "binary_crossentropy", "count_output": "mean_squared_error"},  # MSE for peak count regression
+    #     metrics={"peak_output": "accuracy", "count_output": "mae"}
+    # )
 
     return model
 

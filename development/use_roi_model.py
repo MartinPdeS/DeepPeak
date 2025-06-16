@@ -1,19 +1,18 @@
 
 from DeepPeak.signals import generate_signal_dataset
-from DeepPeak.utils.visualization import SignalPlotter
-from DeepPeak.models import filter_predictions
+from DeepPeak.visualization import SignalPlotter
+from DeepPeak.classifier.utils import filter_predictions, find_middle_indices
 import tensorflow as tf
 from DeepPeak.directories import weights_path
-from DeepPeak.utils.ROI import find_middle_indices
 
 NUM_PEAKS = 3
-SEQUENCE_LENGTH = 200
+SEQUENCE_LENGTH = 128
 
-model_path = weights_path / 'ROI_Model.keras'
+model_path = weights_path / 'ROI_128.keras'
 roi_model = tf.keras.models.load_model(model_path)
 
 
-signals, amplitudes, positions, _, _, _ = generate_signal_dataset(
+training = generate_signal_dataset(
     n_samples=100,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
@@ -25,7 +24,7 @@ signals, amplitudes, positions, _, _, _ = generate_signal_dataset(
 )
 
 predictions, uncertainty = filter_predictions(
-    signals=signals,
+    signals=training.signals,
     model=roi_model,
     n_samples=30,
     threshold=0.9
@@ -46,10 +45,9 @@ indices = find_middle_indices(
 # individual Gaussians using a custom curve function.
 
 plotter = SignalPlotter()
-plotter.add_signals(signals)
-plotter.add_scatter(positions, amplitudes)
-plotter.add_vline(indices)
+plotter.add_signals(training.signals)
+plotter.add_scatter(training.positions, training.amplitudes)
 plotter.add_roi(predictions)
 
 plotter.set_title("Demo: Signals + Peaks + ROI")
-_ = plotter.plot(n_examples=6, n_columns=3, random_select=True)
+_ = plotter.plot(n_examples=15, n_columns=5, random_select=True)
