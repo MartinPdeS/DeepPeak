@@ -165,7 +165,7 @@ def plot_gradcam_with_signal(
     plt.tight_layout()
     plt.show()
 
-def plot_training_history(*histories, filtering: list = None, y_scale: str = 'log', show: bool = True) -> plt.Figure:
+def plot_training_history(history, metrics: list, y_scale: str = 'log', show: bool = True) -> plt.Figure:
     """
     Plot training and validation performance metrics (loss and accuracy).
 
@@ -176,41 +176,24 @@ def plot_training_history(*histories, filtering: list = None, y_scale: str = 'lo
     filtering : list of str, optional
         List of wildcard patterns to filter the keys in the history dictionary. Use '*' as a wildcard.
     """
-    # Convert wildcard patterns to regex patterns
-    def wildcard_to_regex(pattern):
-        return "^" + re.escape(pattern).replace("\\*", ".*") + "$"
+    metrics = set(metrics).intersection(set(history.history))
 
     with plt.style.context(mps):
-        figure, axes = plt.subplots(
-            nrows=len(histories),
+        figure, ax = plt.subplots(
+            nrows=1,
             ncols=1,
             sharex=True,
-            squeeze=False,
-            figsize=(8, 3 * len(histories))
+            squeeze=True,
+            figsize=(8, 3)
         )
 
-    for history in histories:
-        # Filter the history dictionary based on converted patterns
-        if filtering is not None:
-            regex_patterns = [wildcard_to_regex(pattern) for pattern in filtering]
-            history_dict = {
-                k: v for k, v in history.history.items()
-                if any(re.fullmatch(regex, k) for regex in regex_patterns)
-            }
-        else:
-            history_dict = history.history
+    for metric in metrics:
+        values = history.history[metric]
+        ax.plot(values, label=metric.replace('_', ' '))
+        ax.legend(loc='upper left')
+        ax.set_yscale(y_scale)
 
-        if not history_dict:
-            print("No matching keys found for the provided filtering patterns.")
-            return
-
-        for ax, (key, value) in zip(axes.flatten(), history_dict.items()):
-            ax.plot(value, label=history.name if hasattr(history, 'name') else '')
-            ax.legend(loc='upper left')
-            ax.set_ylabel(key.replace('_', ' '))
-            ax.set_yscale(y_scale)
-
-    axes.flatten()[-1].set_xlabel('Number of Epochs')
+    ax.set_xlabel('Number of Epochs')
     figure.suptitle('Training History')
 
     plt.tight_layout()
@@ -219,6 +202,61 @@ def plot_training_history(*histories, filtering: list = None, y_scale: str = 'lo
         plt.show()
 
     return figure
+
+# def plot_training_history(*histories, filtering: list = None, y_scale: str = 'log', show: bool = True) -> plt.Figure:
+#     """
+#     Plot training and validation performance metrics (loss and accuracy).
+
+#     Parameters
+#     ----------
+#     history : tensorflow.keras.callbacks.History
+#         The training history object from model.fit().
+#     filtering : list of str, optional
+#         List of wildcard patterns to filter the keys in the history dictionary. Use '*' as a wildcard.
+#     """
+#     # Convert wildcard patterns to regex patterns
+#     def wildcard_to_regex(pattern):
+#         return "^" + re.escape(pattern).replace("\\*", ".*") + "$"
+
+#     with plt.style.context(mps):
+#         figure, axes = plt.subplots(
+#             nrows=len(histories),
+#             ncols=1,
+#             sharex=True,
+#             squeeze=False,
+#             figsize=(8, 3 * len(histories))
+#         )
+
+#     for history in histories:
+#         # Filter the history dictionary based on converted patterns
+#         if filtering is not None:
+#             regex_patterns = [wildcard_to_regex(pattern) for pattern in filtering]
+#             history_dict = {
+#                 k: v for k, v in history.history.items()
+#                 if any(re.fullmatch(regex, k) for regex in regex_patterns)
+#             }
+#         else:
+#             history_dict = history.history
+
+#         if not history_dict:
+#             print("No matching keys found for the provided filtering patterns.")
+#             return
+
+#         for ax, (key, value) in zip(axes.flatten(), history_dict.items()):
+#             ax.plot(value, label=history.name if hasattr(history, 'name') else '')
+#             ax.legend(loc='upper left')
+#             ax.set_ylabel(key.replace('_', ' '))
+#             ax.set_yscale(y_scale)
+
+#     axes.flatten()[-1].set_xlabel('Number of Epochs')
+#     figure.suptitle('Training History')
+
+#     plt.tight_layout()
+
+#     if show:
+#         plt.show()
+
+#     return figure
 
 
 class SignalPlotter:
