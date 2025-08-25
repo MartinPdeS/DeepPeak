@@ -1,203 +1,283 @@
+from __future__ import annotations
+
 from typing import Tuple, Optional, Dict
 import numpy as np
-from tensorflow.keras.utils import to_categorical  # type: ignore
+from enum import Enum
+from DeepPeak.dataset import DataSet  # type: ignore
 
-class DataSet:
+
+class Kernel(Enum):
+    GAUSSIAN = "gaussian"
+    LORENTZIAN = "lorentzian"
+    BESSEL = "bessel"
+    SQUARE = "square"
+    ASYMMETRIC_GAUSSIAN = "asym_gaussian"
+    DIRAC = "dirac"
+
+
+class SignalDatasetGenerator:
     """
-    A simple container class for datasets.
+    Class-based generator for synthetic 1D signals with variable peak counts and shapes.
+    Mirrors the behavior of the original `generate_signal_dataset` function, but without
+    relying on Keras for one-hot encoding.
 
-    This class dynamically sets attributes based on the provided keyword arguments,
-    allowing for flexible storage of various dataset components.
-
-    Parameters
-    ----------
-    **kwargs : dict
-        Keyword arguments to be set as attributes of the instance.
+    Key features:
+    - Supports Gaussian, Lorentzian, Bessel-like, Square, Asymmetric Gaussian, and Dirac kernels
+    - Returns labels marking discrete peak locations
+    - Optional Gaussian noise
+    - Optional NumPy-based one-hot encoding for the number of peaks
+    - Optional ROI mask computation (exposed via `last_rois_` attribute)
     """
-    def __init__(self, **kwargs):
-        for key, value in kwargs.items():
-            setattr(self, key, value)
 
+    # --- public attributes updated on each generate() call ---
+    last_rois_: Optional[np.ndarray] = None
 
-def interpret_input(*inputs):
-    """
-    Decorator that ensures specified function parameters are interpreted as tuples.
+    def __init__(self, n_samples: int, sequence_length: int) -> None:
+        """
+        Initialize the signal dataset generator.
 
-    If a parameter listed in `inputs` is provided as a scalar (int or float),
-    it will be converted into a tuple of the form (value, value).
+        Parameters
+        ----------
+        n_samples : int
+            Number of signals (rows) to generate.
+        sequence_length : int
+            Length of each signal (columns).
+        """
+        self.n_samples = n_samples
+        self.sequence_length = sequence_length
 
-    Parameters
-    ----------
-    *inputs : str
-        Names of the parameters to be interpreted as tuples.
+    # -------------------------- public API --------------------------
 
-    Returns
-    -------
-    function
-        A wrapped function with specified parameters guaranteed to be tuples.
-    """
-    def _interpret_input(function):
-        def wrapper(**kwargs):
-            kwargs = {
-                k: (v, v) if k in inputs and isinstance(v, (float, int)) else v
-                for k, v in kwargs.items()
-            }
-            return function(**kwargs)
-        return wrapper
-    return _interpret_input
+    def generate(
+        self,
+        *,
+        n_peaks: Tuple[int, int] | int,
+        signal_type: Kernel | str = Kernel.GAUSSIAN,
+        extra_kwargs: Optional[Dict] = None,
+        amplitude: Tuple[float, float] | float = (1.0, 2.0),
+        position: Tuple[float, float] | float = (0.0, 1.0),  # normalized 0..1
+        width: Tuple[float, float] | float = (0.03, 0.03),
+        seed: Optional[int] = None,
+        noise_std: float = 0.01,
+        categorical_peak_count: bool = False,
+        kernel: Optional[np.ndarray] = None,
+        compute_region_of_interest: bool = False,
+        roi_width_in_pixels: int = 4,
+    ) -> DataSet:
+        """
+        Generate a dataset of 1D signals with varying number of peaks.
 
+        Parameters
+        ----------
+        n_peaks : (int,int) or int
+            (min_peaks, max_peaks) inclusive; if int, uses (v, v).
+        signal_type : Kernel | str
+            Peak shape type (Kernel enum or matching string value).
+        extra_kwargs : dict, optional
+            Additional args for specific kernels (e.g., `separation`, `second_peak_ratio` for ASYMMETRIC_GAUSSIAN).
+        amplitude : (float,float) or float
+            Amplitude range; if float, uses (v, v).
+        position : (float,float) or float
+            Position range in [0, 1]; if float, uses (v, v).
+        width : (float,float) or float
+            Width range; if float, uses (v, v).
+        seed : int, optional
+            RNG seed.
+        noise_std : float
+            Additive Gaussian noise std.
+        categorical_peak_count : bool
+            If True, return one-hot encoding of peak counts (NumPy-based).
+        kernel : np.ndarray, optional
+            Convolution kernel used only for DIRAC.
+        compute_region_of_interest : bool
+            If True, compute an ROI mask around each discrete peak (stored in `last_rois_`).
+        roi_width_in_pixels : int
+            ROI full width in samples (integer), used when `compute_region_of_interest=True`.
 
-@interpret_input('width', 'position', 'amplitude')
-def generate_signal_dataset(
-    n_samples: int,
-    sequence_length: int,
-    n_peaks: Tuple[int, int],
-    signal_type: str = 'gaussian',
-    extra_kwargs: Optional[Dict] = None,
-    amplitude: Tuple[float, float] = (1.0, 2.0),
-    position: Tuple[float, float] = (0.0, 1.0),  # Normalized position (0-1)
-    width: Tuple[float, float] = (0.03, 0.03),
-    seed: Optional[int] = None,
-    noise_std: float = 0.01,
-    categorical_peak_count: bool = False,
-    kernel: Optional[np.ndarray] = None
-):
-    """
-    Generate 1D signals with varying numbers of peaks, and produce associated labels and peak parameters.
+        Returns
+        -------
+        DataSet
+            Object with fields: signals, labels, amplitudes, positions, widths, x_values, num_peaks.
+        """
+        # -------------------- sanitize/normalize inputs --------------------
+        if isinstance(signal_type, str):
+            signal_type = Kernel(signal_type)
+        self._assert_kernel(signal_type)
 
-    The generated signals can be of different types, including Gaussian, Lorentzian, Bessel,
-    square, asymmetric Gaussian, and dirac delta signals. For each sample, a random number
-    of peaks is generated between a minimum and maximum value. For samples that do not have the
-    maximum number of peaks, the amplitudes and positions for the inactive peaks are set to np.nan.
+        # coerce scalars to (v, v)
+        n_peaks = self._ensure_tuple(n_peaks)
+        amplitude = self._ensure_tuple(amplitude)
+        position = self._ensure_tuple(position)
+        width = self._ensure_tuple(width)
 
-    Parameters
-    ----------
-    n_samples : int
-        Number of signals to generate.
-    sequence_length : int
-        Length of each generated signal (number of data points).
-    n_peaks : tuple of int
-        Tuple (min_peaks, max_peaks) specifying the range for the number of peaks per signal.
-    signal_type : str, optional
-        Type of signal to generate. Options include:
-        'gaussian', 'lorentzian', 'bessel', 'square', 'asym_gaussian', 'dirac'. Default is 'gaussian'.
-    extra_kwargs : dict, optional
-        Additional keyword arguments used for certain signal types (e.g., separation and second_peak_ratio for 'asym_gaussian').
-    amplitude : tuple of float, optional
-        Range (min, max) for generating peak amplitudes. Default is (1.0, 2.0).
-    position : tuple of float, optional
-        Range (min, max) for generating peak positions (normalized between 0 and 1). Default is (0.0, 1.0).
-    width : tuple of float, optional
-        Range (min, max) for generating peak widths. Default is (0.03, 0.03).
-    seed : int, optional
-        Seed for the random number generator. If provided, results are reproducible.
-    noise_std : float, optional
-        Standard deviation of Gaussian noise added to the signal. Default is 0.01.
-    categorical_peak_count : bool, optional
-        If True, the number of peaks is returned as a categorical (one-hot encoded) array.
-        Otherwise, it is returned as integer counts.
-    kernel : np.ndarray, optional
-        Convolution kernel to be applied to the signal when signal_type is 'dirac'.
+        if seed is not None:
+            np.random.seed(seed)
+        if extra_kwargs is None:
+            extra_kwargs = {}
 
-    Returns
-    -------
-    DataSet
-        An instance of DataSet containing the following attributes:
-            - signals : np.ndarray
-                Array of generated signals.
-            - labels : np.ndarray
-                Binary label array where 1 indicates the presence of a peak.
-            - amplitudes : np.ndarray
-                Array of peak amplitudes. Inactive peak entries (when a sample has fewer than the maximum peaks) are set to np.nan.
-            - positions : np.ndarray
-                Array of peak positions (normalized). Inactive peak entries are set to np.nan.
-            - widths : np.ndarray
-                Array of peak widths.
-            - x_values : np.ndarray
-                Array of x-axis values for the signal.
-            - num_peaks : np.ndarray or one-hot encoded array
-                Number of peaks per sample (or one-hot encoded representation if categorical_peak_count is True).
-    """
-    if seed is not None:
-        np.random.seed(seed)
+        min_peaks, max_peaks = int(n_peaks[0]), int(n_peaks[1])
+        num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=self.n_samples)
 
-    if extra_kwargs is None:
-        extra_kwargs = {}
+        amplitudes = np.random.uniform(*amplitude, size=(self.n_samples, max_peaks))
+        positions = np.random.uniform(*position, size=(self.n_samples, max_peaks))
+        widths = np.random.uniform(*width, size=(self.n_samples, max_peaks))
 
-    min_peaks, max_peaks = n_peaks
-    num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
+        # Keep a copy for label computation prior to NaN-masking
+        positions_for_labels = positions.copy()
 
-    amplitudes = np.random.uniform(*amplitude, size=(n_samples, max_peaks))
-    positions = np.random.uniform(*position, size=(n_samples, max_peaks))
-    widths = np.random.uniform(*width, size=(n_samples, max_peaks))
+        # Mask inactive peaks (index >= num_peaks[i]) -> set to NaN
+        peak_indices = np.arange(max_peaks)
+        mask = peak_indices < num_peaks[:, None]
+        amplitudes[~mask] = np.nan
+        positions[~mask] = np.nan
+        widths[~mask] = np.nan
 
-    # Keep a copy of the original positions for label computation
-    positions_for_labels = positions.copy()
+        x_values = np.linspace(0.0, 1.0, self.sequence_length)
+        x_ = x_values.reshape(1, 1, -1)
+        pos_ = positions_for_labels[..., np.newaxis]
+        wid_ = widths[..., np.newaxis]
+        amp_ = amplitudes[..., np.newaxis]
 
-    # Create a mask for active peaks (True for indices < num_peaks for each sample)
-    peak_indices = np.arange(max_peaks)
-    mask = peak_indices < num_peaks[:, None]
-
-    # Set inactive peak amplitudes and positions to np.nan
-    amplitudes[~mask] = np.nan
-    positions[~mask] = np.nan
-    widths[~mask] = np.nan
-
-    x_values = np.linspace(0, 1, sequence_length)
-    x_ = x_values.reshape(1, 1, -1)
-    # Use original positions for signal generation to ensure valid computation
-    pos_ = positions_for_labels[..., np.newaxis]
-    wid_ = widths[..., np.newaxis]
-    amp_ = amplitudes[..., np.newaxis]
-
-    # Initialize labels array (all zeros)
-    labels = np.zeros((n_samples, sequence_length))
-    match signal_type.lower():
-        case 'gaussian':
-            peaks = amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_)**2)
-        case 'lorentzian':
-            peaks = amp_ / (1 + ((x_ - pos_) / wid_)**2)
-        case 'bessel':
-            peaks = amp_ * np.abs(np.sin((x_ - pos_) / wid_)) / ((x_ - pos_) / wid_ + 1e-6)
-        case 'square':
-            peaks = amp_ * ((np.abs(x_ - pos_) < wid_) * 1.0)
-        case 'asym_gaussian':
-            separation = extra_kwargs.get('separation', 0.1)
-            second_peak_ratio = extra_kwargs.get('second_peak_ratio', 0.5)
-            peaks = amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_)**2) + (amp_ * second_peak_ratio * np.exp(-0.5 * ((x_ - (pos_ + separation)) / (wid_ * 0.5))**2))
-        case 'dirac':
-            signals = np.zeros((n_samples, sequence_length))
-            for i in range(n_samples):
-                signal = np.zeros(sequence_length)
-                # Use original positions to determine the peak index
-                peak_pos = (positions_for_labels[i, :num_peaks[i]] * (sequence_length - 1)).astype(int)
-                signal[peak_pos] = amplitudes[i, :num_peaks[i]]
+        # Build signals
+        if signal_type == Kernel.DIRAC:
+            signals = np.zeros((self.n_samples, self.sequence_length))
+            for i in range(self.n_samples):
+                sig = np.zeros(self.sequence_length)
+                # Use original positions (not NaN-masked) to construct impulses
+                peak_pos = (positions_for_labels[i, : num_peaks[i]] * (self.sequence_length - 1)).astype(int)
+                sig[peak_pos] = amplitudes[i, : num_peaks[i]]
                 if kernel is not None:
-                    signal = np.convolve(signal, kernel, mode='same')
-                signals[i] = signal
-        case _:
-            raise ValueError("Invalid signal type. Choose from 'gaussian', 'lorentzian', 'bessel', 'square', 'asym_gaussian', 'dirac'.")
+                    sig = np.convolve(sig, kernel, mode="same")
+                signals[i] = sig
+        else:
+            peaks = self._build_peaks(signal_type, x_, pos_, wid_, amp_, extra_kwargs)
+            signals = np.nansum(peaks, axis=1)
 
-    # Compute label array: Mark the positions where peaks occur using original positions
-    peak_positions = (positions_for_labels * (sequence_length - 1)).astype(int)
-    for i in range(n_samples):
-        labels[i, peak_positions[i, :num_peaks[i]]] = 1
+        # Labels: 1 at discrete peak centers using *original* positions
+        labels = np.zeros((self.n_samples, self.sequence_length))
+        peak_positions = (positions_for_labels * (self.sequence_length - 1)).astype(int)
+        for i in range(self.n_samples):
+            labels[i, peak_positions[i, : num_peaks[i]]] = 1
 
-    if signal_type != 'dirac':
-        signals = np.nansum(peaks, axis=1)
+        # Add noise
+        if noise_std > 0:
+            signals = signals + np.random.normal(0.0, noise_std, signals.shape)
 
-    if noise_std > 0:
-        signals += np.random.normal(0, noise_std, signals.shape)
+        # Optional one-hot (no Keras)
+        if categorical_peak_count:
+            num_peaks_out = self._one_hot_numpy(num_peaks, max_peaks + 1, dtype=np.float32)
+        else:
+            num_peaks_out = num_peaks
 
-    if categorical_peak_count:
-        num_peaks = to_categorical(num_peaks, max_peaks + 1)
+        # Optional ROI
+        self.last_rois_ = None
+        if compute_region_of_interest:
+            self.last_rois_ = self._compute_rois_from_signals(
+                signals=signals,
+                positions=positions,
+                amplitudes=amplitudes,
+                width_in_pixels=roi_width_in_pixels,
+            )
 
-    return DataSet(
-        signals=signals,
-        labels=labels,
-        amplitudes=amplitudes,
-        positions=positions,
-        widths=widths,
-        x_values=x_values,
-        num_peaks=num_peaks
-    )
+        return DataSet(
+            signals=signals,
+            labels=labels,
+            amplitudes=amplitudes,
+            positions=positions,
+            widths=widths,
+            x_values=x_values,
+            num_peaks=num_peaks_out,
+            region_of_interest=self.last_rois_
+        )
+
+    # -------------------------- helpers --------------------------
+
+    @staticmethod
+    def _ensure_tuple(value: Tuple[float, float] | float | Tuple[int, int] | int) -> Tuple[float, float] | Tuple[int, int]:
+        """If value is a scalar, return (v, v); otherwise return value."""
+        if isinstance(value, (int, float)):
+            return (value, value)  # type: ignore[return-value]
+        return value  # type: ignore[return-value]
+
+    @staticmethod
+    def _assert_kernel(signal_type: Kernel) -> None:
+        if not isinstance(signal_type, Kernel):
+            raise ValueError(f"`signal_type` must be a Kernel enum or matching string, got {signal_type!r}")
+
+    @staticmethod
+    def _one_hot_numpy(indices: np.ndarray, num_classes: int, dtype=np.float32) -> np.ndarray:
+        """
+        Fast, pure-NumPy one-hot encoder.
+        """
+        indices = np.asarray(indices, dtype=np.int64).ravel()
+        if indices.size == 0:
+            return np.zeros((0, num_classes), dtype=dtype)
+        if (indices < 0).any() or (indices >= num_classes).any():
+            raise ValueError("indices out of range for the specified num_classes")
+
+        out = np.zeros((indices.shape[0], num_classes), dtype=dtype)
+        out[np.arange(indices.shape[0]), indices] = 1
+        return out
+
+    @staticmethod
+    def _compute_rois_from_signals(
+        signals: np.ndarray,
+        positions: np.ndarray,
+        amplitudes: np.ndarray,
+        width_in_pixels: int,
+    ) -> np.ndarray:
+        """
+        Compute binary ROI mask with ±(width_in_pixels // 2) around each peak center.
+        """
+        n_samples, sequence_length = signals.shape
+        _, n_peaks = positions.shape
+
+        rois = np.zeros_like(signals, dtype=np.int32)
+        pixel_positions = (positions * (sequence_length - 1)).astype(int)
+        half_w = width_in_pixels // 2
+
+        for i in range(n_samples):
+            for j in range(n_peaks):
+                center_idx = pixel_positions[i, j]
+                amp = amplitudes[i, j]
+                if np.isnan(amp) or amp == 0:
+                    continue
+                if center_idx < 0 or center_idx > (sequence_length - 1):
+                    continue
+                start_idx = max(0, center_idx - half_w)
+                end_idx = min(sequence_length, center_idx + half_w + 2)
+                rois[i, start_idx:end_idx] = 1
+        return rois
+
+    @staticmethod
+    def _build_peaks(
+        signal_type: Kernel,
+        x_: np.ndarray,
+        pos_: np.ndarray,
+        wid_: np.ndarray,
+        amp_: np.ndarray,
+        extra_kwargs: Dict,
+    ) -> np.ndarray:
+        """
+        Vectorized construction of peaks for non-DIRAC kernels.
+        """
+        match signal_type:
+            case Kernel.GAUSSIAN:
+                return amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_) ** 2)
+            case Kernel.LORENTZIAN:
+                return amp_ / (1.0 + ((x_ - pos_) / wid_) ** 2)
+            case Kernel.BESSEL:
+                z = (x_ - pos_) / wid_
+                return amp_ * np.abs(np.sin(z)) / (z + 1e-6)
+            case Kernel.SQUARE:
+                return amp_ * ((np.abs(x_ - pos_) < wid_) * 1.0)
+            case Kernel.ASYMMETRIC_GAUSSIAN:
+                separation = extra_kwargs.get("separation", 0.1)
+                second_peak_ratio = extra_kwargs.get("second_peak_ratio", 0.5)
+                return (
+                    amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_) ** 2)
+                    + (amp_ * second_peak_ratio)
+                    * np.exp(-0.5 * ((x_ - (pos_ + separation)) / (wid_ * 0.5)) ** 2)
+                )
+            case _:
+                raise ValueError(f"Unsupported signal_type: {signal_type}")
