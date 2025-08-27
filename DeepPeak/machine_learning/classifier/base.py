@@ -1,7 +1,10 @@
 from typing import Optional, Union, Iterable
 import numpy as np
+import re
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from MPSPlots.styles import mps as plot_style
+
 from DeepPeak.helper import mpl_plot
 
 HistoryLike = Union[tf.keras.callbacks.History, dict]
@@ -168,7 +171,7 @@ class BaseClassifier():
     # --------------------------------------------------------------------- #
     # Plotting
     # --------------------------------------------------------------------- #
-    def plot_model_history(self, history: Optional[HistoryLike] = None) -> None:
+    def plot_model_history(self, filter_pattern: str = r".*") -> None:
         """
         Plot training/validation curves from a History or dict-like object.
 
@@ -178,42 +181,35 @@ class BaseClassifier():
 
         Parameters
         ----------
-        history : Optional[HistoryLike]
-            Training history to plot.
+        filter_pattern : str
+            Optional regex pattern to filter the metrics to plot.
         """
-        hist = self._coerce_history(history or self.history_)
+        hist = self.history_.history
+
         if hist is None:
             raise ValueError("No history available. Train the model or pass a History/dict to plot.")
 
-        # Determine which keys are present
-        keys = list(hist.keys())
-        loss_keys = [k for k in ("loss", "val_loss") if k in hist]
-        acc_keys = [k for k in ("accuracy", "val_accuracy", "acc", "val_acc") if k in hist]
+        parameters = list(hist.keys())
 
-        nrows = 1 + (1 if acc_keys else 0)
-        fig, axes = plt.subplots(nrows=nrows, ncols=1, figsize=(7, 4 * nrows))
-        if nrows == 1:
-            axes = [axes]
+        if filter_pattern is not None:
+            pattern = re.compile(filter_pattern)
+            parameters = [s for s in parameters if pattern.match(s)]
 
-        # Loss
-        ax = axes[0]
-        for k in loss_keys:
-            ax.plot(hist[k], label=k)
-        ax.set_title("Loss")
-        ax.set_xlabel("Epoch")
-        ax.set_ylabel("Loss")
-        ax.legend()
+        if len(parameters) == 0:
+            print(f"No matching parameters found. List of parameters: {list(hist.keys())}")
+            return
 
-        # Accuracy (if available)
-        if nrows > 1:
-            ax = axes[1]
-            for k in acc_keys:
-                ax.plot(hist[k], label=k)
-            ax.set_title("Accuracy")
-            ax.set_xlabel("Epoch")
-            ax.set_ylabel("Accuracy")
-            ax.legend()
+        with plt.style.context(plot_style):
+            nrows = len(parameters)
+            figure, axes = plt.subplots(nrows=len(parameters), ncols=1, figsize=(8, 2 * nrows), squeeze=False)
 
-        plt.tight_layout()
-        plt.show()
+            for ax, parameter in zip(axes.flatten(), parameters):
+                ax.plot(hist[parameter], label=parameter)
+                ax.legend()
+                ax.set_title(parameter)
+                ax.set_xlabel("Epoch")
+                ax.set_ylabel(parameter)
+
+            plt.tight_layout()
+            plt.show()
 

@@ -75,14 +75,14 @@ history = dense_net.fit(
     dataset.signals,
     dataset.region_of_interest,
     validation_split=0.2,
-    epochs=20,
+    epochs=4,
     batch_size=64
 )
 
 # %%
 # Plot training history
 # ---------------------
-dense_net.plot_model_history(history)
+dense_net.plot_model_history(filter_pattern="BinaryIoU")
 
 # %%
 # Predict and visualize on a test signal
