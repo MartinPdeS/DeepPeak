@@ -2,20 +2,20 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/MartinPdeS/DeepPeak/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name                                                 |    Stmts |     Miss |  Cover |   Missing |
-|----------------------------------------------------- | -------: | -------: | -----: | --------: |
-| DeepPeak/algorithms/non\_maximum\_suppression.py     |      110 |      110 |     0% |     1-330 |
-| DeepPeak/dataset.py                                  |       28 |       28 |     0% |      1-54 |
-| DeepPeak/helper.py                                   |       18 |       18 |     0% |      3-50 |
-| DeepPeak/machine\_learning/classifier/autoencoder.py |       39 |       39 |     0% |      1-90 |
-| DeepPeak/machine\_learning/classifier/base.py        |       83 |       83 |     0% |     1-218 |
-| DeepPeak/machine\_learning/classifier/dense.py       |       28 |       28 |     0% |      1-63 |
-| DeepPeak/machine\_learning/classifier/utils.py       |       38 |       38 |     0% |     1-249 |
-| DeepPeak/machine\_learning/classifier/wavenet.py     |       36 |       36 |     0% |      1-88 |
-| DeepPeak/signals.py                                  |      132 |      132 |     0% |     1-345 |
-| DeepPeak/utils.py                                    |       71 |       71 |     0% |     1-167 |
-| DeepPeak/visualization.py                            |      202 |      202 |     0% |     1-767 |
-|                                            **TOTAL** |  **785** |  **785** | **0%** |           |
+| Name                                                 |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
+|----------------------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
+| DeepPeak/algorithms/non\_maximum\_suppression.py     |      110 |      110 |       16 |        0 |      0% |     1-330 |
+| DeepPeak/dataset.py                                  |       28 |       21 |       16 |        0 |     20% |     21-54 |
+| DeepPeak/helper.py                                   |       18 |       11 |        4 |        0 |     32% |     33-48 |
+| DeepPeak/machine\_learning/classifier/autoencoder.py |       39 |        1 |        2 |        1 |     95% |        62 |
+| DeepPeak/machine\_learning/classifier/base.py        |       83 |       24 |       20 |        7 |     68% |22-40, 44-45, 49-50, 54, 59, 62-64, 95, 112-114, 123-124, 186, 196, 208->217 |
+| DeepPeak/machine\_learning/classifier/dense.py       |       28 |        1 |        4 |        1 |     94% |        44 |
+| DeepPeak/machine\_learning/classifier/utils.py       |       38 |       38 |        2 |        0 |      0% |     1-249 |
+| DeepPeak/machine\_learning/classifier/wavenet.py     |       36 |        1 |        4 |        1 |     95% |        49 |
+| DeepPeak/signals.py                                  |      132 |       35 |       42 |       12 |     64% |104, 114, 115->118, 143-151, 163->167, 168, 174->182, 199, 205, 221-229, 276, 284->291, 329-345 |
+| DeepPeak/utils.py                                    |       71 |       71 |       14 |        0 |      0% |     1-167 |
+| DeepPeak/visualization.py                            |      202 |      202 |       70 |        0 |      0% |     1-767 |
+|                                            **TOTAL** |  **785** |  **515** |  **194** |   **22** | **31%** |           |
 
 
 ## Setup coverage badge

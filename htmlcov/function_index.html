@@ -11,7 +11,7 @@
 <header>
     <div class="content">
         <h1>Coverage report:
-            <span class="pc_cov">0%</span>
+            <span class="pc_cov">31%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -27,6 +27,8 @@
                         <kbd>s</kbd>
                         <kbd>m</kbd>
                         <kbd>x</kbd>
+                        <kbd>b</kbd>
+                        <kbd>p</kbd>
                         <kbd>c</kbd>
                         &nbsp; change column sorting
                     </p>
@@ -55,7 +57,7 @@
         </h2>
         <p class="text">
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.5">coverage.py v7.10.5</a>,
-            created at 2025-08-27 10:58 +0000
+            created at 2025-08-27 11:03 +0000
         </p>
     </div>
 </header>
@@ -68,6 +70,8 @@
                 <th id="statements" aria-sort="none" data-default-sort-order="descending" data-shortcut="s">statements<span class="arrows"></span></th>
                 <th id="missing" aria-sort="none" data-default-sort-order="descending" data-shortcut="m">missing<span class="arrows"></span></th>
                 <th id="excluded" aria-sort="none" data-default-sort-order="descending" data-shortcut="x">excluded<span class="arrows"></span></th>
+                <th id="branches" aria-sort="none" data-default-sort-order="descending" data-shortcut="b">branches<span class="arrows"></span></th>
+                <th id="partial" aria-sort="none" data-default-sort-order="descending" data-shortcut="p">partial<span class="arrows"></span></th>
                 <th id="coverage" class="right" aria-sort="none" data-shortcut="c">coverage<span class="arrows"></span></th>
             </tr>
         </thead>
@@ -78,6 +82,8 @@
                 <td>13</td>
                 <td>13</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 13">0%</td>
             </tr>
             <tr class="region">
@@ -86,7 +92,9 @@
                 <td>25</td>
                 <td>25</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 25">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 29">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_726542d7dec6cea9_non_maximum_suppression_py.html#t162">DeepPeak/algorithms/non_maximum_suppression.py</a></td>
@@ -94,13 +102,17 @@
                 <td>18</td>
                 <td>18</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 18">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 22">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_726542d7dec6cea9_non_maximum_suppression_py.html#t190">DeepPeak/algorithms/non_maximum_suppression.py</a></td>
                 <td class="name left"><a href="z_726542d7dec6cea9_non_maximum_suppression_py.html#t190"><data value='full_width_half_maximum_to_sigma'>NonMaximumSuppression.full_width_half_maximum_to_sigma</data></a></td>
                 <td>1</td>
                 <td>1</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 1">0%</td>
             </tr>
@@ -110,6 +122,8 @@
                 <td>5</td>
                 <td>5</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 5">0%</td>
             </tr>
             <tr class="region">
@@ -117,6 +131,8 @@
                 <td class="name left"><a href="z_726542d7dec6cea9_non_maximum_suppression_py.html#t225"><data value='correlate'>NonMaximumSuppression._correlate</data></a></td>
                 <td>1</td>
                 <td>1</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 1">0%</td>
             </tr>
@@ -126,13 +142,17 @@
                 <td>13</td>
                 <td>13</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 13">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 17">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_726542d7dec6cea9_non_maximum_suppression_py.html#t275">DeepPeak/algorithms/non_maximum_suppression.py</a></td>
                 <td class="name left"><a href="z_726542d7dec6cea9_non_maximum_suppression_py.html#t275"><data value='estimate_noise_std'>NonMaximumSuppression._estimate_noise_std</data></a></td>
                 <td>3</td>
                 <td>3</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 3">0%</td>
             </tr>
@@ -142,7 +162,9 @@
                 <td>11</td>
                 <td>11</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 11">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 15">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_726542d7dec6cea9_non_maximum_suppression_py.html">DeepPeak/algorithms/non_maximum_suppression.py</a></td>
@@ -150,15 +172,19 @@
                 <td>20</td>
                 <td>20</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 20">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_dataset_py.html#t16">DeepPeak/dataset.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_dataset_py.html#t16"><data value='init__'>DataSet.__init__</data></a></td>
                 <td>2</td>
+                <td>0</td>
+                <td>0</td>
                 <td>2</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 2">0%</td>
+                <td class="right" data-ratio="4 4">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_dataset_py.html#t20">DeepPeak/dataset.py</a></td>
@@ -166,23 +192,29 @@
                 <td>21</td>
                 <td>21</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 21">0%</td>
+                <td>14</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 35">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_dataset_py.html">DeepPeak/dataset.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_dataset_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>5</td>
-                <td>5</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 5">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="5 5">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_helper_py.html#t8">DeepPeak/helper.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_helper_py.html#t8"><data value='mpl_plot'>mpl_plot</data></a></td>
                 <td>2</td>
-                <td>2</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 2">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="2 2">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_helper_py.html#t10">DeepPeak/helper.py</a></td>
@@ -190,37 +222,47 @@
                 <td>11</td>
                 <td>11</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 11">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 15">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_helper_py.html">DeepPeak/helper.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_helper_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>5</td>
-                <td>5</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 5">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="5 5">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_autoencoder_py.html#t59">DeepPeak/machine_learning/classifier/autoencoder.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_autoencoder_py.html#t59"><data value='build'>Autoencoder.build</data></a></td>
                 <td>19</td>
-                <td>19</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 19">0%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="right" data-ratio="19 21">90%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_autoencoder_py.html">DeepPeak/machine_learning/classifier/autoencoder.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_autoencoder_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>20</td>
-                <td>20</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 20">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="20 20">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t11">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t11"><data value='plot_prediction'>BaseClassifier.plot_prediction</data></a></td>
                 <td>7</td>
                 <td>7</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 7">0%</td>
             </tr>
@@ -230,6 +272,8 @@
                 <td>2</td>
                 <td>2</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 2">0%</td>
             </tr>
             <tr class="region">
@@ -238,45 +282,57 @@
                 <td>2</td>
                 <td>2</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 2">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t52">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t52"><data value='ensure_built'>BaseClassifier._ensure_built</data></a></td>
                 <td>2</td>
-                <td>2</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 2">0%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="right" data-ratio="2 4">50%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t57">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t57"><data value='coerce_history'>BaseClassifier._coerce_history</data></a></td>
                 <td>7</td>
-                <td>7</td>
+                <td>4</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 7">0%</td>
+                <td>6</td>
+                <td>2</td>
+                <td class="right" data-ratio="5 13">38%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t66">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t66"><data value='summary'>BaseClassifier.summary</data></a></td>
                 <td>2</td>
-                <td>2</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 2">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="2 2">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t71">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t71"><data value='predict'>BaseClassifier.predict</data></a></td>
                 <td>5</td>
-                <td>5</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 5">0%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="right" data-ratio="5 7">71%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t97">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t97"><data value='evaluate'>BaseClassifier.evaluate</data></a></td>
                 <td>3</td>
                 <td>3</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 3">0%</td>
             </tr>
@@ -286,53 +342,67 @@
                 <td>2</td>
                 <td>2</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 2">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t126">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t126"><data value='fit'>BaseClassifier.fit</data></a></td>
                 <td>4</td>
-                <td>4</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 4">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="4 4">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t171">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html#t171"><data value='plot_model_history'>BaseClassifier.plot_model_history</data></a></td>
                 <td>27</td>
-                <td>27</td>
+                <td>2</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 27">0%</td>
+                <td>10</td>
+                <td>3</td>
+                <td class="right" data-ratio="32 37">86%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>20</td>
-                <td>20</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 20">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="20 20">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_dense_py.html#t41">DeepPeak/machine_learning/classifier/dense.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_dense_py.html#t41"><data value='build'>DenseNet.build</data></a></td>
                 <td>10</td>
-                <td>10</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 10">0%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="right" data-ratio="12 14">86%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_dense_py.html">DeepPeak/machine_learning/classifier/dense.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_dense_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>18</td>
-                <td>18</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 18">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="18 18">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_utils_py.html#t5">DeepPeak/machine_learning/classifier/utils.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_utils_py.html#t5"><data value='compute_segmentation_metrics'>compute_segmentation_metrics</data></a></td>
                 <td>8</td>
                 <td>8</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 8">0%</td>
             </tr>
@@ -342,13 +412,17 @@
                 <td>10</td>
                 <td>10</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 10">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 12">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_utils_py.html#t134">DeepPeak/machine_learning/classifier/utils.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_utils_py.html#t134"><data value='mc_dropout_prediction'>mc_dropout_prediction</data></a></td>
                 <td>4</td>
                 <td>4</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 4">0%</td>
             </tr>
@@ -358,6 +432,8 @@
                 <td>9</td>
                 <td>9</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 9">0%</td>
             </tr>
             <tr class="region">
@@ -366,55 +442,69 @@
                 <td>7</td>
                 <td>7</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 7">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_wavenet_py.html#t44">DeepPeak/machine_learning/classifier/wavenet.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_wavenet_py.html#t44"><data value='build'>WaveNet.build</data></a></td>
                 <td>18</td>
-                <td>18</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 18">0%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="right" data-ratio="20 22">91%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_wavenet_py.html">DeepPeak/machine_learning/classifier/wavenet.py</a></td>
                 <td class="name left"><a href="z_5d28d843bd061520_wavenet_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>18</td>
-                <td>18</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 18">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="18 18">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t35">DeepPeak/signals.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t35"><data value='init__'>SignalDatasetGenerator.__init__</data></a></td>
                 <td>2</td>
-                <td>2</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 2">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="2 2">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t51">DeepPeak/signals.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t51"><data value='generate'>SignalDatasetGenerator.generate</data></a></td>
                 <td>51</td>
-                <td>51</td>
+                <td>11</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 51">0%</td>
+                <td>20</td>
+                <td>7</td>
+                <td class="right" data-ratio="49 71">69%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t196">DeepPeak/signals.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t196"><data value='ensure_tuple'>SignalDatasetGenerator._ensure_tuple</data></a></td>
                 <td>3</td>
-                <td>3</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 3">0%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="right" data-ratio="3 5">60%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t203">DeepPeak/signals.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t203"><data value='assert_kernel'>SignalDatasetGenerator._assert_kernel</data></a></td>
                 <td>2</td>
-                <td>2</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 2">0%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="right" data-ratio="2 4">50%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t208">DeepPeak/signals.py</a></td>
@@ -422,31 +512,39 @@
                 <td>8</td>
                 <td>8</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 8">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 12">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t233">DeepPeak/signals.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t233"><data value='compute_rois_from_signals'>SignalDatasetGenerator._compute_rois_from_signals</data></a></td>
                 <td>24</td>
-                <td>24</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 24">0%</td>
+                <td>4</td>
+                <td>2</td>
+                <td class="right" data-ratio="25 28">89%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t296">DeepPeak/signals.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html#t296"><data value='build_peaks'>SignalDatasetGenerator._build_peaks</data></a></td>
                 <td>16</td>
-                <td>16</td>
+                <td>13</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 16">0%</td>
+                <td>10</td>
+                <td>1</td>
+                <td class="right" data-ratio="4 26">15%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html">DeepPeak/signals.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>26</td>
-                <td>26</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 26">0%</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td class="right" data-ratio="26 26">100%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html#t9">DeepPeak/utils.py</a></td>
@@ -454,7 +552,9 @@
                 <td>5</td>
                 <td>5</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 5">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 9">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html#t18">DeepPeak/utils.py</a></td>
@@ -462,13 +562,17 @@
                 <td>7</td>
                 <td>7</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 7">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 9">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html#t34">DeepPeak/utils.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html#t34"><data value='filter_with_wavelet_transform'>filter_with_wavelet_transform</data></a></td>
                 <td>10</td>
                 <td>10</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 10">0%</td>
             </tr>
@@ -478,6 +582,8 @@
                 <td>3</td>
                 <td>3</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 3">0%</td>
             </tr>
             <tr class="region">
@@ -485,6 +591,8 @@
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html#t93"><data value='build_design_matrix'>PulseDeconvolver._build_design_matrix</data></a></td>
                 <td>1</td>
                 <td>1</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 1">0%</td>
             </tr>
@@ -494,7 +602,9 @@
                 <td>10</td>
                 <td>10</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 10">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 14">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html#t130">DeepPeak/utils.py</a></td>
@@ -502,13 +612,17 @@
                 <td>20</td>
                 <td>20</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 20">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 24">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html">DeepPeak/utils.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>15</td>
                 <td>15</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 15">0%</td>
             </tr>
@@ -518,13 +632,17 @@
                 <td>13</td>
                 <td>13</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 13">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 15">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t52">DeepPeak/visualization.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t52"><data value='plot_dense'>plot_dense</data></a></td>
                 <td>10</td>
                 <td>10</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 10">0%</td>
             </tr>
@@ -534,7 +652,9 @@
                 <td>21</td>
                 <td>21</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 21">0%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 27">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t168">DeepPeak/visualization.py</a></td>
@@ -542,13 +662,17 @@
                 <td>14</td>
                 <td>14</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 14">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 18">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t290">DeepPeak/visualization.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t290"><data value='init__'>SignalPlotter.__init__</data></a></td>
                 <td>12</td>
                 <td>12</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 12">0%</td>
             </tr>
@@ -558,7 +682,9 @@
                 <td>12</td>
                 <td>12</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 12">0%</td>
+                <td>6</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 18">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t342">DeepPeak/visualization.py</a></td>
@@ -566,7 +692,9 @@
                 <td>6</td>
                 <td>6</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 6">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 8">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t388">DeepPeak/visualization.py</a></td>
@@ -574,7 +702,9 @@
                 <td>5</td>
                 <td>5</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 5">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 7">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t436">DeepPeak/visualization.py</a></td>
@@ -582,13 +712,17 @@
                 <td>5</td>
                 <td>5</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 5">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 7">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t480">DeepPeak/visualization.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t480"><data value='configure_display'>SignalPlotter.configure_display</data></a></td>
                 <td>5</td>
                 <td>5</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 5">0%</td>
             </tr>
@@ -598,6 +732,8 @@
                 <td>2</td>
                 <td>2</td>
                 <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td class="right" data-ratio="0 2">0%</td>
             </tr>
             <tr class="region">
@@ -606,7 +742,9 @@
                 <td>7</td>
                 <td>7</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 7">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 11">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t562">DeepPeak/visualization.py</a></td>
@@ -614,7 +752,9 @@
                 <td>10</td>
                 <td>10</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 10">0%</td>
+                <td>8</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 18">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html#t615">DeepPeak/visualization.py</a></td>
@@ -622,13 +762,17 @@
                 <td>58</td>
                 <td>58</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 58">0%</td>
+                <td>34</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 92">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html">DeepPeak/visualization.py</a></td>
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html"><data value=''><span class='no-noun'>(no function)</span></data></a></td>
                 <td>22</td>
                 <td>22</td>
+                <td>0</td>
+                <td>0</td>
                 <td>0</td>
                 <td class="right" data-ratio="0 22">0%</td>
             </tr>
@@ -638,9 +782,11 @@
                 <td class="name left">Total</td>
                 <td class="name left">&nbsp;</td>
                 <td>785</td>
-                <td>785</td>
+                <td>515</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 785">0%</td>
+                <td>194</td>
+                <td>22</td>
+                <td class="right" data-ratio="304 979">31%</td>
             </tr>
         </tfoot>
     </table>
@@ -652,7 +798,7 @@
     <div class="content">
         <p>
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.5">coverage.py v7.10.5</a>,
-            created at 2025-08-27 10:58 +0000
+            created at 2025-08-27 11:03 +0000
         </p>
     </div>
     <aside class="hidden">

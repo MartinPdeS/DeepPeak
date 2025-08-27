@@ -11,7 +11,7 @@
 <header>
     <div class="content">
         <h1>Coverage report:
-            <span class="pc_cov">0%</span>
+            <span class="pc_cov">31%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -26,6 +26,8 @@
                         <kbd>s</kbd>
                         <kbd>m</kbd>
                         <kbd>x</kbd>
+                        <kbd>b</kbd>
+                        <kbd>p</kbd>
                         <kbd>c</kbd>
                         &nbsp; change column sorting
                     </p>
@@ -54,7 +56,7 @@
         </h2>
         <p class="text">
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.5">coverage.py v7.10.5</a>,
-            created at 2025-08-27 10:58 +0000
+            created at 2025-08-27 11:03 +0000
         </p>
     </div>
 </header>
@@ -66,6 +68,8 @@
                 <th id="statements" aria-sort="none" data-default-sort-order="descending" data-shortcut="s">statements<span class="arrows"></span></th>
                 <th id="missing" aria-sort="none" data-default-sort-order="descending" data-shortcut="m">missing<span class="arrows"></span></th>
                 <th id="excluded" aria-sort="none" data-default-sort-order="descending" data-shortcut="x">excluded<span class="arrows"></span></th>
+                <th id="branches" aria-sort="none" data-default-sort-order="descending" data-shortcut="b">branches<span class="arrows"></span></th>
+                <th id="partial" aria-sort="none" data-default-sort-order="descending" data-shortcut="p">partial<span class="arrows"></span></th>
                 <th id="coverage" class="right" aria-sort="none" data-shortcut="c">coverage<span class="arrows"></span></th>
             </tr>
         </thead>
@@ -75,86 +79,110 @@
                 <td>110</td>
                 <td>110</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 110">0%</td>
+                <td>16</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 126">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_dataset_py.html">DeepPeak/dataset.py</a></td>
                 <td>28</td>
-                <td>28</td>
+                <td>21</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 28">0%</td>
+                <td>16</td>
+                <td>0</td>
+                <td class="right" data-ratio="9 44">20%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_helper_py.html">DeepPeak/helper.py</a></td>
                 <td>18</td>
-                <td>18</td>
+                <td>11</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 18">0%</td>
+                <td>4</td>
+                <td>0</td>
+                <td class="right" data-ratio="7 22">32%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_autoencoder_py.html">DeepPeak/machine_learning/classifier/autoencoder.py</a></td>
                 <td>39</td>
-                <td>39</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 39">0%</td>
+                <td>2</td>
+                <td>1</td>
+                <td class="right" data-ratio="39 41">95%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_base_py.html">DeepPeak/machine_learning/classifier/base.py</a></td>
                 <td>83</td>
-                <td>83</td>
+                <td>24</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 83">0%</td>
+                <td>20</td>
+                <td>7</td>
+                <td class="right" data-ratio="70 103">68%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_dense_py.html">DeepPeak/machine_learning/classifier/dense.py</a></td>
                 <td>28</td>
-                <td>28</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 28">0%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="right" data-ratio="30 32">94%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_utils_py.html">DeepPeak/machine_learning/classifier/utils.py</a></td>
                 <td>38</td>
                 <td>38</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 38">0%</td>
+                <td>2</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 40">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_5d28d843bd061520_wavenet_py.html">DeepPeak/machine_learning/classifier/wavenet.py</a></td>
                 <td>36</td>
-                <td>36</td>
+                <td>1</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 36">0%</td>
+                <td>4</td>
+                <td>1</td>
+                <td class="right" data-ratio="38 40">95%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_signals_py.html">DeepPeak/signals.py</a></td>
                 <td>132</td>
-                <td>132</td>
+                <td>35</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 132">0%</td>
+                <td>42</td>
+                <td>12</td>
+                <td class="right" data-ratio="111 174">64%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_utils_py.html">DeepPeak/utils.py</a></td>
                 <td>71</td>
                 <td>71</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 71">0%</td>
+                <td>14</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 85">0%</td>
             </tr>
             <tr class="region">
                 <td class="name left"><a href="z_fb547e70cbb5625a_visualization_py.html">DeepPeak/visualization.py</a></td>
                 <td>202</td>
                 <td>202</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 202">0%</td>
+                <td>70</td>
+                <td>0</td>
+                <td class="right" data-ratio="0 272">0%</td>
             </tr>
         </tbody>
         <tfoot>
             <tr class="total">
                 <td class="name left">Total</td>
                 <td>785</td>
-                <td>785</td>
+                <td>515</td>
                 <td>0</td>
-                <td class="right" data-ratio="0 785">0%</td>
+                <td>194</td>
+                <td>22</td>
+                <td class="right" data-ratio="304 979">31%</td>
             </tr>
         </tfoot>
     </table>
@@ -166,7 +194,7 @@
     <div class="content">
         <p>
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.5">coverage.py v7.10.5</a>,
-            created at 2025-08-27 10:58 +0000
+            created at 2025-08-27 11:03 +0000
         </p>
     </div>
     <aside class="hidden">
