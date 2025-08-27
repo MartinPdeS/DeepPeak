@@ -9,7 +9,6 @@ from DeepPeak.signals import Kernel, SignalDatasetGenerator
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-
 architectures = [DenseNet, WaveNet, Autoencoder]
 
 
