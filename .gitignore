@@ -16,6 +16,7 @@
 !pyproject.toml
 !README.rst
 
-# But ignore docs/build inside docs
+# But ignore docs/build inside docs and code
 docs/build/
 docs/source/gallery/
+*__pycache__*
