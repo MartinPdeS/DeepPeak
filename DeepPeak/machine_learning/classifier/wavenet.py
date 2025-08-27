@@ -32,8 +32,11 @@ class WaveNet(BaseClassifier):
     seed: Optional[int]
         Random seed for reproducibility.
 
-    Architecture
-    ------------
+    Notes
+    -----
+
+    Architecture:
+
     - Input projection (1x1) to `num_filters` channels
     - Stack of dilated causal Conv1D blocks with exponentially increasing dilation
       (1, 2, 4, ..., 2^(L-1)), residual connections, and skip connections

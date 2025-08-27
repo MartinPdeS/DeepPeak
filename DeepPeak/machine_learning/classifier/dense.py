@@ -31,8 +31,11 @@ class DenseNet(BaseClassifier):
     seed: Optional[int]
         Random seed for reproducibility.
 
-    Architecture
-    ------------
+
+    Notes
+    -----
+    Architecture:
+
     - Three 1D Conv layers with ReLU activations and exponentially increasing dilation
       (default: 1, 2, 4), padding='same'
     - Final 1x1 Conv with sigmoid -> per-step probability map named 'ROI'

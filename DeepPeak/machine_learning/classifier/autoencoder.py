@@ -35,8 +35,12 @@ class Autoencoder(BaseClassifier):
     seed: Optional[int]
         Random seed for reproducibility.
 
-    Architecture
-    ------------
+
+
+    Notes
+    -----
+    Architecture:
+
     Encoder:
       - Conv1D(f[0], K, relu, same) -> Dropout(p) -> MaxPool1D(2)
       - Conv1D(f[1], K, relu, same) -> Dropout(p) -> MaxPool1D(2)
