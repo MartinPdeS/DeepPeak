@@ -1,2 +1,25 @@
+[
 {
+  "name": "latest",
+  "version": "latest",
+  "url": "https://martinpdes.github.io/DeepPeak/docs/latest"
 }
+,
+{
+  "name": "source",
+  "version": "source",
+  "url": "https://martinpdes.github.io/DeepPeak/docs/source"
+}
+,
+{
+  "name": "examples",
+  "version": "examples",
+  "url": "https://martinpdes.github.io/DeepPeak/docs/examples"
+}
+,
+{
+  "name": "0.0.0.0",
+  "version": "0.0.0.0",
+  "url": "https://martinpdes.github.io/DeepPeak/docs/0.0.0.0"
+}
+]
