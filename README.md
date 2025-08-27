@@ -4,16 +4,18 @@
 
 | Name                                                 |    Stmts |     Miss |  Cover |   Missing |
 |----------------------------------------------------- | -------: | -------: | -----: | --------: |
-| DeepPeak/models/ROI\_model.py                        |       36 |       36 |     0% |     1-188 |
-| DeepPeak/models/count\_model.py                      |       11 |       11 |     0% |      1-12 |
-| DeepPeak/models/position\_amplitude\_model.py        |       18 |       18 |     0% |      1-49 |
-| DeepPeak/models/position\_amplitude\_width\_model.py |       13 |       13 |     0% |      1-14 |
-| DeepPeak/models/position\_model.py                   |       18 |       18 |     0% |      2-73 |
-| DeepPeak/signals.py                                  |       58 |       58 |     0% |     1-130 |
-| DeepPeak/utils/ROI.py                                |       75 |       75 |     0% |     1-281 |
-| DeepPeak/utils/training\_utils.py                    |       17 |       17 |     0% |      1-28 |
-| DeepPeak/utils/visualization.py                      |      209 |      209 |     0% |     1-725 |
-|                                            **TOTAL** |  **455** |  **455** | **0%** |           |
+| DeepPeak/algorithms/non\_maximum\_suppression.py     |      110 |      110 |     0% |     1-330 |
+| DeepPeak/dataset.py                                  |       28 |       28 |     0% |      1-54 |
+| DeepPeak/helper.py                                   |       18 |       18 |     0% |      3-50 |
+| DeepPeak/machine\_learning/classifier/autoencoder.py |       39 |       39 |     0% |      1-90 |
+| DeepPeak/machine\_learning/classifier/base.py        |       83 |       83 |     0% |     1-218 |
+| DeepPeak/machine\_learning/classifier/dense.py       |       28 |       28 |     0% |      1-63 |
+| DeepPeak/machine\_learning/classifier/utils.py       |       38 |       38 |     0% |     1-249 |
+| DeepPeak/machine\_learning/classifier/wavenet.py     |       36 |       36 |     0% |      1-88 |
+| DeepPeak/signals.py                                  |      132 |      132 |     0% |     1-345 |
+| DeepPeak/utils.py                                    |       71 |       71 |     0% |     1-167 |
+| DeepPeak/visualization.py                            |      202 |      202 |     0% |     1-767 |
+|                                            **TOTAL** |  **785** |  **785** | **0%** |           |
 
 
 ## Setup coverage badge
