@@ -6,6 +6,12 @@
 }
 ,
 {
+  "name": "v0.0.1",
+  "version": "v0.0.1",
+  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.1"
+}
+,
+{
   "name": "source",
   "version": "source",
   "url": "https://martinpdes.github.io/DeepPeak/docs/source"
