@@ -15,6 +15,7 @@
 !meta.yaml
 !pyproject.toml
 !README.rst
+!notebook.ipynb
 
 # But ignore docs/build inside docs and code
 docs/build/
