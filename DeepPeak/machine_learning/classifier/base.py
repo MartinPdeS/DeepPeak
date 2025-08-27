@@ -171,7 +171,7 @@ class BaseClassifier():
     # --------------------------------------------------------------------- #
     # Plotting
     # --------------------------------------------------------------------- #
-    def plot_model_history(self, filter_pattern: str = r".*") -> None:
+    def plot_model_history(self, filter_pattern: str = None) -> None:
         """
         Plot training/validation curves from a History or dict-like object.
 
@@ -191,6 +191,8 @@ class BaseClassifier():
 
         parameters = list(hist.keys())
 
+        filter_pattern = r".*" if filter_pattern is None else filter_pattern
+
         if filter_pattern is not None:
             pattern = re.compile(filter_pattern)
             parameters = [s for s in parameters if pattern.match(s)]
@@ -201,7 +203,7 @@ class BaseClassifier():
 
         with plt.style.context(plot_style):
             nrows = len(parameters)
-            figure, axes = plt.subplots(nrows=len(parameters), ncols=1, figsize=(8, 2 * nrows), squeeze=False)
+            figure, axes = plt.subplots(nrows=len(parameters), ncols=1, figsize=(8, 3 * nrows), squeeze=False)
 
             for ax, parameter in zip(axes.flatten(), parameters):
                 ax.plot(hist[parameter], label=parameter)
