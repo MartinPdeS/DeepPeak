@@ -26,30 +26,28 @@ Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset
 of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-35
+.. GENERATED FROM PYTHON SOURCE LINES 10-33
 
 .. code-block:: Python
 
-    from DeepPeak.signals import SignalDatasetGenerator, Kernel
+
     from DeepPeak.algorithms import NonMaximumSuppression
+    from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
     NUM_PEAKS = 3
     SEQUENCE_LENGTH = 400
 
     gaussian_width = 0.03
 
-    generator = SignalDatasetGenerator(
-        n_samples=1,
-        sequence_length=SEQUENCE_LENGTH
-    )
+    generator = SignalDatasetGenerator(n_samples=1, sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
         signal_type=Kernel.GAUSSIAN,
         n_peaks=(3, 3),
-        amplitude=(10, 300),      # Amplitude range
-        position=(0.3, 0.7),     # Peak position range
-        width=gaussian_width,      # Width range
-        noise_std=2,           # Add some noise
+        amplitude=(10, 300),  # Amplitude range
+        position=(0.3, 0.7),  # Peak position range
+        width=gaussian_width,  # Width range
+        noise_std=2,  # Add some noise
         categorical_peak_count=False,
     )
 
@@ -67,11 +65,11 @@ the results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-37
+.. GENERATED FROM PYTHON SOURCE LINES 34-35
 
 Configure and run the detector
 
-.. GENERATED FROM PYTHON SOURCE LINES 37-49
+.. GENERATED FROM PYTHON SOURCE LINES 35-45
 
 .. code-block:: Python
 
@@ -82,12 +80,10 @@ Configure and run the detector
         kernel_truncation_radius_in_sigmas=3,
     )
 
-    peak_locator.run(
-        time_samples=dataset.x_values,
-        signal=dataset.signals.squeeze()
-    )
+    peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals.squeeze())
 
     peak_locator.plot()
+
 
 
 .. image-sg:: /gallery/images/sphx_glr_non_maximum_suppression_002.png
@@ -102,7 +98,7 @@ Configure and run the detector
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.384 seconds)
+   **Total running time of the script:** (0 minutes 0.388 seconds)
 
 
 .. _sphx_glr_download_gallery_non_maximum_suppression.py:

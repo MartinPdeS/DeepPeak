@@ -37,13 +37,14 @@ We will:
 Imports and reproducibility
 --------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-27
+.. GENERATED FROM PYTHON SOURCE LINES 21-28
 
 .. code-block:: Python
 
     import numpy as np
-    from DeepPeak.signals import SignalDatasetGenerator, Kernel
+
     from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
+    from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
     np.random.seed(42)
 
@@ -54,22 +55,19 @@ Imports and reproducibility
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 28-30
+.. GENERATED FROM PYTHON SOURCE LINES 29-31
 
 Generate synthetic dataset
 -------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-49
+.. GENERATED FROM PYTHON SOURCE LINES 31-47
 
 .. code-block:: Python
 
     NUM_PEAKS = 3
     SEQUENCE_LENGTH = 200
 
-    generator = SignalDatasetGenerator(
-        n_samples=100,
-        sequence_length=SEQUENCE_LENGTH
-    )
+    generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
         signal_type=Kernel.GAUSSIAN,
@@ -79,7 +77,7 @@ Generate synthetic dataset
         width=(0.03, 0.05),
         noise_std=0.1,
         categorical_peak_count=False,
-        compute_region_of_interest=True
+        compute_region_of_interest=True,
     )
 
 
@@ -89,12 +87,12 @@ Generate synthetic dataset
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-52
+.. GENERATED FROM PYTHON SOURCE LINES 48-50
 
 Visualize a few example signals and their regions of interest
 ------------------------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-54
+.. GENERATED FROM PYTHON SOURCE LINES 50-52
 
 .. code-block:: Python
 
@@ -112,12 +110,12 @@ Visualize a few example signals and their regions of interest
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 55-57
+.. GENERATED FROM PYTHON SOURCE LINES 53-55
 
 Build and summarize the WaveNet classifier
 ------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 57-71
+.. GENERATED FROM PYTHON SOURCE LINES 55-69
 
 .. code-block:: Python
 
@@ -128,9 +126,9 @@ Build and summarize the WaveNet classifier
         kernel_size=3,
         pool_size=2,
         upsample_size=2,
-        optimizer='adam',
-        loss='binary_crossentropy',
-        metrics=[BinaryIoU(threshold=0.5)]
+        optimizer="adam",
+        loss="binary_crossentropy",
+        metrics=[BinaryIoU(threshold=0.5)],
     )
     dense_net.build()
     dense_net.summary()
@@ -182,12 +180,12 @@ Build and summarize the WaveNet classifier
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 72-74
+.. GENERATED FROM PYTHON SOURCE LINES 70-72
 
 Train the classifier
 --------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 74-82
+.. GENERATED FROM PYTHON SOURCE LINES 72-80
 
 .. code-block:: Python
 
@@ -196,7 +194,7 @@ Train the classifier
         dataset.region_of_interest,
         validation_split=0.2,
         epochs=4,
-        batch_size=64
+        batch_size=64,
     )
 
 
@@ -208,23 +206,23 @@ Train the classifier
  .. code-block:: none
 
     Epoch 1/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0464 - loss: 0.7193    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 324ms/step - BinaryIoU: 0.0453 - loss: 0.7032 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6404
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0616 - loss: 0.7270    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 322ms/step - BinaryIoU: 0.0610 - loss: 0.7105 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6437
     Epoch 2/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6465    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6510 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6193
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6482    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6479 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6251
     Epoch 3/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6199    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6184 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6058
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6299    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6207 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6143
     Epoch 4/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5815    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5779 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5847
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5830    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5793 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5930
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 83-85
+.. GENERATED FROM PYTHON SOURCE LINES 81-83
 
 Plot training history
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-87
+.. GENERATED FROM PYTHON SOURCE LINES 83-85
 
 .. code-block:: Python
 
@@ -242,19 +240,17 @@ Plot training history
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 88-90
+.. GENERATED FROM PYTHON SOURCE LINES 86-88
 
 Predict and visualize on a test signal
 --------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-93
+.. GENERATED FROM PYTHON SOURCE LINES 88-89
 
 .. code-block:: Python
 
-    dense_net.plot_prediction(
-        signal=dataset.signals[0:1, :],
-        threshold=0.4
-    )
+    dense_net.plot_prediction(signal=dataset.signals[0:1, :], threshold=0.4)
+
 
 
 .. image-sg:: /gallery/images/sphx_glr_classifier_autoencoder_003.png
@@ -275,7 +271,7 @@ Predict and visualize on a test signal
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.242 seconds)
+   **Total running time of the script:** (0 minutes 7.191 seconds)
 
 
 .. _sphx_glr_download_gallery_classifier_autoencoder.py:

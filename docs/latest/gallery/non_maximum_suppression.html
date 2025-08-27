@@ -487,26 +487,23 @@ to download the full example code.</p>
 Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset
 of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalDatasetGenerator</span><span class="p">,</span> <span class="n">Kernel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">NonMaximumSuppression</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">NonMaximumSuppression</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">SignalDatasetGenerator</span>
 
 <span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">400</span>
 
 <span class="n">gaussian_width</span> <span class="o">=</span> <span class="mf">0.03</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span>
-    <span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span>
-<span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="n">signal_type</span><span class="o">=</span><span class="n">Kernel</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">,</span>
     <span class="n">n_peaks</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
-    <span class="n">amplitude</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>      <span class="c1"># Amplitude range</span>
-    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">),</span>     <span class="c1"># Peak position range</span>
-    <span class="n">width</span><span class="o">=</span><span class="n">gaussian_width</span><span class="p">,</span>      <span class="c1"># Width range</span>
-    <span class="n">noise_std</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>           <span class="c1"># Add some noise</span>
+    <span class="n">amplitude</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>  <span class="c1"># Amplitude range</span>
+    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">),</span>  <span class="c1"># Peak position range</span>
+    <span class="n">width</span><span class="o">=</span><span class="n">gaussian_width</span><span class="p">,</span>  <span class="c1"># Width range</span>
+    <span class="n">noise_std</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="c1"># Add some noise</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -521,15 +518,12 @@ the results.</p>
     <span class="n">kernel_truncation_radius_in_sigmas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">peak_locator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-    <span class="n">time_samples</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span>
-    <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">squeeze</span><span class="p">()</span>
-<span class="p">)</span>
+<span class="n">peak_locator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">time_samples</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
 
 <span class="n">peak_locator</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_non_maximum_suppression_002.png" srcset="../_images/sphx_glr_non_maximum_suppression_002.png" alt="Equal-width Gaussian pulse detection (coarse)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.384 seconds)</p>
+<img src="../_images/sphx_glr_non_maximum_suppression_002.png" srcset="../_images/sphx_glr_non_maximum_suppression_002.png" alt="Equal-width Gaussian pulse detection (coarse)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.388 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-non-maximum-suppression-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/25e1135ef1ffbe32122a83c577db9e9d/non_maximum_suppression.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">non_maximum_suppression.ipynb</span></code></a></p>

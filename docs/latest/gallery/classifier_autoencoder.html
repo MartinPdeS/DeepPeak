@@ -496,8 +496,9 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <section id="imports-and-reproducibility">
 <h2>Imports and reproducibility<a class="headerlink" href="#imports-and-reproducibility" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalDatasetGenerator</span><span class="p">,</span> <span class="n">Kernel</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.machine_learning.classifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">Autoencoder</span><span class="p">,</span> <span class="n">BinaryIoU</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">SignalDatasetGenerator</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
@@ -508,10 +509,7 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">200</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span>
-    <span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-    <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span>
-<span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="n">signal_type</span><span class="o">=</span><span class="n">Kernel</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">,</span>
@@ -521,7 +519,7 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">width</span><span class="o">=</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">compute_region_of_interest</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">compute_region_of_interest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -541,9 +539,9 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">upsample_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;adam&#39;</span><span class="p">,</span>
-    <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;binary_crossentropy&#39;</span><span class="p">,</span>
-    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">BinaryIoU</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)]</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;binary_crossentropy&quot;</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">BinaryIoU</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)],</span>
 <span class="p">)</span>
 <span class="n">dense_net</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="n">dense_net</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
@@ -594,26 +592,26 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">dataset</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">,</span>
     <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">epochs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0464 - loss: 0.7193
-2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 324ms/step - BinaryIoU: 0.0453 - loss: 0.7032 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6404
+1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0616 - loss: 0.7270
+2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 322ms/step - BinaryIoU: 0.0610 - loss: 0.7105 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6437
 Epoch 2/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6465
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6510 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6193
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6482
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6479 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6251
 Epoch 3/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6199
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6184 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6058
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6299
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6207 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6143
 Epoch 4/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5815
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5779 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5847
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5830
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5793 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5930
 </pre></div>
 </div>
 </section>
@@ -625,16 +623,13 @@ Epoch 4/4
 <img src="../_images/sphx_glr_classifier_autoencoder_002.png" srcset="../_images/sphx_glr_classifier_autoencoder_002.png" alt="BinaryIoU" class = "sphx-glr-single-img"/></section>
 <section id="predict-and-visualize-on-a-test-signal">
 <h2>Predict and visualize on a test signal<a class="headerlink" href="#predict-and-visualize-on-a-test-signal" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_prediction</span><span class="p">(</span>
-    <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span>
-    <span class="n">threshold</span><span class="o">=</span><span class="mf">0.4</span>
-<span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_prediction</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_classifier_autoencoder_003.png" srcset="../_images/sphx_glr_classifier_autoencoder_003.png" alt="Predicted Region of Interest" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1200x500 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.242 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.191 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-autoencoder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/027ad6dec8c2fb9e539fbd7af3497d66/classifier_autoencoder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_autoencoder.ipynb</span></code></a></p>

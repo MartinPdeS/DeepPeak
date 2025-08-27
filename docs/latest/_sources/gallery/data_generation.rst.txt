@@ -40,7 +40,7 @@ Imports
 
 .. code-block:: Python
 
-    from DeepPeak.signals import SignalDatasetGenerator, Kernel
+    from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
 
 
@@ -58,7 +58,7 @@ We generate a dataset with `NUM_PEAKS` Gaussian pulses per signal.
 The peak amplitudes, positions, and widths are randomly chosen within
 specified ranges.
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-50
+.. GENERATED FROM PYTHON SOURCE LINES 29-48
 
 .. code-block:: Python
 
@@ -67,23 +67,21 @@ specified ranges.
     SEQUENCE_LENGTH = 200
     sample_count = 3
 
-    generator = SignalDatasetGenerator(
-        n_samples=sample_count,
-        sequence_length=SEQUENCE_LENGTH
-    )
+    generator = SignalDatasetGenerator(n_samples=sample_count, sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
         signal_type=Kernel.GAUSSIAN,
         n_peaks=(1, NUM_PEAKS),
-        amplitude=(1, 100),      # Amplitude range
-        position=(0.1, 0.9),     # Peak position range
-        width=(0.03, 0.05),      # Width range
-        noise_std=0.1,           # Add some noise
+        amplitude=(1, 100),  # Amplitude range
+        position=(0.1, 0.9),  # Peak position range
+        width=(0.03, 0.05),  # Width range
+        noise_std=0.1,  # Add some noise
         categorical_peak_count=False,
-        compute_region_of_interest=True
+        compute_region_of_interest=True,
     )
 
     dataset.plot()
+
 
 
 .. image-sg:: /gallery/images/sphx_glr_data_generation_001.png
@@ -98,7 +96,7 @@ specified ranges.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.467 seconds)
+   **Total running time of the script:** (0 minutes 0.462 seconds)
 
 
 .. _sphx_glr_download_gallery_data_generation.py:
