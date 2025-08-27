@@ -19,9 +19,8 @@ We will:
 # Imports and reproducibility
 # --------------------------
 import numpy as np
-import matplotlib.pyplot as plt
 from DeepPeak.signals import SignalDatasetGenerator, Kernel
-from DeepPeak.machine_learning.classifier import Autoencoder
+from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
 
 np.random.seed(42)
 
@@ -64,7 +63,7 @@ dense_net = Autoencoder(
     upsample_size=2,
     optimizer='adam',
     loss='binary_crossentropy',
-    metrics=['accuracy']
+    metrics=[BinaryIoU(threshold=0.5)]
 )
 dense_net.build()
 dense_net.summary()
