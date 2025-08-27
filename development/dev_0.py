@@ -1,8 +1,11 @@
-
-from DeepPeak.utils.visualization import visualize_validation_cases
 import numpy as np
+
 from DeepPeak.signals import generate_square_dataset
-from DeepPeak.utils.visualization import plot_dataset  # Replace 'your_module' with the actual module name
+from DeepPeak.utils.visualization import (
+    plot_dataset,
+    visualize_validation_cases,
+)  # Replace 'your_module' with the actual module name
+
 # from DeepPeak import models
 # from DeepPeak.signals import generate_gaussian_dataset
 # from DeepPeak.utils.visualization import plot_training_history, visualize_validation_cases

@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.metrics import precision_recall_fscore_support
 from tensorflow.keras import models  # type: ignore
 
+
 def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -> dict:
     """
     Compute segmentation metrics between the predicted and ground truth ROI masks.
@@ -29,7 +30,7 @@ def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -
     true_flat = true_mask.flatten()
 
     # Compute precision, recall, and F1 score.
-    precision, recall, f1, _ = precision_recall_fscore_support(true_flat, pred_flat, average='binary')
+    precision, recall, f1, _ = precision_recall_fscore_support(true_flat, pred_flat, average="binary")
 
     # Compute Intersection over Union (IoU)
     intersection = np.logical_and(true_flat, pred_flat).sum()
@@ -44,7 +45,7 @@ def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -
         "recall": recall,
         "f1_score": f1,
         "iou": iou,
-        "dice": dice
+        "dice": dice,
     }
 
 
@@ -112,7 +113,7 @@ def roi_containment_metric(roi_pred: np.ndarray, roi_gt: np.ndarray) -> dict:
             "containment_ratio": 0.0,
             "misfit_ratio": 1.0,
             "n_pred": 0,
-            "n_intersection": 0
+            "n_intersection": 0,
         }
 
     # Intersection of predicted ROI with ground truth ROI
@@ -127,14 +128,11 @@ def roi_containment_metric(roi_pred: np.ndarray, roi_gt: np.ndarray) -> dict:
         "containment_ratio": containment_ratio,
         "misfit_ratio": misfit_ratio,
         "n_pred": int(n_pred),
-        "n_intersection": int(n_intersection)
+        "n_intersection": int(n_intersection),
     }
 
 
-def mc_dropout_prediction(
-        model: models.Model,
-        signals: np.ndarray,
-        num_samples: int = 30) -> tuple[np.ndarray, np.ndarray]:
+def mc_dropout_prediction(model: models.Model, signals: np.ndarray, num_samples: int = 30) -> tuple[np.ndarray, np.ndarray]:
     """
     Perform Monte Carlo (MC) dropout to estimate the mean and uncertainty of ROI predictions.
 
@@ -174,19 +172,19 @@ def mc_dropout_prediction(
     >>> print(mean_pred.shape, std_pred.shape)
     (10, 128, 1) (10, 128, 1)
     """
-    predictions = np.array([
-        model(signals, training=True)['ROI'].numpy() for _ in range(num_samples)
-    ])
+    predictions = np.array([model(signals, training=True)["ROI"].numpy() for _ in range(num_samples)])
     mean_prediction = predictions.mean(axis=0)
     uncertainty = predictions.std(axis=0)
     return mean_prediction, uncertainty
 
+
 def filter_predictions(
-        model: models.Model,
-        signals: np.ndarray,
-        n_samples: int = 30,
-        threshold: float = 0.9,
-        std_threshold: float = 0.1) -> np.ndarray:
+    model: models.Model,
+    signals: np.ndarray,
+    n_samples: int = 30,
+    threshold: float = 0.9,
+    std_threshold: float = 0.1,
+) -> np.ndarray:
     """
     Estimate a binarized ROI mask using Monte Carlo dropout sampling.
 
@@ -230,9 +228,7 @@ def filter_predictions(
     >>> print(filtered_mask.shape)
     (5, 128, 1)
     """
-    predictions = np.array(
-        [model(signals, training=True)['ROI'].numpy() for _ in range(n_samples)]
-    )
+    predictions = np.array([model(signals, training=True)["ROI"].numpy() for _ in range(n_samples)])
 
     mean_prediction = predictions.mean(axis=0)
 
@@ -247,4 +243,3 @@ def filter_predictions(
     mean_prediction *= std_mask
 
     return mean_prediction.squeeze(), uncertainty.squeeze()
-

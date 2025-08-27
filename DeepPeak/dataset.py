@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from MPSPlots.styles import mps as plot_style
 
+
 class DataSet:
     """
     A simple container class for datasets.
@@ -13,27 +14,50 @@ class DataSet:
     **kwargs : dict
         Keyword arguments to be set as attributes of the instance.
     """
+
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def plot(self, number_of_samples: int | None = None, ax: plt.Axes = None, show: bool = True):
+    def plot(
+        self,
+        number_of_samples: int | None = None,
+        ax: plt.Axes = None,
+        show: bool = True,
+    ):
         sample_count = self.signals.shape[0]
 
         if number_of_samples is None:
             number_of_samples = sample_count
 
         with plt.style.context(plot_style):
-            figure, axes = plt.subplots(nrows=number_of_samples, ncols=1, figsize=(8, 3 * number_of_samples), squeeze=False)
+            figure, axes = plt.subplots(
+                nrows=number_of_samples,
+                ncols=1,
+                figsize=(8, 3 * number_of_samples),
+                squeeze=False,
+            )
 
             for idx, ax in enumerate(axes.flatten()):
-                ax.plot(self.x_values, self.signals[idx], label='signal')
-                ax.vlines(self.positions[idx], ymin=0, ymax=1, transform=ax.get_xaxis_transform(), color='red', linestyle='--', linewidth=1, label='positions')
+                ax.plot(self.x_values, self.signals[idx], label="signal")
+                ax.vlines(
+                    self.positions[idx],
+                    ymin=0,
+                    ymax=1,
+                    transform=ax.get_xaxis_transform(),
+                    color="red",
+                    linestyle="--",
+                    linewidth=1,
+                    label="positions",
+                )
 
                 if self.region_of_interest is not None:
-                    roi_patch = ax.fill_between(self.x_values, y1=0, y2=1,
+                    roi_patch = ax.fill_between(
+                        self.x_values,
+                        y1=0,
+                        y2=1,
                         where=(self.region_of_interest[idx] != 0),
-                        color='lightblue',
+                        color="lightblue",
                         alpha=1.0,
                         transform=ax.get_xaxis_transform(),
                     )

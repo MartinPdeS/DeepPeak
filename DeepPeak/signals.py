@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from typing import Tuple, Optional, Dict
-import numpy as np
 from enum import Enum
+from typing import Dict, Optional, Tuple
+
+import numpy as np
+
 from DeepPeak.dataset import DataSet  # type: ignore
 
 
@@ -187,13 +189,15 @@ class SignalDatasetGenerator:
             widths=widths,
             x_values=x_values,
             num_peaks=num_peaks_out,
-            region_of_interest=self.last_rois_
+            region_of_interest=self.last_rois_,
         )
 
     # -------------------------- helpers --------------------------
 
     @staticmethod
-    def _ensure_tuple(value: Tuple[float, float] | float | Tuple[int, int] | int) -> Tuple[float, float] | Tuple[int, int]:
+    def _ensure_tuple(
+        value: Tuple[float, float] | float | Tuple[int, int] | int,
+    ) -> Tuple[float, float] | Tuple[int, int]:
         """If value is a scalar, return (v, v); otherwise return value."""
         if isinstance(value, (int, float)):
             return (value, value)  # type: ignore[return-value]
@@ -228,13 +232,13 @@ class SignalDatasetGenerator:
         out[np.arange(indices.shape[0]), indices] = 1
         return out
 
-
     @staticmethod
     def _compute_rois_from_signals(
         signals: np.ndarray,
         positions: np.ndarray,
         amplitudes: np.ndarray,
-        width_in_pixels: int) -> np.ndarray:
+        width_in_pixels: int,
+    ) -> np.ndarray:
         """
         Vectorized ROI builder: marks ±(width_in_pixels//2) around each valid peak center.
         - No Python loops over samples/peaks.
@@ -260,8 +264,8 @@ class SignalDatasetGenerator:
         assert positions.shape[0] == n_samples and amplitudes.shape == positions.shape
 
         # Convert normalized positions -> pixel centers (int), keep shape
-        tmp = positions * (sequence_length - 1)                      # float, may have NaN/inf
-        centers = np.full_like(tmp, fill_value=-1, dtype=np.int64)   # sentinel for invalid
+        tmp = positions * (sequence_length - 1)  # float, may have NaN/inf
+        centers = np.full_like(tmp, fill_value=-1, dtype=np.int64)  # sentinel for invalid
         valid_pos = np.isfinite(tmp)
         centers[valid_pos] = np.rint(tmp[valid_pos]).astype(np.int64)
         np.clip(centers, 0, sequence_length - 1, out=centers)
@@ -276,7 +280,7 @@ class SignalDatasetGenerator:
             raise ValueError("width_in_pixels must be non-negative")
         half = w // 2
         starts = np.clip(centers - half, 0, sequence_length)
-        ends   = np.clip(centers + half + 1, 0, sequence_length)  # +1 for inclusive end
+        ends = np.clip(centers + half + 1, 0, sequence_length)  # +1 for inclusive end
 
         # Difference array per sample: add +1 at start, -1 at end
         diff = np.zeros((n_samples, sequence_length + 1), dtype=np.int32)
@@ -284,13 +288,12 @@ class SignalDatasetGenerator:
         if ii.size:
             s = starts[ii, jj]
             e = ends[ii, jj]
-            np.add.at(diff, (ii, s),  1)
+            np.add.at(diff, (ii, s), 1)
             np.add.at(diff, (ii, e), -1)
 
         # Cumulative sum -> coverage counts; binarize
         rois = (np.cumsum(diff[:, :sequence_length], axis=1) > 0).astype(np.int32)
         return rois
-
 
     @staticmethod
     def _build_peaks(
@@ -299,7 +302,8 @@ class SignalDatasetGenerator:
         pos_: np.ndarray,
         wid_: np.ndarray,
         amp_: np.ndarray,
-        extra_kwargs: Dict) -> np.ndarray:
+        extra_kwargs: Dict,
+    ) -> np.ndarray:
         """
         Vectorized construction of peaks for non-DIRAC kernels.
 
@@ -336,10 +340,6 @@ class SignalDatasetGenerator:
             case Kernel.ASYMMETRIC_GAUSSIAN:
                 separation = extra_kwargs.get("separation", 0.1)
                 second_peak_ratio = extra_kwargs.get("second_peak_ratio", 0.5)
-                return (
-                    amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_) ** 2)
-                    + (amp_ * second_peak_ratio)
-                    * np.exp(-0.5 * ((x_ - (pos_ + separation)) / (wid_ * 0.5)) ** 2)
-                )
+                return amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_) ** 2) + (amp_ * second_peak_ratio) * np.exp(-0.5 * ((x_ - (pos_ + separation)) / (wid_ * 0.5)) ** 2)
             case _:
                 raise ValueError(f"Unsupported signal_type: {signal_type}")

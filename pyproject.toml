@@ -97,3 +97,6 @@ relative_files = true
 
 [tool.doc8]
 ignore = ["D001"]
+
+[tool.black]
+line-length = 300

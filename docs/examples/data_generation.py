@@ -17,7 +17,7 @@ We use:
 # %%
 # Imports
 # -------
-from DeepPeak.signals import SignalDatasetGenerator, Kernel
+from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
 # %%
 # Generate Synthetic Signal Dataset
@@ -31,20 +31,17 @@ NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 sample_count = 3
 
-generator = SignalDatasetGenerator(
-    n_samples=sample_count,
-    sequence_length=SEQUENCE_LENGTH
-)
+generator = SignalDatasetGenerator(n_samples=sample_count, sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     signal_type=Kernel.GAUSSIAN,
     n_peaks=(1, NUM_PEAKS),
-    amplitude=(1, 100),      # Amplitude range
-    position=(0.1, 0.9),     # Peak position range
-    width=(0.03, 0.05),      # Width range
-    noise_std=0.1,           # Add some noise
+    amplitude=(1, 100),  # Amplitude range
+    position=(0.1, 0.9),  # Peak position range
+    width=(0.03, 0.05),  # Width range
+    noise_std=0.1,  # Add some noise
     categorical_peak_count=False,
-    compute_region_of_interest=True
+    compute_region_of_interest=True,
 )
 
 dataset.plot()

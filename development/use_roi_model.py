@@ -1,14 +1,14 @@
+import tensorflow as tf
 
+from DeepPeak.classifier.utils import filter_predictions, find_middle_indices
+from DeepPeak.directories import weights_path
 from DeepPeak.signals import generate_signal_dataset
 from DeepPeak.visualization import SignalPlotter
-from DeepPeak.classifier.utils import filter_predictions, find_middle_indices
-import tensorflow as tf
-from DeepPeak.directories import weights_path
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 128
 
-model_path = weights_path / 'ROI_128.keras'
+model_path = weights_path / "ROI_128.keras"
 roi_model = tf.keras.models.load_model(model_path)
 
 
@@ -23,18 +23,9 @@ training = generate_signal_dataset(
     categorical_peak_count=False,
 )
 
-predictions, uncertainty = filter_predictions(
-    signals=training.signals,
-    model=roi_model,
-    n_samples=30,
-    threshold=0.9
-)
+predictions, uncertainty = filter_predictions(signals=training.signals, model=roi_model, n_samples=30, threshold=0.9)
 
-indices = find_middle_indices(
-    ROIs=predictions,
-    pad_width=5,
-    fill_value=0
-) / 200
+indices = find_middle_indices(ROIs=predictions, pad_width=5, fill_value=0) / 200
 
 
 # %%

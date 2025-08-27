@@ -20,7 +20,7 @@ We will:
 # --------------------------
 import numpy as np
 
-from DeepPeak.machine_learning.classifier import WaveNet
+from DeepPeak.machine_learning.classifier import WaveNet, BinaryIoU
 from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
 np.random.seed(42)
@@ -59,7 +59,7 @@ dense_net = WaveNet(
     kernel_size=3,
     optimizer="adam",
     loss="binary_crossentropy",
-    metrics=["accuracy"],
+    metrics=["accuracy", BinaryIoU(threshold=0.5)],
 )
 dense_net.build()
 dense_net.summary()

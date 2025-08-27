@@ -1,15 +1,17 @@
-from tensorflow.keras.utils import to_categorical  # type: ignore
 from itertools import islice
-import sklearn.model_selection as sk
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pywt
-import matplotlib.pyplot as plt
+import sklearn.model_selection as sk
 from matplotlib import style as mps
+from tensorflow.keras.utils import to_categorical  # type: ignore
+
 
 def batched(iterable, n: int):  # Function is present in itertools for python 3.12+
     # batched('ABCDEFG', 3) → ABC DEF G
     if n < 1:
-        raise ValueError('n must be at least one')
+        raise ValueError("n must be at least one")
     iterator = iter(iterable)
     while batch := tuple(islice(iterator, n)):
         yield batch
@@ -20,18 +22,16 @@ def dataset_split(test_size: float, random_state: float, **kwargs) -> dict:
 
     splitted = sk.train_test_split(*values, test_size=test_size, random_state=random_state)
 
-    output = {
-        'train': dict(), 'test': dict()
-    }
+    output = {"train": dict(), "test": dict()}
 
     for (k, v), (train_data, test_data) in zip(kwargs.items(), batched(splitted, 2)):
-        output['train'][k] = train_data
-        output['test'][k] = test_data
+        output["train"][k] = train_data
+        output["test"][k] = test_data
 
     return output
 
 
-def filter_with_wavelet_transform(signals: np.ndarray, low_boundary: int, high_boundary: int, kernel: str = 'mexh') -> tuple[np.ndarray, np.ndarray]:
+def filter_with_wavelet_transform(signals: np.ndarray, low_boundary: int, high_boundary: int, kernel: str = "mexh") -> tuple[np.ndarray, np.ndarray]:
     """
     Efficient filtering of multiple signals using CWT, with minimal looping.
 
@@ -128,11 +128,7 @@ class PulseDeconvolver:
         return amplitudes
 
     def plot(self, data_set: object) -> None:
-
-        estimated_amplitudes = self.deconvolve(
-            signals=data_set.signals,
-            centers=data_set.positions
-        )
+        estimated_amplitudes = self.deconvolve(signals=data_set.signals, centers=data_set.positions)
 
         n_plot = data_set.signals.shape[0]
 
@@ -142,15 +138,39 @@ class PulseDeconvolver:
         for index in range(n_plot):
             ax = axes[index, 0]
 
-            ax.plot(data_set.x_values, data_set.signals[index], color='C0', linewidth=2, label='Raw signal')
+            ax.plot(
+                data_set.x_values,
+                data_set.signals[index],
+                color="C0",
+                linewidth=2,
+                label="Raw signal",
+            )
 
-            for a, p, w in zip(data_set.amplitudes[index], data_set.positions[index], data_set.widths[index]):
-                y = a * np.exp(-(data_set.x_values - p)**2 / (2 * w**2))
-                ax.plot(data_set.x_values, y, linestyle='--', linewidth=1, color='black', label='Individual pulses')
+            for a, p, w in zip(
+                data_set.amplitudes[index],
+                data_set.positions[index],
+                data_set.widths[index],
+            ):
+                y = a * np.exp(-((data_set.x_values - p) ** 2) / (2 * w**2))
+                ax.plot(
+                    data_set.x_values,
+                    y,
+                    linestyle="--",
+                    linewidth=1,
+                    color="black",
+                    label="Individual pulses",
+                )
 
-                ax.axvline(p, color='green', label='measurement position')
+                ax.axvline(p, color="green", label="measurement position")
 
-            ax.scatter(x=data_set.positions[index], y=estimated_amplitudes[index], color='red', s=60, zorder=10, label='Evaluated amplitudes')
+            ax.scatter(
+                x=data_set.positions[index],
+                y=estimated_amplitudes[index],
+                color="red",
+                s=60,
+                zorder=10,
+                label="Evaluated amplitudes",
+            )
 
             ax.legend()
 
@@ -158,12 +178,8 @@ class PulseDeconvolver:
             by_label = dict(zip(labels, handles))  # Removes duplicates
             ax.legend(by_label.values(), by_label.keys())
 
-
-
-        ax.set_ylabel('Amplitude of the signal [Normalized]')
-        ax.set_xlabel('Time [Normalized]')
+        ax.set_ylabel("Amplitude of the signal [Normalized]")
+        ax.set_xlabel("Time [Normalized]")
 
         plt.tight_layout()
         plt.show()
-
-

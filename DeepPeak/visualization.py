@@ -1,12 +1,11 @@
+import re
 from typing import Callable, Optional, Union
 
-import numpy as np
-import re
 import matplotlib.pyplot as plt
-from tf_explain.core.grad_cam import GradCAM
-from tensorflow.keras.models import Model  # type: ignore
+import numpy as np
 from MPSPlots.styles import mps
-
+from tensorflow.keras.models import Model  # type: ignore
+from tf_explain.core.grad_cam import GradCAM
 
 
 def plot_conv1D(model, input_signal, layer_name):
@@ -74,7 +73,13 @@ def plot_dense(model, input_signal, layer_name):
 
     # Plot the activations using a step plot
     plt.figure(figsize=(12, 6))
-    plt.step(range(len(activations[0])), activations[0], where="mid", color="blue", linewidth=2)
+    plt.step(
+        range(len(activations[0])),
+        activations[0],
+        where="mid",
+        color="blue",
+        linewidth=2,
+    )
     plt.title(f"Activations for {layer_name}")
     plt.xlabel("Neuron Index")
     plt.ylabel("Activation Value")
@@ -148,7 +153,12 @@ def plot_gradcam_with_signal(
     # Plot the signal and predictions
     axes[0].plot(signal.squeeze(), color="blue", linewidth=1.5, label="Input Signal")
     for i, pred in enumerate(predictions):
-        axes[0].axvline(x=pred * input_length, color="red", linestyle="--", label=f"Predicted Peak {i + 1}")
+        axes[0].axvline(
+            x=pred * input_length,
+            color="red",
+            linestyle="--",
+            label=f"Predicted Peak {i + 1}",
+        )
     axes[0].set_ylabel("Signal Amplitude")
     axes[0].legend(loc="upper right")
     axes[0].grid(True)
@@ -157,7 +167,12 @@ def plot_gradcam_with_signal(
     for i, ax in enumerate(axes[1:]):
         if i >= max_channels:
             break
-        ax.imshow(heatmaps[:, :, i].T, aspect="auto", cmap="jet", extent=[0, input_length, 0, 1])
+        ax.imshow(
+            heatmaps[:, :, i].T,
+            aspect="auto",
+            cmap="jet",
+            extent=[0, input_length, 0, 1],
+        )
         ax.set_ylabel(f"Channel {i}")
         ax.set_yticks([])
 
@@ -165,7 +180,8 @@ def plot_gradcam_with_signal(
     plt.tight_layout()
     plt.show()
 
-def plot_training_history(history, metrics: list, y_scale: str = 'log', show: bool = True) -> plt.Figure:
+
+def plot_training_history(history, metrics: list, y_scale: str = "log", show: bool = True) -> plt.Figure:
     """
     Plot training and validation performance metrics (loss and accuracy).
 
@@ -179,22 +195,16 @@ def plot_training_history(history, metrics: list, y_scale: str = 'log', show: bo
     metrics = set(metrics).intersection(set(history.history))
 
     with plt.style.context(mps):
-        figure, ax = plt.subplots(
-            nrows=1,
-            ncols=1,
-            sharex=True,
-            squeeze=True,
-            figsize=(8, 3)
-        )
+        figure, ax = plt.subplots(nrows=1, ncols=1, sharex=True, squeeze=True, figsize=(8, 3))
 
     for metric in metrics:
         values = history.history[metric]
-        ax.plot(values, label=metric.replace('_', ' '))
-        ax.legend(loc='upper left')
+        ax.plot(values, label=metric.replace("_", " "))
+        ax.legend(loc="upper left")
         ax.set_yscale(y_scale)
 
-    ax.set_xlabel('Number of Epochs')
-    figure.suptitle('Training History')
+    ax.set_xlabel("Number of Epochs")
+    figure.suptitle("Training History")
 
     plt.tight_layout()
 
@@ -202,6 +212,7 @@ def plot_training_history(history, metrics: list, y_scale: str = 'log', show: bo
         plt.show()
 
     return figure
+
 
 # def plot_training_history(*histories, filtering: list = None, y_scale: str = 'log', show: bool = True) -> plt.Figure:
 #     """
@@ -289,15 +300,15 @@ class SignalPlotter:
 
     def __init__(self):
         # Internal storage for required signals and overlays.
-        self.signals = None            # 2D array of shape (n_samples, sequence_length)
-        self.x_values = None           # 1D array of shape (sequence_length,), inferred if not provided
+        self.signals = None  # 2D array of shape (n_samples, sequence_length)
+        self.x_values = None  # 1D array of shape (sequence_length,), inferred if not provided
 
         # Accumulate overlays in lists
-        self._scatter = []           # List of scatter dictionaries: keys: scatter_x, scatter_y, color, marker, label, alpha.
-        self._vlines = []            # List of vertical line dictionaries: keys: x, color, linestyle, label, linewidth, alpha.
-        self._hlines = []            # List of horizontal line dictionaries: keys: y, color, linestyle, label, linewidth, alpha.
-        self._rois = []              # List of ROI overlay dictionaries: keys: roi_array, color, label, alpha.
-        self._custom_curves = []     # List of custom curve dictionaries: keys: curve_func, label, color, style, kwargs_arrays.
+        self._scatter = []  # List of scatter dictionaries: keys: scatter_x, scatter_y, color, marker, label, alpha.
+        self._vlines = []  # List of vertical line dictionaries: keys: x, color, linestyle, label, linewidth, alpha.
+        self._hlines = []  # List of horizontal line dictionaries: keys: y, color, linestyle, label, linewidth, alpha.
+        self._rois = []  # List of ROI overlay dictionaries: keys: roi_array, color, label, alpha.
+        self._custom_curves = []  # List of custom curve dictionaries: keys: curve_func, label, color, style, kwargs_arrays.
 
         # Display toggles
         self.show_scatter = True
@@ -346,7 +357,7 @@ class SignalPlotter:
         color: str = "red",
         marker: str = "o",
         label: str = "Scatter",
-        alpha: float = 0.8
+        alpha: float = 0.8,
     ):
         """
         Accumulate scatter overlay points (e.g., for peak markers).
@@ -375,14 +386,16 @@ class SignalPlotter:
         scatter_y = np.asarray(scatter_y)
         if scatter_x.shape != scatter_y.shape:
             raise ValueError("scatter_x and scatter_y must have the same shape.")
-        self._scatter.append({
-            "scatter_x": scatter_x,
-            "scatter_y": scatter_y,
-            "color": color,
-            "marker": marker,
-            "label": label,
-            "alpha": alpha
-        })
+        self._scatter.append(
+            {
+                "scatter_x": scatter_x,
+                "scatter_y": scatter_y,
+                "color": color,
+                "marker": marker,
+                "label": label,
+                "alpha": alpha,
+            }
+        )
         return self
 
     def add_vline(
@@ -392,7 +405,7 @@ class SignalPlotter:
         linestyle: str = "--",
         label: str = "vline",
         linewidth: float = 1.0,
-        alpha: float = 1.0
+        alpha: float = 1.0,
     ):
         """
         Accumulate vertical line overlay(s).
@@ -423,22 +436,27 @@ class SignalPlotter:
             x = np.array([x])
         else:
             x = np.asarray(x)
-        self._vlines.append({
-            "x": x,
-            "color": color,
-            "linestyle": linestyle,
-            "label": label,
-            "linewidth": linewidth,
-            "alpha": alpha
-        })
+        self._vlines.append(
+            {
+                "x": x,
+                "color": color,
+                "linestyle": linestyle,
+                "label": label,
+                "linewidth": linewidth,
+                "alpha": alpha,
+            }
+        )
         return self
 
-    def add_hline(self, y: Union[float, np.ndarray],
-                  color: str = "cyan",
-                  linestyle: str = "-.",
-                  label: str = "hline",
-                  linewidth: float = 1.0,
-                  alpha: float = 1.0):
+    def add_hline(
+        self,
+        y: Union[float, np.ndarray],
+        color: str = "cyan",
+        linestyle: str = "-.",
+        label: str = "hline",
+        linewidth: float = 1.0,
+        alpha: float = 1.0,
+    ):
         """
         Accumulate horizontal line overlay(s).
 
@@ -467,17 +485,25 @@ class SignalPlotter:
             y = np.array([y])
         else:
             y = np.asarray(y)
-        self._hlines.append({
-            "y": y,
-            "color": color,
-            "linestyle": linestyle,
-            "label": label,
-            "linewidth": linewidth,
-            "alpha": alpha
-        })
+        self._hlines.append(
+            {
+                "y": y,
+                "color": color,
+                "linestyle": linestyle,
+                "label": label,
+                "linewidth": linewidth,
+                "alpha": alpha,
+            }
+        )
         return self
 
-    def configure_display(self, show_scatter: bool = True, show_vlines: bool = True, show_hlines: bool = True, show_roi: bool = True):
+    def configure_display(
+        self,
+        show_scatter: bool = True,
+        show_vlines: bool = True,
+        show_hlines: bool = True,
+        show_roi: bool = True,
+    ):
         """
         Configure display options for overlays.
 
@@ -520,7 +546,13 @@ class SignalPlotter:
         self.title = title
         return self
 
-    def add_roi(self, roi_array: np.ndarray, color: str = 'green', label: str = 'ROI', alpha: float = 0.6):
+    def add_roi(
+        self,
+        roi_array: np.ndarray,
+        color: str = "green",
+        label: str = "ROI",
+        alpha: float = 0.6,
+    ):
         """
         Add an ROI mask overlay along with plotting parameters. Multiple ROI overlays
         can be added and will all be plotted.
@@ -551,12 +583,7 @@ class SignalPlotter:
             raise ValueError("ROI array must be 2D of shape (n_samples, sequence_length).")
         if self.signals is not None and roi_array.shape != self.signals.shape:
             raise ValueError(f"ROI array shape must match signals shape: {roi_array.shape} vs {self.signals.shape}.")
-        self._rois.append({
-            "roi_array": roi_array,
-            "color": color,
-            "label": label,
-            "alpha": alpha
-        })
+        self._rois.append({"roi_array": roi_array, "color": color, "label": label, "alpha": alpha})
         return self
 
     def add_custom_curves(
@@ -565,7 +592,7 @@ class SignalPlotter:
         label: str = "CustomCurves",
         color: str = "green",
         style: str = "--",
-        **kwargs_arrays
+        **kwargs_arrays,
     ):
         """
         Add one or more custom curves to overlay on each signal. Each keyword argument
@@ -603,13 +630,15 @@ class SignalPlotter:
             for name, arr in kwargs_arrays.items():
                 if arr.shape[0] != n_samples:
                     raise ValueError(f"{name}.shape[0] = {arr.shape[0]} != n_samples={n_samples}")
-        self._custom_curves.append({
-            "curve_func": curve_function,
-            "label": label,
-            "color": color,
-            "style": style,
-            "kwargs_arrays": kwargs_arrays
-        })
+        self._custom_curves.append(
+            {
+                "curve_func": curve_function,
+                "label": label,
+                "color": color,
+                "style": style,
+                "kwargs_arrays": kwargs_arrays,
+            }
+        )
         return self
 
     def plot(
@@ -617,7 +646,7 @@ class SignalPlotter:
         sample_indices: Optional[list] = None,
         n_examples: int = 4,
         n_columns: int = 2,
-        random_select: bool = False
+        random_select: bool = False,
     ):
         """
         Plot the signals with all overlays (ROI, scatter, vertical/horizontal lines, custom curves).
@@ -663,11 +692,12 @@ class SignalPlotter:
 
         with plt.style.context(mps):
             fig, axes = plt.subplots(
-                nrows=n_rows, ncols=n_columns,
+                nrows=n_rows,
+                ncols=n_columns,
                 figsize=(5 * n_columns, 4 * n_rows),
                 squeeze=False,
                 sharex=True,
-                sharey=True
+                sharey=True,
             )
 
         # Iterate over selected samples
@@ -677,7 +707,7 @@ class SignalPlotter:
             ax = axes[row, col]
 
             # Plot the main signal
-            ax.plot(x_vals, self.signals[idx], label=f"Signal #{idx}", color='blue')
+            ax.plot(x_vals, self.signals[idx], label=f"Signal #{idx}", color="blue")
 
             # Plot ROI overlays
             if self._rois and self.show_roi:
@@ -691,7 +721,7 @@ class SignalPlotter:
                         color=roi_info["color"],
                         alpha=roi_info.get("alpha", 0.6),
                         transform=ax.get_xaxis_transform(),
-                        label=roi_info["label"]
+                        label=roi_info["label"],
                     )
 
             # Plot scatter overlays
@@ -700,11 +730,12 @@ class SignalPlotter:
                     scatter_x = scatter_info["scatter_x"][idx]
                     scatter_y = scatter_info["scatter_y"][idx]
                     ax.scatter(
-                        scatter_x, scatter_y,
+                        scatter_x,
+                        scatter_y,
                         color=scatter_info["color"],
                         marker=scatter_info["marker"],
                         alpha=scatter_info["alpha"],
-                        label=scatter_info["label"]
+                        label=scatter_info["label"],
                     )
 
             # Plot vertical line overlays
@@ -719,7 +750,8 @@ class SignalPlotter:
                         alpha=vline_info["alpha"],
                         label=vline_info["label"],
                         transform=ax.get_xaxis_transform(),
-                        ymin=0, ymax=1
+                        ymin=0,
+                        ymax=1,
                     )
             # Plot horizontal line overlays
             if self._hlines and self.show_hlines:
@@ -732,7 +764,8 @@ class SignalPlotter:
                         alpha=hline_info["alpha"],
                         label=hline_info["label"],
                         transform=ax.get_yaxis_transform(),
-                        xmin=0, xmax=1
+                        xmin=0,
+                        xmax=1,
                     )
 
             # Plot custom curves overlays

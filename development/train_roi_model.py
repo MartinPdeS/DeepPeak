@@ -22,10 +22,11 @@ the predicted ROI aligns with the true peaks.
 # Imports
 # -------
 import numpy as np
-from DeepPeak.signals import generate_signal_dataset
-from DeepPeak.utils.visualization import plot_training_history, SignalPlotter
+
 from DeepPeak.models import build_ROI_model, filter_predictions
+from DeepPeak.signals import generate_signal_dataset
 from DeepPeak.utils.ROI import compute_rois_from_signals
+from DeepPeak.utils.visualization import SignalPlotter, plot_training_history
 
 # %%
 # Generate Synthetic Data
@@ -45,7 +46,7 @@ NUM_PEAKS = 3
 SEQUENCE_LENGTH = 64 * 2
 
 signals, amplitudes, positions, widths, x_values, num_peaks = generate_signal_dataset(
-    kernel='gaussian',
+    kernel="gaussian",
     n_samples=1000,
     sequence_length=SEQUENCE_LENGTH,
     n_peaks=(1, NUM_PEAKS),
@@ -64,12 +65,7 @@ signals, amplitudes, positions, widths, x_values, num_peaks = generate_signal_da
 # peak's center. The function ``compute_rois_from_signals`` returns a binary
 # mask of shape ``(n_samples, SEQUENCE_LENGTH)`` indicating where pulses lie.
 
-ROI = compute_rois_from_signals(
-    signals=signals,
-    positions=positions,
-    width_in_pixels=3,
-    amplitudes=amplitudes
-)
+ROI = compute_rois_from_signals(signals=signals, positions=positions, width_in_pixels=3, amplitudes=amplitudes)
 
 # %%
 # Visualize Signals and Ground-Truth ROI
@@ -94,14 +90,10 @@ _ = plotter.plot(n_examples=6, n_columns=3, random_select=False)
 
 roi_model = build_ROI_model(SEQUENCE_LENGTH)
 
-history = roi_model.fit(
-    signals, ROI,
-    validation_split=0.2,
-    epochs=20,
-    batch_size=32
-)
+history = roi_model.fit(signals, ROI, validation_split=0.2, epochs=20, batch_size=32)
 
 from DeepPeak.directories import weights_path
+
 roi_model.save(weights_path / "ROI_Model_128.keras")
 
 # %%
@@ -110,4 +102,4 @@ roi_model.save(weights_path / "ROI_Model_128.keras")
 #
 # We can then check how the loss evolves over epochs.
 
-_ = plot_training_history(history, filtering=['*loss*'])
+_ = plot_training_history(history, filtering=["*loss*"])

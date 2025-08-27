@@ -1,16 +1,39 @@
-from typing import Optional, Tuple, Union
+from typing import Iterable, Optional, Tuple, Union
+from dataclasses import dataclass, field
 import tensorflow as tf
 from tensorflow.keras import layers, models  # type: ignore
-from dataclasses import dataclass, field
 
 from DeepPeak.machine_learning.classifier.base import BaseClassifier
-
+from DeepPeak.machine_learning.classifier.metrics import BinaryIoU
 
 
 @dataclass
 class Autoencoder(BaseClassifier):
     """
     1D convolutional autoencoder for predicting an ROI (Region Of Interest) mask.
+
+    Parameters
+    ----------
+    sequence_length: int
+        Length of the input sequences.
+    dropout_rate: float
+        Dropout rate for regularization.
+    filters: Tuple[int, int, int]
+        Number of filters in each convolutional layer.
+    kernel_size: int
+        Size of the convolutional kernels.
+    pool_size: int
+        Pooling size for downsampling.
+    upsample_size: int
+        Upsampling size for the decoder.
+    optimizer: Union[str, tf.keras.optimizers.Optimizer]
+        Optimizer for model compilation.
+    loss: Union[str, tf.keras.losses.Loss]
+        Loss function for model training.
+    metrics: Tuple[Union[str, tf.keras.metrics.Metric]]
+        Metrics for model evaluation.
+    seed: Optional[int]
+        Random seed for reproducibility.
 
     Architecture
     ------------
@@ -46,12 +69,16 @@ class Autoencoder(BaseClassifier):
     upsample_size: int = 2
     optimizer: Union[str, tf.keras.optimizers.Optimizer] = "adam"
     loss: Union[str, tf.keras.losses.Loss] = "binary_crossentropy"
-    metrics: Tuple[Union[str, tf.keras.metrics.Metric], ...] = ("accuracy",)
+    metrics: Tuple[Union[str, tf.keras.metrics.Metric]] = "accuracy"
     seed: Optional[int] = None
 
     # filled after build()
     model: tf.keras.Model = field(init=False, repr=False, default=None)
     history_: Optional[tf.keras.callbacks.History] = field(init=False, repr=False, default=None)
+
+    def __post_init__(self):
+        if not isinstance(self.metrics, (tuple, list)):
+            self.metrics = (self.metrics,)
 
     # --------------------------------------------------------------------- #
     # Build / compile
@@ -64,23 +91,53 @@ class Autoencoder(BaseClassifier):
         inputs = layers.Input(shape=(self.sequence_length, 1), name="input")
 
         # Encoder
-        x = layers.Conv1D(self.filters[0], self.kernel_size, activation="relu", padding="same", name="enc_conv0")(inputs)
+        x = layers.Conv1D(
+            self.filters[0],
+            self.kernel_size,
+            activation="relu",
+            padding="same",
+            name="enc_conv0",
+        )(inputs)
         x = layers.Dropout(self.dropout_rate, name="enc_drop0")(x)
         x = layers.MaxPooling1D(pool_size=self.pool_size, padding="same", name="enc_pool0")(x)
 
-        x = layers.Conv1D(self.filters[1], self.kernel_size, activation="relu", padding="same", name="enc_conv1")(x)
+        x = layers.Conv1D(
+            self.filters[1],
+            self.kernel_size,
+            activation="relu",
+            padding="same",
+            name="enc_conv1",
+        )(x)
         x = layers.Dropout(self.dropout_rate, name="enc_drop1")(x)
         x = layers.MaxPooling1D(pool_size=self.pool_size, padding="same", name="enc_pool1")(x)
 
         # Bottleneck
-        x = layers.Conv1D(self.filters[2], self.kernel_size, activation="relu", padding="same", name="bottleneck_conv")(x)
+        x = layers.Conv1D(
+            self.filters[2],
+            self.kernel_size,
+            activation="relu",
+            padding="same",
+            name="bottleneck_conv",
+        )(x)
         x = layers.Dropout(self.dropout_rate, name="bottleneck_drop")(x)
 
         # Decoder
         x = layers.UpSampling1D(size=self.upsample_size, name="dec_up0")(x)
-        x = layers.Conv1D(self.filters[1], self.kernel_size, activation="relu", padding="same", name="dec_conv0")(x)
+        x = layers.Conv1D(
+            self.filters[1],
+            self.kernel_size,
+            activation="relu",
+            padding="same",
+            name="dec_conv0",
+        )(x)
         x = layers.UpSampling1D(size=self.upsample_size, name="dec_up1")(x)
-        x = layers.Conv1D(self.filters[0], self.kernel_size, activation="relu", padding="same", name="dec_conv1")(x)
+        x = layers.Conv1D(
+            self.filters[0],
+            self.kernel_size,
+            activation="relu",
+            padding="same",
+            name="dec_conv1",
+        )(x)
 
         # Output head
         roi = layers.Conv1D(1, kernel_size=1, activation="sigmoid", name="ROI")(x)

@@ -1,15 +1,17 @@
-from typing import Optional, Union, Iterable
-import numpy as np
 import re
-import tensorflow as tf
+from typing import Iterable, Optional, Union
+
 import matplotlib.pyplot as plt
+import numpy as np
+import tensorflow as tf
 from MPSPlots.styles import mps as plot_style
 
 from DeepPeak.helper import mpl_plot
 
 HistoryLike = Union[tf.keras.callbacks.History, dict]
 
-class BaseClassifier():
+
+class BaseClassifier:
     @mpl_plot
     def plot_prediction(self, figure: plt.Figure, ax: plt.Axes, signal: np.ndarray, threshold: float) -> None:
         """
@@ -25,7 +27,7 @@ class BaseClassifier():
         region_of_interest = self.predict(signal.reshape([1, signal.size])).squeeze()
         x_values = np.arange(signal.size)
 
-        ax.plot(x_values, signal.squeeze(), color='black')
+        ax.plot(x_values, signal.squeeze(), color="black")
 
         ax.fill_between(
             x=x_values,
@@ -33,9 +35,9 @@ class BaseClassifier():
             y2=1,
             transform=ax.get_xaxis_transform(),
             where=region_of_interest > threshold,
-            color='lightblue',
+            color="lightblue",
             alpha=0.6,
-            label='Predicted ROI'
+            label="Predicted ROI",
         )
 
         ax.set_title("Predicted Region of Interest")
@@ -71,7 +73,14 @@ class BaseClassifier():
         self._ensure_built()
         self.model.summary(*args, **kwargs)
 
-    def predict(self, signal: np.ndarray, *, batch_size: int = 32, verbose: int = 0, threshold: Optional[float] = None) -> np.ndarray:
+    def predict(
+        self,
+        signal: np.ndarray,
+        *,
+        batch_size: int = 32,
+        verbose: int = 0,
+        threshold: Optional[float] = None,
+    ) -> np.ndarray:
         """
         Predict per-timestep probabilities; optionally return a binary mask if `threshold` is set.
 
@@ -123,16 +132,21 @@ class BaseClassifier():
         For dilation rates d_i = 2^i and kernel size K:
             RF = 1 + sum_i (K - 1) * d_i
         """
-        rf = 1 + sum((self.kernel_size - 1) * (2 ** i) for i in range(self.num_dilation_layers))
+        rf = 1 + sum((self.kernel_size - 1) * (2**i) for i in range(self.num_dilation_layers))
         return rf
 
-    def fit(self, x: np.ndarray, y: np.ndarray, *,
+    def fit(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        *,
         batch_size: int = 32,
         epochs: int = 20,
         validation_split: float = 0.2,
         callbacks: Optional[Iterable[tf.keras.callbacks.Callback]] = None,
         verbose: int = 1,
-        shuffle: bool = True) -> tf.keras.callbacks.History:
+        shuffle: bool = True,
+    ) -> tf.keras.callbacks.History:
         """
         Train the model and store the History in `history_`.
 
@@ -157,7 +171,8 @@ class BaseClassifier():
         """
         self._ensure_built()
         history = self.model.fit(
-            x, y,
+            x,
+            y,
             batch_size=batch_size,
             epochs=epochs,
             validation_split=validation_split,
@@ -214,4 +229,3 @@ class BaseClassifier():
 
             plt.tight_layout()
             plt.show()
-

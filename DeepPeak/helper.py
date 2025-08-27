@@ -1,8 +1,8 @@
-
 # -*- coding: utf-8 -*-
 from functools import wraps
-from MPSPlots.styles import mps as plot_style
+
 import matplotlib.pyplot as plt
+from MPSPlots.styles import mps as plot_style
 
 
 def mpl_plot(function):

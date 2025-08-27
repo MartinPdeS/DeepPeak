@@ -1,15 +1,35 @@
-from typing import Optional, Tuple, Union
+from typing import Iterable, Optional, Tuple, Union
+from dataclasses import dataclass, field
 import tensorflow as tf
 from tensorflow.keras import layers, models  # type: ignore
-from dataclasses import dataclass, field
 
 from DeepPeak.machine_learning.classifier.base import BaseClassifier
+from DeepPeak.machine_learning.classifier.metrics import BinaryIoU
 
 
 @dataclass
 class DenseNet(BaseClassifier):
     """
     Compact 1D ConvNet for per-timestep peak classification.
+
+    Parameters
+    ----------
+    sequence_length: int
+        Length of the input sequences.
+    filters: Tuple[int, int, int]
+        Number of filters in each convolutional layer.
+    dilation_rates: Tuple[int, int, int]
+        Dilation rates for each convolutional layer.
+    kernel_size: int
+        Size of the convolutional kernels.
+    optimizer: Union[str, tf.keras.optimizers.Optimizer]
+        Optimizer for model compilation.
+    loss: Union[str, tf.keras.losses.Loss]
+        Loss function for model training.
+    metrics: Tuple[Union[str, tf.keras.metrics.Metric]]
+        Metrics for model evaluation.
+    seed: Optional[int]
+        Random seed for reproducibility.
 
     Architecture
     ------------
@@ -28,12 +48,16 @@ class DenseNet(BaseClassifier):
     kernel_size: int = 3
     optimizer: Union[str, tf.keras.optimizers.Optimizer] = "adam"
     loss: Union[str, tf.keras.losses.Loss] = "binary_crossentropy"
-    metrics: Tuple[Union[str, tf.keras.metrics.Metric], ...] = ("accuracy",)
+    metrics: Tuple[Union[str, tf.keras.metrics.Metric]] = "accuracy"
     seed: Optional[int] = None
 
     # filled after build()
     model: tf.keras.Model = field(init=False, repr=False, default=None)
     history_: Optional[tf.keras.callbacks.History] = field(init=False, repr=False, default=None)
+
+    def __post_init__(self):
+        if not isinstance(self.metrics, (tuple, list)):
+            self.metrics = (self.metrics,)
 
     # --------------------------------------------------------------------- #
     # Construction / compilation

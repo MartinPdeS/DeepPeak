@@ -19,8 +19,9 @@ We will:
 # Imports and reproducibility
 # --------------------------
 import numpy as np
-from DeepPeak.signals import SignalDatasetGenerator, Kernel
+
 from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
+from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
 np.random.seed(42)
 
@@ -30,10 +31,7 @@ np.random.seed(42)
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-generator = SignalDatasetGenerator(
-    n_samples=100,
-    sequence_length=SEQUENCE_LENGTH
-)
+generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     signal_type=Kernel.GAUSSIAN,
@@ -43,7 +41,7 @@ dataset = generator.generate(
     width=(0.03, 0.05),
     noise_std=0.1,
     categorical_peak_count=False,
-    compute_region_of_interest=True
+    compute_region_of_interest=True,
 )
 
 # %%
@@ -61,9 +59,9 @@ dense_net = Autoencoder(
     kernel_size=3,
     pool_size=2,
     upsample_size=2,
-    optimizer='adam',
-    loss='binary_crossentropy',
-    metrics=[BinaryIoU(threshold=0.5)]
+    optimizer="adam",
+    loss="binary_crossentropy",
+    metrics=[BinaryIoU(threshold=0.5)],
 )
 dense_net.build()
 dense_net.summary()
@@ -76,7 +74,7 @@ history = dense_net.fit(
     dataset.region_of_interest,
     validation_split=0.2,
     epochs=4,
-    batch_size=64
+    batch_size=64,
 )
 
 # %%
@@ -87,7 +85,4 @@ dense_net.plot_model_history(filter_pattern="BinaryIoU")
 # %%
 # Predict and visualize on a test signal
 # --------------------------------------
-dense_net.plot_prediction(
-    signal=dataset.signals[0:1, :],
-    threshold=0.4
-)
+dense_net.plot_prediction(signal=dataset.signals[0:1, :], threshold=0.4)

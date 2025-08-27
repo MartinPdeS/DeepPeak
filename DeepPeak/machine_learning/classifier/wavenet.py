@@ -1,15 +1,36 @@
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, Iterable
+from dataclasses import dataclass, field
 import tensorflow as tf
 from tensorflow.keras import layers, models  # type: ignore
-from dataclasses import dataclass, field
 
 from DeepPeak.machine_learning.classifier.base import BaseClassifier
+from DeepPeak.machine_learning.classifier.metrics import BinaryIoU
 
 
 @dataclass
 class WaveNet(BaseClassifier):
     """
     WaveNet-style 1D detector for per-timestep peak classification.
+
+
+    Parameters
+    ----------
+    sequence_length: int
+        Length of the input sequences.
+    num_filters: int
+        Number of filters in the convolutional layers.
+    num_dilation_layers: int
+        Number of dilated convolutional layers.
+    kernel_size: int
+        Size of the convolutional kernels.
+    optimizer: Union[str, tf.keras.optimizers.Optimizer]
+        Optimizer for model compilation.
+    loss: Union[str, tf.keras.losses.Loss]
+        Loss function for model training.
+    metrics: Tuple[Union[str, tf.keras.metrics.Metric]]
+        Metrics for model evaluation.
+    seed: Optional[int]
+        Random seed for reproducibility.
 
     Architecture
     ------------
@@ -31,12 +52,16 @@ class WaveNet(BaseClassifier):
     kernel_size: int = 3
     optimizer: Union[str, tf.keras.optimizers.Optimizer] = "adam"
     loss: Union[str, tf.keras.losses.Loss] = "binary_crossentropy"
-    metrics: Tuple[Union[str, tf.keras.metrics.Metric], ...] = (tf.keras.metrics.BinaryAccuracy(name="accuracy", threshold=0.5), )
+    metrics: Tuple[Union[str, tf.keras.metrics.Metric]] = "accuracy"
     seed: Optional[int] = None
 
     # filled after build()
     model: tf.keras.Model = field(init=False, repr=False, default=None)
     history_: Optional[tf.keras.callbacks.History] = field(init=False, repr=False, default=None)
+
+    def __post_init__(self):
+        if not isinstance(self.metrics, (tuple, list)):
+            self.metrics = (self.metrics,)
 
     # --------------------------------------------------------------------- #
     # Construction / compilation
@@ -56,7 +81,7 @@ class WaveNet(BaseClassifier):
         skip_paths = []
 
         for i in range(self.num_dilation_layers):
-            dilation = 2 ** i
+            dilation = 2**i
 
             # Dilated causal conv
             h = layers.Conv1D(
