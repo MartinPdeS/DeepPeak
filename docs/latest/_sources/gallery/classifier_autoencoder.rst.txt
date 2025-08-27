@@ -37,14 +37,13 @@ We will:
 Imports and reproducibility
 --------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-28
+.. GENERATED FROM PYTHON SOURCE LINES 21-27
 
 .. code-block:: Python
 
     import numpy as np
-    import matplotlib.pyplot as plt
     from DeepPeak.signals import SignalDatasetGenerator, Kernel
-    from DeepPeak.machine_learning.classifier import Autoencoder
+    from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
 
     np.random.seed(42)
 
@@ -55,12 +54,12 @@ Imports and reproducibility
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 29-31
+.. GENERATED FROM PYTHON SOURCE LINES 28-30
 
 Generate synthetic dataset
 -------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 31-50
+.. GENERATED FROM PYTHON SOURCE LINES 30-49
 
 .. code-block:: Python
 
@@ -90,12 +89,12 @@ Generate synthetic dataset
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-53
+.. GENERATED FROM PYTHON SOURCE LINES 50-52
 
 Visualize a few example signals and their regions of interest
 ------------------------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-55
+.. GENERATED FROM PYTHON SOURCE LINES 52-54
 
 .. code-block:: Python
 
@@ -113,12 +112,12 @@ Visualize a few example signals and their regions of interest
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 56-58
+.. GENERATED FROM PYTHON SOURCE LINES 55-57
 
 Build and summarize the WaveNet classifier
 ------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-72
+.. GENERATED FROM PYTHON SOURCE LINES 57-71
 
 .. code-block:: Python
 
@@ -131,7 +130,7 @@ Build and summarize the WaveNet classifier
         upsample_size=2,
         optimizer='adam',
         loss='binary_crossentropy',
-        metrics=['accuracy']
+        metrics=[BinaryIoU(threshold=0.5)]
     )
     dense_net.build()
     dense_net.summary()
@@ -183,12 +182,12 @@ Build and summarize the WaveNet classifier
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
+.. GENERATED FROM PYTHON SOURCE LINES 72-74
 
 Train the classifier
 --------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 75-83
+.. GENERATED FROM PYTHON SOURCE LINES 74-82
 
 .. code-block:: Python
 
@@ -196,7 +195,7 @@ Train the classifier
         dataset.signals,
         dataset.region_of_interest,
         validation_split=0.2,
-        epochs=20,
+        epochs=4,
         batch_size=64
     )
 
@@ -208,66 +207,34 @@ Train the classifier
 
  .. code-block:: none
 
-    Epoch 1/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - accuracy: 0.8923 - loss: 0.6700    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 262ms/step - accuracy: 0.9036 - loss: 0.6689 - val_accuracy: 0.9613 - val_loss: 0.6462
-    Epoch 2/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - accuracy: 0.9476 - loss: 0.6227    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9480 - loss: 0.6184 - val_accuracy: 0.9745 - val_loss: 0.6327
-    Epoch 3/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - accuracy: 0.9490 - loss: 0.5839    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9495 - loss: 0.5829 - val_accuracy: 0.9690 - val_loss: 0.5839
-    Epoch 4/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - accuracy: 0.9513 - loss: 0.5513    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9506 - loss: 0.5417 - val_accuracy: 0.9660 - val_loss: 0.5435
-    Epoch 5/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9563 - loss: 0.4862    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9540 - loss: 0.4835 - val_accuracy: 0.9512 - val_loss: 0.4857
-    Epoch 6/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9566 - loss: 0.4116    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9556 - loss: 0.4055 - val_accuracy: 0.9620 - val_loss: 0.3823
-    Epoch 7/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9539 - loss: 0.3485    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9531 - loss: 0.3366 - val_accuracy: 0.9530 - val_loss: 0.3002
-    Epoch 8/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9544 - loss: 0.2572    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9529 - loss: 0.2473 - val_accuracy: 0.9490 - val_loss: 0.2129
-    Epoch 9/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9559 - loss: 0.1736    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9556 - loss: 0.1707 - val_accuracy: 0.9582 - val_loss: 0.1407
-    Epoch 10/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9592 - loss: 0.1285    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9591 - loss: 0.1226 - val_accuracy: 0.9517 - val_loss: 0.1237
-    Epoch 11/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9552 - loss: 0.1091    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9569 - loss: 0.1047 - val_accuracy: 0.9615 - val_loss: 0.1087
-    Epoch 12/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9545 - loss: 0.0988    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9531 - loss: 0.1007 - val_accuracy: 0.9717 - val_loss: 0.0992
-    Epoch 13/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9565 - loss: 0.0944    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9553 - loss: 0.0952 - val_accuracy: 0.9693 - val_loss: 0.0990
-    Epoch 14/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9609 - loss: 0.0911    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 51ms/step - accuracy: 0.9598 - loss: 0.0937 - val_accuracy: 0.9638 - val_loss: 0.0981
-    Epoch 15/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - accuracy: 0.9588 - loss: 0.0913    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9577 - loss: 0.0964 - val_accuracy: 0.9667 - val_loss: 0.0946
-    Epoch 16/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9584 - loss: 0.0917    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9604 - loss: 0.0886 - val_accuracy: 0.9712 - val_loss: 0.0895
-    Epoch 17/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9577 - loss: 0.0910    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9586 - loss: 0.0895 - val_accuracy: 0.9735 - val_loss: 0.0850
-    Epoch 18/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9588 - loss: 0.0877    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9597 - loss: 0.0859 - val_accuracy: 0.9668 - val_loss: 0.0882
-    Epoch 19/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9596 - loss: 0.0867    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9596 - loss: 0.0918 - val_accuracy: 0.9587 - val_loss: 0.0935
-    Epoch 20/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9588 - loss: 0.0942    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9587 - loss: 0.0949 - val_accuracy: 0.9632 - val_loss: 0.0914
+    Epoch 1/4
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0617 - loss: 0.7002    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 332ms/step - BinaryIoU: 0.0596 - loss: 0.6927 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6463
+    Epoch 2/4
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6493    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6444 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6285
+    Epoch 3/4
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6223    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6182 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6115
+    Epoch 4/4
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5808    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5806 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5826
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 84-86
+.. GENERATED FROM PYTHON SOURCE LINES 83-85
 
 Plot training history
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-88
+.. GENERATED FROM PYTHON SOURCE LINES 85-87
 
 .. code-block:: Python
 
-    dense_net.plot_model_history(history)
+    dense_net.plot_model_history(filter_pattern="BinaryIoU")
 
 
 
 
 .. image-sg:: /gallery/images/sphx_glr_classifier_autoencoder_002.png
-   :alt: Loss, Accuracy
+   :alt: BinaryIoU
    :srcset: /gallery/images/sphx_glr_classifier_autoencoder_002.png
    :class: sphx-glr-single-img
 
@@ -275,12 +242,12 @@ Plot training history
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-91
+.. GENERATED FROM PYTHON SOURCE LINES 88-90
 
 Predict and visualize on a test signal
 --------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 91-94
+.. GENERATED FROM PYTHON SOURCE LINES 90-93
 
 .. code-block:: Python
 
@@ -308,7 +275,7 @@ Predict and visualize on a test signal
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 8.092 seconds)
+   **Total running time of the script:** (0 minutes 6.926 seconds)
 
 
 .. _sphx_glr_download_gallery_classifier_autoencoder.py:

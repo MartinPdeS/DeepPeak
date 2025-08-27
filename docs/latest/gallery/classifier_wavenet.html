@@ -496,9 +496,9 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <section id="imports-and-reproducibility">
 <h2>Imports and reproducibility<a class="headerlink" href="#imports-and-reproducibility" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalDatasetGenerator</span><span class="p">,</span> <span class="n">Kernel</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.machine_learning.classifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">WaveNet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">SignalDatasetGenerator</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
@@ -509,10 +509,7 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">200</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span>
-    <span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-    <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span>
-<span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="n">signal_type</span><span class="o">=</span><span class="n">Kernel</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">,</span>
@@ -522,7 +519,7 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">width</span><span class="o">=</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">compute_region_of_interest</span><span class="o">=</span><span class="kc">True</span>
+    <span class="n">compute_region_of_interest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -540,9 +537,9 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">num_filters</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
     <span class="n">num_dilation_layers</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
     <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;adam&#39;</span><span class="p">,</span>
-    <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;binary_crossentropy&#39;</span><span class="p">,</span>
-    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;accuracy&#39;</span><span class="p">]</span>
+    <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;binary_crossentropy&quot;</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="n">dense_net</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="n">dense_net</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
@@ -641,111 +638,108 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">dataset</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">,</span>
     <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 4s 4s/step - accuracy: 0.7549 - loss: 1.0374
-2/2 ━━━━━━━━━━━━━━━━━━━━ 5s 444ms/step - accuracy: 0.7931 - loss: 0.9035 - val_accuracy: 0.8580 - val_loss: 0.8507
+1/2 ━━━━━━━━━━━━━━━━━━━━ 4s 4s/step - accuracy: 0.1384 - loss: 2.2066
+2/2 ━━━━━━━━━━━━━━━━━━━━ 5s 464ms/step - accuracy: 0.2963 - loss: 1.9692 - val_accuracy: 0.9613 - val_loss: 0.6681
 Epoch 2/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 109ms/step - accuracy: 0.8280 - loss: 1.1302
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 75ms/step - accuracy: 0.8423 - loss: 1.0158 - val_accuracy: 0.9613 - val_loss: 0.3707
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 110ms/step - accuracy: 0.9488 - loss: 0.8597
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 79ms/step - accuracy: 0.9496 - loss: 0.8483 - val_accuracy: 0.9613 - val_loss: 0.5769
 Epoch 3/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9505 - loss: 0.5003
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 75ms/step - accuracy: 0.9496 - loss: 0.5280 - val_accuracy: 0.9613 - val_loss: 0.3476
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 104ms/step - accuracy: 0.9510 - loss: 0.7629
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 77ms/step - accuracy: 0.9496 - loss: 0.7620 - val_accuracy: 0.9613 - val_loss: 0.3964
 Epoch 4/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9491 - loss: 0.5018
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9496 - loss: 0.4745 - val_accuracy: 0.9710 - val_loss: 0.1581
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 100ms/step - accuracy: 0.9484 - loss: 0.5519
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 79ms/step - accuracy: 0.9496 - loss: 0.5041 - val_accuracy: 0.9462 - val_loss: 0.2280
 Epoch 5/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9569 - loss: 0.2319
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 75ms/step - accuracy: 0.9556 - loss: 0.2299 - val_accuracy: 0.9605 - val_loss: 0.1631
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9294 - loss: 0.2840
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 76ms/step - accuracy: 0.9269 - loss: 0.2959 - val_accuracy: 0.9407 - val_loss: 0.2006
 Epoch 6/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9416 - loss: 0.2345
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 75ms/step - accuracy: 0.9434 - loss: 0.2188 - val_accuracy: 0.9613 - val_loss: 0.1477
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - accuracy: 0.9195 - loss: 0.2654
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 75ms/step - accuracy: 0.9268 - loss: 0.2454 - val_accuracy: 0.9613 - val_loss: 0.1339
 Epoch 7/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9488 - loss: 0.2189
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9495 - loss: 0.2018 - val_accuracy: 0.9620 - val_loss: 0.1077
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 105ms/step - accuracy: 0.9515 - loss: 0.1707
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 77ms/step - accuracy: 0.9496 - loss: 0.1969 - val_accuracy: 0.9613 - val_loss: 0.1258
 Epoch 8/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9478 - loss: 0.1546
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9486 - loss: 0.1477 - val_accuracy: 0.9677 - val_loss: 0.0836
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 105ms/step - accuracy: 0.9503 - loss: 0.1730
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 76ms/step - accuracy: 0.9511 - loss: 0.1637 - val_accuracy: 0.9565 - val_loss: 0.1075
 Epoch 9/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9573 - loss: 0.1120
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9566 - loss: 0.1115 - val_accuracy: 0.9665 - val_loss: 0.0841
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9391 - loss: 0.1415
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 76ms/step - accuracy: 0.9385 - loss: 0.1454 - val_accuracy: 0.9635 - val_loss: 0.0939
 Epoch 10/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 100ms/step - accuracy: 0.9566 - loss: 0.1057
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9554 - loss: 0.1069 - val_accuracy: 0.9677 - val_loss: 0.0869
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - accuracy: 0.9498 - loss: 0.1156
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 77ms/step - accuracy: 0.9501 - loss: 0.1139 - val_accuracy: 0.9613 - val_loss: 0.1013
 Epoch 11/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9570 - loss: 0.1026
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 75ms/step - accuracy: 0.9563 - loss: 0.1048 - val_accuracy: 0.9625 - val_loss: 0.0951
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9497 - loss: 0.1243
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 76ms/step - accuracy: 0.9498 - loss: 0.1240 - val_accuracy: 0.9638 - val_loss: 0.0889
 Epoch 12/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 100ms/step - accuracy: 0.9518 - loss: 0.1160
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9516 - loss: 0.1134 - val_accuracy: 0.9685 - val_loss: 0.0812
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 100ms/step - accuracy: 0.9544 - loss: 0.1075
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 77ms/step - accuracy: 0.9551 - loss: 0.1069 - val_accuracy: 0.9700 - val_loss: 0.0804
 Epoch 13/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9589 - loss: 0.0955
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 76ms/step - accuracy: 0.9603 - loss: 0.0948 - val_accuracy: 0.9718 - val_loss: 0.0777
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - accuracy: 0.9593 - loss: 0.0982
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 77ms/step - accuracy: 0.9587 - loss: 0.1018 - val_accuracy: 0.9720 - val_loss: 0.0765
 Epoch 14/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 104ms/step - accuracy: 0.9609 - loss: 0.0925
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 73ms/step - accuracy: 0.9619 - loss: 0.0900 - val_accuracy: 0.9653 - val_loss: 0.0775
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9602 - loss: 0.1005
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 79ms/step - accuracy: 0.9607 - loss: 0.0988 - val_accuracy: 0.9740 - val_loss: 0.0692
 Epoch 15/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9565 - loss: 0.0976
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9574 - loss: 0.0961 - val_accuracy: 0.9728 - val_loss: 0.0677
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9643 - loss: 0.0893
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9632 - loss: 0.0903 - val_accuracy: 0.9675 - val_loss: 0.0683
 Epoch 16/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9593 - loss: 0.0903
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9618 - loss: 0.0866 - val_accuracy: 0.9725 - val_loss: 0.0681
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 100ms/step - accuracy: 0.9623 - loss: 0.0854
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 75ms/step - accuracy: 0.9613 - loss: 0.0899 - val_accuracy: 0.9747 - val_loss: 0.0643
 Epoch 17/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9581 - loss: 0.0921
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9598 - loss: 0.0884 - val_accuracy: 0.9677 - val_loss: 0.0657
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9625 - loss: 0.0888
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 76ms/step - accuracy: 0.9646 - loss: 0.0841 - val_accuracy: 0.9765 - val_loss: 0.0650
 Epoch 18/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9584 - loss: 0.0862
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9596 - loss: 0.0848 - val_accuracy: 0.9743 - val_loss: 0.0624
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9627 - loss: 0.0884
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 77ms/step - accuracy: 0.9649 - loss: 0.0849 - val_accuracy: 0.9795 - val_loss: 0.0608
 Epoch 19/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 104ms/step - accuracy: 0.9645 - loss: 0.0804
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9641 - loss: 0.0811 - val_accuracy: 0.9753 - val_loss: 0.0612
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - accuracy: 0.9681 - loss: 0.0799
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9675 - loss: 0.0809 - val_accuracy: 0.9740 - val_loss: 0.0602
 Epoch 20/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - accuracy: 0.9652 - loss: 0.0789
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.9641 - loss: 0.0802 - val_accuracy: 0.9703 - val_loss: 0.0597
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - accuracy: 0.9671 - loss: 0.0805
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 77ms/step - accuracy: 0.9653 - loss: 0.0825 - val_accuracy: 0.9790 - val_loss: 0.0580
 </pre></div>
 </div>
 </section>
 <section id="plot-training-history">
 <h2>Plot training history<a class="headerlink" href="#plot-training-history" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_model_history</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_model_history</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_classifier_wavenet_002.png" srcset="../_images/sphx_glr_classifier_wavenet_002.png" alt="Loss, Accuracy" class = "sphx-glr-single-img"/></section>
+<img src="../_images/sphx_glr_classifier_wavenet_002.png" srcset="../_images/sphx_glr_classifier_wavenet_002.png" alt="accuracy, loss, val_accuracy, val_loss" class = "sphx-glr-single-img"/></section>
 <section id="predict-and-visualize-on-a-test-signal">
 <h2>Predict and visualize on a test signal<a class="headerlink" href="#predict-and-visualize-on-a-test-signal" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_prediction</span><span class="p">(</span>
-    <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span>
-    <span class="n">threshold</span><span class="o">=</span><span class="mf">0.4</span>
-<span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_prediction</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_classifier_wavenet_003.png" srcset="../_images/sphx_glr_classifier_wavenet_003.png" alt="Predicted Region of Interest" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1200x500 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 9.639 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 10.202 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-wavenet-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b51bbbaf62ed0591b6ea1aacdcdca2b4/classifier_wavenet.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_wavenet.ipynb</span></code></a></p>
