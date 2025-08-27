@@ -1,0 +1,139 @@
+{
+ "Kernel.GAUSSIAN": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak.signals",
+   "module_short": "DeepPeak.signals",
+   "name": "Kernel"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak",
+   "module_short": "DeepPeak",
+   "name": "Kernel"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak.signals.Kernel",
+   "module_short": "DeepPeak.signals.Kernel",
+   "name": "GAUSSIAN"
+  }
+ ],
+ "NUM_PEAKS": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "SEQUENCE_LENGTH": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ],
+ "SignalDatasetGenerator": [
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "DeepPeak.signals",
+   "module_short": "DeepPeak.signals",
+   "name": "SignalDatasetGenerator"
+  },
+  {
+   "is_class": true,
+   "is_explicit": false,
+   "module": "DeepPeak",
+   "module_short": "DeepPeak",
+   "name": "SignalDatasetGenerator"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak.signals",
+   "module_short": "DeepPeak.signals",
+   "name": "SignalDatasetGenerator"
+  }
+ ],
+ "dataset": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak.dataset",
+   "module_short": "DeepPeak.dataset",
+   "name": "DataSet"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak",
+   "module_short": "DeepPeak",
+   "name": "DataSet"
+  }
+ ],
+ "dataset.plot": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak.dataset",
+   "module_short": "DeepPeak.dataset",
+   "name": "DataSet.plot"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak",
+   "module_short": "DeepPeak",
+   "name": "DataSet.plot"
+  }
+ ],
+ "generator": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak.signals",
+   "module_short": "DeepPeak.signals",
+   "name": "SignalDatasetGenerator"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak",
+   "module_short": "DeepPeak",
+   "name": "SignalDatasetGenerator"
+  }
+ ],
+ "generator.generate": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak.signals",
+   "module_short": "DeepPeak.signals",
+   "name": "SignalDatasetGenerator.generate"
+  },
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "DeepPeak",
+   "module_short": "DeepPeak",
+   "name": "SignalDatasetGenerator.generate"
+  }
+ ],
+ "sample_count": [
+  {
+   "is_class": false,
+   "is_explicit": false,
+   "module": "builtins",
+   "module_short": "builtins",
+   "name": "int"
+  }
+ ]
+}
