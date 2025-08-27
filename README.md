@@ -7,12 +7,12 @@
 | DeepPeak/algorithms/non\_maximum\_suppression.py     |      110 |      110 |       16 |        0 |      0% |     1-314 |
 | DeepPeak/dataset.py                                  |       28 |       21 |       16 |        0 |     20% |     28-78 |
 | DeepPeak/helper.py                                   |       18 |       11 |        4 |        0 |     32% |     33-48 |
-| DeepPeak/machine\_learning/classifier/autoencoder.py |       43 |        1 |        4 |        2 |     94% |80->exit, 89 |
+| DeepPeak/machine\_learning/classifier/autoencoder.py |       43 |        1 |        4 |        2 |     94% |84->exit, 93 |
 | DeepPeak/machine\_learning/classifier/base.py        |       80 |       28 |       18 |        5 |     60% |27-45, 49-50, 54-55, 59, 63-69, 107, 124-126, 135-136, 205, 211->215, 216-217 |
-| DeepPeak/machine\_learning/classifier/dense.py       |       32 |        1 |        6 |        2 |     92% |59->exit, 68 |
+| DeepPeak/machine\_learning/classifier/dense.py       |       32 |        1 |        6 |        2 |     92% |62->exit, 71 |
 | DeepPeak/machine\_learning/classifier/metrics.py     |       48 |       12 |        6 |        0 |     67% |18-34, 104 |
 | DeepPeak/machine\_learning/classifier/utils.py       |       38 |       38 |        2 |        0 |      0% |     1-245 |
-| DeepPeak/machine\_learning/classifier/wavenet.py     |       40 |        1 |        6 |        2 |     93% |63->exit, 74 |
+| DeepPeak/machine\_learning/classifier/wavenet.py     |       40 |        1 |        6 |        2 |     93% |66->exit, 77 |
 | DeepPeak/signals.py                                  |      132 |       35 |       42 |       12 |     64% |106, 116, 117->120, 145-153, 165->169, 170, 176->184, 203, 209, 225-233, 280, 288->295, 333-345 |
 | DeepPeak/utils.py                                    |       71 |       71 |       14 |        0 |      0% |     1-185 |
 | DeepPeak/visualization.py                            |      202 |      202 |       70 |        0 |      0% |     1-800 |
