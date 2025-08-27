@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
-import matplotlib.pyplot as plt
 
 
 class NonMaximumSuppression:
@@ -54,7 +54,9 @@ class NonMaximumSuppression:
         self.threshold = threshold
         self.minimum_separation = minimum_separation
         self.maximum_number_of_pulses = int(maximum_number_of_pulses)
-        self.kernel_truncation_radius_in_sigmas = float(kernel_truncation_radius_in_sigmas)
+        self.kernel_truncation_radius_in_sigmas = float(
+            kernel_truncation_radius_in_sigmas
+        )
 
         # Results after detection (coarse, no quadratic refinement)
         self.gaussian_kernel_: NDArray[np.float64] | None = None
@@ -66,7 +68,9 @@ class NonMaximumSuppression:
         self.suppression_half_window_in_samples_: int | None = None
         self.results: dict[str, object] | None = None
 
-    def run(self, time_samples: NDArray[np.float64], signal: NDArray[np.float64]) -> dict[str, object]:
+    def run(
+        self, time_samples: NDArray[np.float64], signal: NDArray[np.float64]
+    ) -> dict[str, object]:
         r"""
         Run the detection pipeline (matched filter + non-maximum suppression).
 
@@ -97,8 +101,11 @@ class NonMaximumSuppression:
 
             r[n] = \max_{|k-n|\leq W} r[k], \qquad r[n] \ge \tau.
         """
-        assert signal.ndim == 1 and time_samples.ndim == 1 and len(signal) == len(time_samples), \
-            "signal and time_samples must be one-dimensional arrays of the same length"
+        assert (
+            signal.ndim == 1
+            and time_samples.ndim == 1
+            and len(signal) == len(time_samples)
+        ), "signal and time_samples must be one-dimensional arrays of the same length"
 
         sample_interval = float(time_samples[1] - time_samples[0])
 
@@ -116,7 +123,9 @@ class NonMaximumSuppression:
         else:
             minimum_separation = self.minimum_separation
 
-        suppression_half_window_in_samples = int(max(1, np.round(minimum_separation / sample_interval / 2.0)))
+        suppression_half_window_in_samples = int(
+            max(1, np.round(minimum_separation / sample_interval / 2.0))
+        )
 
         if self.threshold == "auto":
             noise_sigma = self._estimate_noise_std(matched_filter_output)
@@ -134,7 +143,9 @@ class NonMaximumSuppression:
 
         # Coarse peak times and heights (no sub-sample refinement)
         peak_times = time_samples[peak_indices] if peak_indices.size else np.empty(0)
-        peak_heights = matched_filter_output[peak_indices] if peak_indices.size else np.empty(0)
+        peak_heights = (
+            matched_filter_output[peak_indices] if peak_indices.size else np.empty(0)
+        )
 
         # Save results on the instance
         self.gaussian_kernel_ = gaussian_kernel
@@ -144,7 +155,9 @@ class NonMaximumSuppression:
         self.peak_times_ = peak_times[order]
         self.peak_heights_ = peak_heights[order]
         self.threshold_used_ = float(threshold_value)
-        self.suppression_half_window_in_samples_ = int(suppression_half_window_in_samples)
+        self.suppression_half_window_in_samples_ = int(
+            suppression_half_window_in_samples
+        )
 
         self.results = {
             "signal": signal,
@@ -155,7 +168,9 @@ class NonMaximumSuppression:
             "matched_filter_output": matched_filter_output,
             "gaussian_kernel": gaussian_kernel,
             "threshold_used": float(threshold_value),
-            "suppression_half_window_in_samples": int(suppression_half_window_in_samples),
+            "suppression_half_window_in_samples": int(
+                suppression_half_window_in_samples
+            ),
         }
         return self.results
 
@@ -164,6 +179,7 @@ class NonMaximumSuppression:
         Plot the input signal, matched-filter output, and coarse peak locations.
         """
         from MPSPlots.styles import mps as plot_style
+
         if not getattr(self, "results", None):
             raise ValueError("Computation not done yet, use .run() first.")
 
@@ -202,7 +218,9 @@ class NonMaximumSuppression:
 
     @staticmethod
     def _build_gaussian_kernel(
-        sample_interval: float, gaussian_sigma: float, truncation_radius_in_sigmas: float
+        sample_interval: float,
+        gaussian_sigma: float,
+        truncation_radius_in_sigmas: float,
     ) -> NDArray[np.float64]:
         r"""
         Construct a discrete Gaussian kernel and normalize to unit energy.
@@ -215,14 +233,20 @@ class NonMaximumSuppression:
         where :math:`L = \left\lceil \dfrac{\text{radius}\,\sigma}{\Delta t} \right\rceil`
         and the discrete energy satisfies :math:`\sum_k g[k]^2 = 1`.
         """
-        half_length = int(np.ceil(truncation_radius_in_sigmas * gaussian_sigma / sample_interval))
-        time_axis = np.arange(-half_length, half_length + 1, dtype=float) * sample_interval
+        half_length = int(
+            np.ceil(truncation_radius_in_sigmas * gaussian_sigma / sample_interval)
+        )
+        time_axis = (
+            np.arange(-half_length, half_length + 1, dtype=float) * sample_interval
+        )
         kernel = np.exp(-0.5 * (time_axis / gaussian_sigma) ** 2)
-        kernel /= np.sqrt(np.sum(kernel ** 2))
+        kernel /= np.sqrt(np.sum(kernel**2))
         return kernel
 
     @staticmethod
-    def _correlate(signal: NDArray[np.float64], kernel: NDArray[np.float64]) -> NDArray[np.float64]:
+    def _correlate(
+        signal: NDArray[np.float64], kernel: NDArray[np.float64]
+    ) -> NDArray[np.float64]:
         r"""
         Discrete correlation (matched filter):
 
@@ -236,10 +260,7 @@ class NonMaximumSuppression:
 
     @staticmethod
     def _non_maximum_suppression(
-        values: NDArray[np.float64],
-        half_window: int,
-        threshold: float,
-        max_peaks: int,
+        values: NDArray[np.float64], half_window: int, threshold: float, max_peaks: int
     ) -> NDArray[np.int_]:
         r"""
         Non-maximum suppression.
@@ -255,7 +276,11 @@ class NonMaximumSuppression:
         Returns at most ``max_peaks`` indices with the largest responses.
         """
         if half_window < 1:
-            core = (values[1:-1] > values[:-2]) & (values[1:-1] >= values[2:]) & (values[1:-1] >= threshold)
+            core = (
+                (values[1:-1] > values[:-2])
+                & (values[1:-1] >= values[2:])
+                & (values[1:-1] >= threshold)
+            )
             idx = np.where(core)[0] + 1
         else:
             window_len = 2 * half_window + 1
@@ -278,9 +303,7 @@ class NonMaximumSuppression:
 
         .. math::
 
-            m = \text{median}(x), \quad
-            MAD = \text{median}(|x-m|), \quad
-            \hat\sigma_n \approx 1.4826 \, MAD
+            m = \text{median}(x), \quad MAD = \text{median}(|x-m|), \quad \hat\sigma_n \approx 1.4826 \, MAD
         """
         m = np.median(values)
         mad = np.median(np.abs(values - m))
@@ -290,8 +313,7 @@ class NonMaximumSuppression:
 
     @staticmethod
     def _sliding_window_view_1d(
-        array: NDArray[np.float64],
-        window_length: int,
+        array: NDArray[np.float64], window_length: int
     ) -> NDArray[np.float64]:
         r"""
         Create a 2D strided view of 1D ``array`` with a moving window of length ``window_length``.
