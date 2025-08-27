@@ -1,6 +1,6 @@
 """
 DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals
-======================================================================
+=======================================================================
 
 This example demonstrates how to use DeepPeak's DenseNet classifier to identify
 regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.

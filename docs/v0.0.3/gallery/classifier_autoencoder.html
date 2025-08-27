@@ -59,7 +59,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals" href="classifier_dense.html" />
-    <link rel="prev" title="DeepPeak Examples" href="index.html" />
+    <link rel="prev" title="Examples" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.3" />
@@ -154,7 +154,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../examples.html">
+  <a class="nav-link nav-internal" href="index.html">
     Examples
   </a>
 </li>
@@ -306,7 +306,7 @@
 
 
 <li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../examples.html">
+  <a class="nav-link nav-internal" href="index.html">
     Examples
   </a>
 </li>
@@ -405,14 +405,11 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html">DeepPeak Examples</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l2 current active"><a class="current reference internal" href="#">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classifier_dense.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
-<li class="toctree-l2"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
-</ul>
-</details></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
 </ul>
 </div>
 </nav></div>
@@ -454,10 +451,7 @@
       </a>
     </li>
     
-    <li class="breadcrumb-item"><a href="../examples.html" class="nav-link"><strong>Examples</strong></a></li>
-    
-    
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">DeepPeak Examples</a></li>
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
     
     <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</span></li>
   </ul>
@@ -598,20 +592,20 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0515 - loss: 0.7960
-2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 326ms/step - BinaryIoU: 0.0507 - loss: 0.7740 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6570
+1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0525 - loss: 0.8578
+2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 339ms/step - BinaryIoU: 0.0535 - loss: 0.8199 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6424
 Epoch 2/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0028 - loss: 0.6542
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0023 - loss: 0.6511 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6340
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - BinaryIoU: 0.0031 - loss: 0.6428
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0025 - loss: 0.6488 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6220
 Epoch 3/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6337
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6311 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6181
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6383
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 65ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6298 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6122
 Epoch 4/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5959
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5940 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5992
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0016 - loss: 0.5893
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0012 - loss: 0.5887 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6002
 </pre></div>
 </div>
 </section>
@@ -629,7 +623,7 @@ Epoch 4/4
 <img src="../_images/sphx_glr_classifier_autoencoder_003.png" srcset="../_images/sphx_glr_classifier_autoencoder_003.png" alt="Predicted Region of Interest" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1200x500 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.645 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.385 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-autoencoder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/027ad6dec8c2fb9e539fbd7af3497d66/classifier_autoencoder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_autoencoder.ipynb</span></code></a></p>

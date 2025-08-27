@@ -58,7 +58,7 @@
     <link rel="icon" href="_static/thumbnail.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="next" title="Examples" href="gallery/index.html" />
     <link rel="prev" title="DeepPeak" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -154,7 +154,7 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="examples.html">
+  <a class="nav-link nav-internal" href="gallery/index.html">
     Examples
   </a>
 </li>
@@ -306,7 +306,7 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="examples.html">
+  <a class="nav-link nav-internal" href="gallery/index.html">
     Examples
   </a>
 </li>
@@ -463,6 +463,132 @@
   <section id="api-reference">
 <h1>API reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
 <p>This document provides the API documentation for the DeepPeak package.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="DeepPeak.machine_learning.classifier.wavenet.WaveNet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">WaveNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">64</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_dilation_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Optimizer</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'adam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Loss</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'binary_crossentropy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Metric</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'accuracy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/machine_learning/classifier/wavenet.html#WaveNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.machine_learning.classifier.wavenet.WaveNet" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClassifier</span></code></p>
+<p>WaveNet-style 1D detector for per-timestep peak classification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence_length</strong> (<em>int</em>) – Length of the input sequences.</p></li>
+<li><p><strong>num_filters</strong> (<em>int</em>) – Number of filters in the convolutional layers.</p></li>
+<li><p><strong>num_dilation_layers</strong> (<em>int</em>) – Number of dilated convolutional layers.</p></li>
+<li><p><strong>kernel_size</strong> (<em>int</em>) – Size of the convolutional kernels.</p></li>
+<li><p><strong>optimizer</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.optimizers.Optimizer</em><em>]</em>) – Optimizer for model compilation.</p></li>
+<li><p><strong>loss</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.losses.Loss</em><em>]</em>) – Loss function for model training.</p></li>
+<li><p><strong>metrics</strong> (<em>Tuple</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.metrics.Metric</em><em>]</em><em>]</em>) – Metrics for model evaluation.</p></li>
+<li><p><strong>seed</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Random seed for reproducibility.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Architecture:</p>
+<ul class="simple">
+<li><p>Input projection (1x1) to <cite>num_filters</cite> channels</p></li>
+<li><p>Stack of dilated causal Conv1D blocks with exponentially increasing dilation
+(1, 2, 4, …, 2^(L-1)), residual connections, and skip connections</p></li>
+<li><p>Aggregated skip path -&gt; ReLU -&gt; 1x1 sigmoid for per-step probability</p></li>
+</ul>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Output shape: (batch, sequence_length, 1), sigmoid probabilities</p></li>
+<li><p>Loss: binary_crossentropy (per time-step)</p></li>
+<li><p>This class encapsulates build/fit/evaluate/predict and plotting utilities</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="DeepPeak.machine_learning.classifier.dense.DenseNet">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DenseNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(32,</span> <span class="pre">64,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilation_rates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(1,</span> <span class="pre">2,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Optimizer</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'adam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Loss</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'binary_crossentropy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Metric</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'accuracy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/machine_learning/classifier/dense.html#DenseNet"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.machine_learning.classifier.dense.DenseNet" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClassifier</span></code></p>
+<p>Compact 1D ConvNet for per-timestep peak classification.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence_length</strong> (<em>int</em>) – Length of the input sequences.</p></li>
+<li><p><strong>filters</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Number of filters in each convolutional layer.</p></li>
+<li><p><strong>dilation_rates</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Dilation rates for each convolutional layer.</p></li>
+<li><p><strong>kernel_size</strong> (<em>int</em>) – Size of the convolutional kernels.</p></li>
+<li><p><strong>optimizer</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.optimizers.Optimizer</em><em>]</em>) – Optimizer for model compilation.</p></li>
+<li><p><strong>loss</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.losses.Loss</em><em>]</em>) – Loss function for model training.</p></li>
+<li><p><strong>metrics</strong> (<em>Tuple</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.metrics.Metric</em><em>]</em><em>]</em>) – Metrics for model evaluation.</p></li>
+<li><p><strong>seed</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Random seed for reproducibility.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Architecture:</p>
+<ul class="simple">
+<li><p>Three 1D Conv layers with ReLU activations and exponentially increasing dilation
+(default: 1, 2, 4), padding=’same’</p></li>
+<li><p>Final 1x1 Conv with sigmoid -&gt; per-step probability map named ‘ROI’</p></li>
+</ul>
+<section id="output">
+<h2>Output<a class="headerlink" href="#output" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>ROI: shape (batch, sequence_length, 1) with probabilities in [0, 1]</p></li>
+</ul>
+</section>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="DeepPeak.machine_learning.classifier.autoencoder.Autoencoder">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Autoencoder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout_rate</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(32,</span> <span class="pre">64,</span> <span class="pre">128)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pool_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upsample_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Optimizer</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'adam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Loss</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'binary_crossentropy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Metric</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'accuracy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/machine_learning/classifier/autoencoder.html#Autoencoder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.machine_learning.classifier.autoencoder.Autoencoder" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseClassifier</span></code></p>
+<p>1D convolutional autoencoder for predicting an ROI (Region Of Interest) mask.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence_length</strong> (<em>int</em>) – Length of the input sequences.</p></li>
+<li><p><strong>dropout_rate</strong> (<em>float</em>) – Dropout rate for regularization.</p></li>
+<li><p><strong>filters</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>]</em>) – Number of filters in each convolutional layer.</p></li>
+<li><p><strong>kernel_size</strong> (<em>int</em>) – Size of the convolutional kernels.</p></li>
+<li><p><strong>pool_size</strong> (<em>int</em>) – Pooling size for downsampling.</p></li>
+<li><p><strong>upsample_size</strong> (<em>int</em>) – Upsampling size for the decoder.</p></li>
+<li><p><strong>optimizer</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.optimizers.Optimizer</em><em>]</em>) – Optimizer for model compilation.</p></li>
+<li><p><strong>loss</strong> (<em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.losses.Loss</em><em>]</em>) – Loss function for model training.</p></li>
+<li><p><strong>metrics</strong> (<em>Tuple</em><em>[</em><em>Union</em><em>[</em><em>str</em><em>, </em><em>tf.keras.metrics.Metric</em><em>]</em><em>]</em>) – Metrics for model evaluation.</p></li>
+<li><p><strong>seed</strong> (<em>Optional</em><em>[</em><em>int</em><em>]</em>) – Random seed for reproducibility.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Architecture:</p>
+<dl class="simple">
+<dt>Encoder:</dt><dd><ul class="simple">
+<li><p>Conv1D(f[0], K, relu, same) -&gt; Dropout(p) -&gt; MaxPool1D(2)</p></li>
+<li><p>Conv1D(f[1], K, relu, same) -&gt; Dropout(p) -&gt; MaxPool1D(2)</p></li>
+</ul>
+</dd>
+<dt>Bottleneck:</dt><dd><ul class="simple">
+<li><p>Conv1D(f[2], K, relu, same) -&gt; Dropout(p)</p></li>
+</ul>
+</dd>
+<dt>Decoder:</dt><dd><ul class="simple">
+<li><p>UpSampling1D(2) -&gt; Conv1D(f[1], K, relu, same)</p></li>
+<li><p>UpSampling1D(2) -&gt; Conv1D(f[0], K, relu, same)</p></li>
+</ul>
+</dd>
+<dt>Output:</dt><dd><ul class="simple">
+<li><p>Conv1D(1, 1, sigmoid, name=”ROI”)</p></li>
+</ul>
+</dd>
+</dl>
+<section id="output-shape">
+<h2>Output shape<a class="headerlink" href="#output-shape" title="Link to this heading">#</a></h2>
+<p>(batch, sequence_length, 1)</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>Loss: binary_crossentropy on the ‘ROI’ head</p></li>
+<li><p>Metrics: configurable (default: accuracy)</p></li>
+<li><p>The pooling/upsampling ladder assumes sequence_length divisible by 4 to
+reconstruct the original length exactly (with padding=’same’ this typically
+works well; validate with a quick model.summary()).</p></li>
+</ul>
+</section>
+</dd></dl>
+
 </section>
 
 
@@ -479,6 +605,20 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.machine_learning.classifier.wavenet.WaveNet"><code class="docutils literal notranslate"><span class="pre">WaveNet</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.machine_learning.classifier.dense.DenseNet"><code class="docutils literal notranslate"><span class="pre">DenseNet</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.machine_learning.classifier.autoencoder.Autoencoder"><code class="docutils literal notranslate"><span class="pre">Autoencoder</span></code></a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">

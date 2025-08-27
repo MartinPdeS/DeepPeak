@@ -8,6 +8,6 @@
     :hidden:
 
     code.rst
-    examples.rst
+    gallery/index.rst
     theory.rst
     references.rst
