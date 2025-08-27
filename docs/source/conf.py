@@ -3,7 +3,6 @@
 
 import sys
 import os
-import datetime
 from sphinx_gallery.sorting import FileNameSortKey
 from MPSPlots.styles import use_mpsplots_style
 from pathlib import Path
@@ -14,7 +13,7 @@ from DeepPeak.directories import doc_css_path
 package_name = "DeepPeak"
 version = DeepPeak.__version__
 
-current_dir = Path("../")
+current_dir = Path(".")
 
 sys.path.append(str(current_dir.resolve()))
 
@@ -25,30 +24,24 @@ def setup(app):
 
 autodoc_mock_imports = [
     'numpy',
-    'pydantic',
     'matplotlib',
     'numpydoc',
 ]
 
 
 project = package_name
-copyright = f'2024-{datetime.date.today().year}, Martin Poinsinet de Sivry-Houle'
+copyright = '2024, Martin Poinsinet de Sivry-Houle'
 author = 'Martin Poinsinet de Sivry-Houle'
 
 extensions = [
     'sphinx.ext.mathjax',
-    'pyvista.ext.plot_directive',
     'sphinx_gallery.gen_gallery',
-    'sphinx.ext.autosummary',
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.intersphinx',
 ]
-
-autodoc_typehints = "description"
-autosummary_generate = True
 
 # Napoleon settings for docstrings
 napoleon_google_docstring = False
@@ -62,13 +55,9 @@ def reset_mpl(gallery_conf, fname):
     use_mpsplots_style()
 
 
-examples_files = [
-    'tutorials',
-]
-
 sphinx_gallery_conf = {
-    "examples_dirs": ['../examples/' + f for f in examples_files],
-    "gallery_dirs": ['gallery/' + f for f in examples_files],
+    'examples_dirs': ['../examples'],
+    'gallery_dirs': ['gallery'],
     'image_scrapers': ('matplotlib'),
     'ignore_pattern': '/__',
     'filename_pattern': r'.*\.py',
@@ -85,11 +74,10 @@ sphinx_gallery_conf = {
 
 
 autodoc_default_options = {
-    "members": True,
-    "undoc-members": False,
-    "show-inheritance": True,
-    "exclude-members": "__annotations__",
+    'members': False,
     'members-order': 'bysource',
+    'undoc-members': False,
+    'show-inheritance': True,
 }
 
 autosectionlabel_prefix_document = True
@@ -107,31 +95,24 @@ html_theme = "pydata_sphinx_theme"
 
 exclude_trees = []
 # default_role = "autolink"
-show_authors = True
 pygments_style = "sphinx"
 
 # -- Sphinx-gallery configuration --------------------------------------------
 major, minor = version[:2]
 binder_branch = f"v{major}.{minor}.x"
 
-html_context = {
-    "github_url": "https://github.com", # or your GitHub Enterprise site
-    "github_user": package_name,
-    "github_repo": package_name,
-    "github_version": "master",
-    "doc_path": "doc/source",
-    "default_mode": "dark",
-}
-
 html_theme_options = dict()
 
 html_theme_options['logo'] = dict(text=package_name, image="_static/thumbnail.png")
-# html_theme_options["show_nav_level"] = 0
-
+html_theme_options["show_nav_level"] = 0
 
 html_theme_options.update({
-    "github_url": f"https://github.com/MartinPdeS/{package_name}",
     "icon_links": [
+        {
+            "name": "GitHub",
+            "url": f"https://github.com/MartinPdeS/{package_name}",
+            "icon": "fa-brands fa-github",
+        },
         {
             "name": "PyPI",
             "url": f"https://pypi.org/project/{package_name}/",
@@ -144,7 +125,7 @@ html_theme_options.update({
         },
     ],
     "navbar_align": "left",
-    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+    "navbar_end": ["version-switcher", "navbar-icon-links"],
     "show_prev_next": False,
     "show_version_warning_banner": True,
     # Footer
@@ -153,8 +134,6 @@ html_theme_options.update({
     # Other
     "pygments_light_style": "default",
     "pygments_dark_style": "github-dark",
-    "show_nav_level": 2,
-    "collapse_navigation": False
 }
 )
 
@@ -171,29 +150,26 @@ latex_elements = {}
 
 
 latex_documents = [
-    (master_doc, f'{package_name}.tex', '', 'Martin Poinsinet de Sivry-Houle', 'manual'),
+    (master_doc, f'{package_name}.tex', f'{package_name} Documentation',
+     'Martin Poinsinet de Sivry-Houle', 'manual'),
 ]
 
 man_pages = [
-    (master_doc, package_name, '', [author], 1)
+    (master_doc, 'supymode', f'{package_name} Documentation',
+     [author], 1)
 ]
 
 texinfo_documents = [
-    (master_doc, package_name, '', author, package_name, 'One line description of project.', 'Miscellaneous'),
+    (master_doc, package_name, f'{package_name} Documentation',
+     author, package_name, 'One line description of project.',
+     'Miscellaneous'),
 ]
 
 epub_title = project
 
 html_static_path = ['_static']
 templates_path = ['_templates']
-html_css_files = ['_static/default.css']
+html_css_files = ['default.css']
 epub_exclude_files = ['search.html']
-
-
-# Intersphinx to get NumPy, SciPy, and other targets
-intersphinx_mapping = {
-    'numpy': ('https://numpy.org/devdocs', None),
-    'scipy': ('https://docs.scipy.org/doc/scipy/', None),
-}
 
 # -

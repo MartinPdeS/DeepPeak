@@ -1,4 +1,3 @@
-import numpy as np
 import matplotlib.pyplot as plt
 from MPSPlots.styles import mps as plot_style
 
@@ -18,13 +17,14 @@ class DataSet:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    def plot(self, ax: plt.Axes = None, show: bool = True):
+    def plot(self, number_of_samples: int | None = None, ax: plt.Axes = None, show: bool = True):
         sample_count = self.signals.shape[0]
+
+        if number_of_samples is None:
+            number_of_samples = sample_count
+
         with plt.style.context(plot_style):
-            if ax is None:
-                figure, axes = plt.subplots(nrows=sample_count, ncols=1, figsize=(8, 3 * sample_count), squeeze=False)
-            else:
-                axes = np.array([[ax]])
+            figure, axes = plt.subplots(nrows=number_of_samples, ncols=1, figsize=(8, 3 * number_of_samples), squeeze=False)
 
             for idx, ax in enumerate(axes.flatten()):
                 ax.plot(self.x_values, self.signals[idx], label='signal')

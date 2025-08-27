@@ -1,8 +1,6 @@
-# Write a description for sphinx documentation with a title
-
 """
 Non-Maximum Suppression for Gaussian Pulse Detection
-----------------------------------------------------
+====================================================
 
 This example demonstrates the use of the NonMaximumSuppression class to detect
 Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset

@@ -20,8 +20,8 @@ requirements:
     - tensorflow
     - tf_explain
     - opencv-python
-    - numpy ~=1.26
-    - scipy ~=1.14
+    - numpy
+    - scipy
     - scikit-learn
     - martinpdes::mpsplots
 

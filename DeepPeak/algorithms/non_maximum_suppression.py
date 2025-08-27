@@ -66,11 +66,7 @@ class NonMaximumSuppression:
         self.suppression_half_window_in_samples_: int | None = None
         self.results: dict[str, object] | None = None
 
-    def run(
-        self,
-        time_samples: NDArray[np.float64],
-        signal: NDArray[np.float64],
-    ) -> dict[str, object]:
+    def run(self, time_samples: NDArray[np.float64], signal: NDArray[np.float64]) -> dict[str, object]:
         r"""
         Run the detection pipeline (matched filter + non-maximum suppression).
 

@@ -208,6 +208,15 @@ class SignalDatasetGenerator:
     def _one_hot_numpy(indices: np.ndarray, num_classes: int, dtype=np.float32) -> np.ndarray:
         """
         Fast, pure-NumPy one-hot encoder.
+
+        Parameters
+        ----------
+        indices: np.ndarray
+            The indices to one-hot encode.
+        num_classes: int
+            The number of classes for the one-hot encoding.
+        dtype: type
+            The data type of the output array.
         """
         indices = np.asarray(indices, dtype=np.int64).ravel()
         if indices.size == 0:
@@ -219,35 +228,69 @@ class SignalDatasetGenerator:
         out[np.arange(indices.shape[0]), indices] = 1
         return out
 
+
     @staticmethod
     def _compute_rois_from_signals(
         signals: np.ndarray,
         positions: np.ndarray,
         amplitudes: np.ndarray,
-        width_in_pixels: int,
-    ) -> np.ndarray:
+        width_in_pixels: int) -> np.ndarray:
         """
-        Compute binary ROI mask with ±(width_in_pixels // 2) around each peak center.
+        Vectorized ROI builder: marks ±(width_in_pixels//2) around each valid peak center.
+        - No Python loops over samples/peaks.
+        - Handles NaNs in positions/amplitudes.
+
+        Parameters
+        ----------
+        signals: np.ndarray
+            The input signals.
+        positions: np.ndarray
+            The positions of the peaks.
+        amplitudes: np.ndarray
+            The amplitudes of the peaks.
+        width_in_pixels: int
+            The width of the ROI in pixels.
+
+        Returns
+        -------
+        np.ndarray
+            The computed ROIs.
         """
         n_samples, sequence_length = signals.shape
-        _, n_peaks = positions.shape
+        assert positions.shape[0] == n_samples and amplitudes.shape == positions.shape
 
-        rois = np.zeros_like(signals, dtype=np.int32)
-        pixel_positions = (positions * (sequence_length - 1)).astype(int)
-        half_w = width_in_pixels // 2
+        # Convert normalized positions -> pixel centers (int), keep shape
+        tmp = positions * (sequence_length - 1)                      # float, may have NaN/inf
+        centers = np.full_like(tmp, fill_value=-1, dtype=np.int64)   # sentinel for invalid
+        valid_pos = np.isfinite(tmp)
+        centers[valid_pos] = np.rint(tmp[valid_pos]).astype(np.int64)
+        np.clip(centers, 0, sequence_length - 1, out=centers)
 
-        for i in range(n_samples):
-            for j in range(n_peaks):
-                center_idx = pixel_positions[i, j]
-                amp = amplitudes[i, j]
-                if np.isnan(amp) or amp == 0:
-                    continue
-                if center_idx < 0 or center_idx > (sequence_length - 1):
-                    continue
-                start_idx = max(0, center_idx - half_w)
-                end_idx = min(sequence_length, center_idx + half_w + 2)
-                rois[i, start_idx:end_idx] = 1
+        # Valid peaks must also have finite, non-zero amplitude
+        valid_amp = np.isfinite(amplitudes) & (amplitudes != 0)
+        valid = valid_pos & valid_amp
+
+        # Interval [start, end) per peak, clipped to bounds
+        w = int(width_in_pixels)
+        if w < 0:
+            raise ValueError("width_in_pixels must be non-negative")
+        half = w // 2
+        starts = np.clip(centers - half, 0, sequence_length)
+        ends   = np.clip(centers + half + 1, 0, sequence_length)  # +1 for inclusive end
+
+        # Difference array per sample: add +1 at start, -1 at end
+        diff = np.zeros((n_samples, sequence_length + 1), dtype=np.int32)
+        ii, jj = np.nonzero(valid)  # indices of valid (sample, peak) pairs
+        if ii.size:
+            s = starts[ii, jj]
+            e = ends[ii, jj]
+            np.add.at(diff, (ii, s),  1)
+            np.add.at(diff, (ii, e), -1)
+
+        # Cumulative sum -> coverage counts; binarize
+        rois = (np.cumsum(diff[:, :sequence_length], axis=1) > 0).astype(np.int32)
         return rois
+
 
     @staticmethod
     def _build_peaks(
@@ -256,10 +299,29 @@ class SignalDatasetGenerator:
         pos_: np.ndarray,
         wid_: np.ndarray,
         amp_: np.ndarray,
-        extra_kwargs: Dict,
-    ) -> np.ndarray:
+        extra_kwargs: Dict) -> np.ndarray:
         """
         Vectorized construction of peaks for non-DIRAC kernels.
+
+        Parameters
+        ----------
+        signal_type: Kernel
+            The type of signal kernel to use.
+        x_: np.ndarray
+            The x-coordinates at which to evaluate the peaks.
+        pos_: np.ndarray
+            The positions of the peaks.
+        wid_: np.ndarray
+            The widths of the peaks.
+        amp_: np.ndarray
+            The amplitudes of the peaks.
+        extra_kwargs: Dict
+            Additional keyword arguments for specific kernel types.
+
+        Returns
+        -------
+        np.ndarray
+            The constructed peaks.
         """
         match signal_type:
             case Kernel.GAUSSIAN:

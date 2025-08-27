@@ -23,7 +23,7 @@ classifiers = [
 keywords = ["refracive index", "optics", "microbeads", "Mie scattering"]
 
 dependencies = [
-    "numpy >=1.26,<3.0",
+    "numpy",
     'tensorflow',
     'scikit-learn',
     'MPSPlots',

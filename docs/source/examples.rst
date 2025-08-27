@@ -9,4 +9,4 @@ Explore our gallery of examples demonstrating the usage of DeepPeak. These examp
     :maxdepth: 2
     :hidden:
 
-    /gallery/tutorials/index.rst
+    /gallery/index.rst
