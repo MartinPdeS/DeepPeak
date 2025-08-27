@@ -27,9 +27,9 @@ dependencies = [
     'tensorflow',
     'scikit-learn',
     'MPSPlots',
-    'PyWavelets',
-    'opencv-python',
-    'tf_explain'
+    # 'PyWavelets',
+    # 'opencv-python',
+    # 'tf_explain'
 ]
 
 [project.urls]

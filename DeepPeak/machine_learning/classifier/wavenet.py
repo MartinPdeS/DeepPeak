@@ -31,7 +31,7 @@ class WaveNet(BaseClassifier):
     kernel_size: int = 3
     optimizer: Union[str, tf.keras.optimizers.Optimizer] = "adam"
     loss: Union[str, tf.keras.losses.Loss] = "binary_crossentropy"
-    metrics: Tuple[Union[str, tf.keras.metrics.Metric], ...] = ("accuracy",)
+    metrics: Tuple[Union[str, tf.keras.metrics.Metric], ...] = (tf.keras.metrics.BinaryAccuracy(name="accuracy", threshold=0.5), )
     seed: Optional[int] = None
 
     # filled after build()
