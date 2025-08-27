@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.437** total execution time for 5 files **from all galleries**:
+**00:44.503** total execution time for 5 files **from all galleries**:
 
 .. container::
 
@@ -32,18 +32,18 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_non_maximum_suppression.py` (``../examples/non_maximum_suppression.py``)
-     - 00:00.437
-     - 0.0
    * - :ref:`sphx_glr_gallery_classifier_autoencoder.py` (``../examples/classifier_autoencoder.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_classifier_dense.py` (``../examples/classifier_dense.py``)
-     - 00:00.000
+     - 00:33.231
      - 0.0
    * - :ref:`sphx_glr_gallery_classifier_wavenet.py` (``../examples/classifier_wavenet.py``)
-     - 00:00.000
+     - 00:07.549
+     - 0.0
+   * - :ref:`sphx_glr_gallery_classifier_dense.py` (``../examples/classifier_dense.py``)
+     - 00:03.116
      - 0.0
    * - :ref:`sphx_glr_gallery_data_generation.py` (``../examples/data_generation.py``)
-     - 00:00.000
+     - 00:00.316
+     - 0.0
+   * - :ref:`sphx_glr_gallery_non_maximum_suppression.py` (``../examples/non_maximum_suppression.py``)
+     - 00:00.292
      - 0.0
