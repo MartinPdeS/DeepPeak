@@ -18,3 +18,4 @@
 
 # But ignore docs/build inside docs
 docs/build/
+docs/source/gallery/
