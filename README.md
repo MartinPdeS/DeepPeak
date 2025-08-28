@@ -4,7 +4,11 @@
 
 | Name                                                 |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
 |----------------------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
-| DeepPeak/algorithms/non\_maximum\_suppression.py     |      110 |      110 |       16 |        0 |      0% |     1-314 |
+| DeepPeak/algorithms/amplitude/base.py                |       18 |       18 |        4 |        0 |      0% |      1-40 |
+| DeepPeak/algorithms/amplitude/cholesky.py            |       56 |       56 |       14 |        0 |      0% |     1-118 |
+| DeepPeak/algorithms/amplitude/closed\_form.py        |       69 |       69 |       16 |        0 |      0% |     1-161 |
+| DeepPeak/algorithms/base.py                          |        0 |        0 |        0 |        0 |    100% |           |
+| DeepPeak/algorithms/non\_maximum\_suppression.py     |      110 |      110 |       16 |        0 |      0% |     1-315 |
 | DeepPeak/dataset.py                                  |       28 |       21 |       16 |        0 |     20% |     28-78 |
 | DeepPeak/helper.py                                   |       18 |       11 |        4 |        0 |     32% |     33-48 |
 | DeepPeak/machine\_learning/classifier/autoencoder.py |       43 |        1 |        4 |        2 |     94% |84->exit, 93 |
@@ -16,7 +20,7 @@
 | DeepPeak/signals.py                                  |      132 |       35 |       42 |       12 |     64% |106, 116, 117->120, 145-153, 165->169, 170, 176->184, 203, 209, 225-233, 280, 288->295, 333-345 |
 | DeepPeak/utils.py                                    |       71 |       71 |       14 |        0 |      0% |     1-185 |
 | DeepPeak/visualization.py                            |      202 |      202 |       70 |        0 |      0% |     1-800 |
-|                                            **TOTAL** |  **842** |  **531** |  **204** |   **23** | **33%** |           |
+|                                            **TOTAL** |  **985** |  **674** |  **238** |   **23** | **28%** |           |
 
 
 ## Setup coverage badge
