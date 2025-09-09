@@ -39,7 +39,7 @@ the results.
 
     gaussian_width = 0.03
 
-    generator = SignalDatasetGenerator(n_samples=1, sequence_length=SEQUENCE_LENGTH)
+    generator = SignalDatasetGenerator(n_samples=200, sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
         signal_type=Kernel.GAUSSIAN,
@@ -51,15 +51,10 @@ the results.
         categorical_peak_count=False,
     )
 
-    dataset.plot()
+    # dataset.plot()
 
 
 
-
-.. image-sg:: /gallery/images/sphx_glr_non_maximum_suppression_001.png
-   :alt: non maximum suppression
-   :srcset: /gallery/images/sphx_glr_non_maximum_suppression_001.png
-   :class: sphx-glr-single-img
 
 
 
@@ -69,7 +64,7 @@ the results.
 
 Configure and run the detector
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-45
+.. GENERATED FROM PYTHON SOURCE LINES 35-44
 
 .. code-block:: Python
 
@@ -80,14 +75,51 @@ Configure and run the detector
         kernel_truncation_radius_in_sigmas=3,
     )
 
-    peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals.squeeze())
+    batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
 
-    peak_locator.plot()
+
+
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 45-46
+
+Plot the results
+
+.. GENERATED FROM PYTHON SOURCE LINES 46-48
+
+.. code-block:: Python
+
+    batch.plot_histogram_counts()
+
+
+
+
+.. image-sg:: /gallery/images/sphx_glr_non_maximum_suppression_001.png
+   :alt: Detected peaks per sample
+   :srcset: /gallery/images/sphx_glr_non_maximum_suppression_001.png
+   :class: sphx-glr-single-img
+
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 49-50
+
+Plot the results
+
+.. GENERATED FROM PYTHON SOURCE LINES 50-51
+
+.. code-block:: Python
+
+    batch.plot(ncols=3, max_plots=6)
 
 
 
 .. image-sg:: /gallery/images/sphx_glr_non_maximum_suppression_002.png
-   :alt: Equal-width Gaussian pulse detection (coarse)
+   :alt: b=0, #peaks=2, b=1, #peaks=2, b=2, #peaks=2, b=3, #peaks=3, b=4, #peaks=1, b=5, #peaks=3
    :srcset: /gallery/images/sphx_glr_non_maximum_suppression_002.png
    :class: sphx-glr-single-img
 
@@ -98,7 +130,7 @@ Configure and run the detector
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.379 seconds)
+   **Total running time of the script:** (0 minutes 0.923 seconds)
 
 
 .. _sphx_glr_download_gallery_non_maximum_suppression.py:

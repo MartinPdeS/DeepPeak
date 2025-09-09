@@ -32,21 +32,21 @@ the results.
 
 
     from DeepPeak.algorithms import NonMaximumSuppression
-    from DeepPeak.algorithms.amplitude import ClosedFormSolver
+    from DeepPeak.algorithms import ClosedFormSolver
     from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
-    NUM_PEAKS = 3
+    NUM_PEAKS = 4
     SEQUENCE_LENGTH = 400
-
+    NSAMPLES = 4
     gaussian_width = 0.03
 
-    generator = SignalDatasetGenerator(n_samples=1, sequence_length=SEQUENCE_LENGTH)
+    generator = SignalDatasetGenerator(n_samples=NSAMPLES, sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
         signal_type=Kernel.GAUSSIAN,
-        n_peaks=2,
+        n_peaks=NUM_PEAKS,
         amplitude=(50, 100),  # Amplitude range
-        position=(0.3, 0.6),  # Peak position range
+        position=(0.1, 0.9),  # Peak position range
         width=gaussian_width,  # Width range
         noise_std=0.3,  # Add some noise
         categorical_peak_count=False,
@@ -70,69 +70,55 @@ the results.
 
 Configure and run the detector
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-69
+.. GENERATED FROM PYTHON SOURCE LINES 36-48
 
 .. code-block:: Python
 
     peak_locator = NonMaximumSuppression(
         gaussian_sigma=0.003,
         threshold="auto",
-        maximum_number_of_pulses=3,
+        maximum_number_of_pulses=NUM_PEAKS,
         kernel_truncation_radius_in_sigmas=3,
     )
 
-    peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals.squeeze())
+    batched_peak_detector = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
+
+    batched_peak_detector.plot()
 
 
-    peak_amplitudes = peak_locator.results["peak_amplitude"]
-    peak_centers = peak_locator.results["peak_times"]
-
-
-    solver = ClosedFormSolver(sigma=dataset.widths.mean().squeeze() / 1.5)
-
-    result = solver.run(centers=peak_centers, matched_responses=peak_locator.results["peak_amplitude"])
-
-
-    print(
-        f"""
-        True Centers:
-        {dataset.positions}
-        Measured Centers:
-        {peak_locator.results['peak_times']}
-        True Amplitudes:
-        {dataset.amplitudes}
-        Solved Amplitudes:
-        {result}\n
-        """
-    )
-
-    solver.plot(true_amplitudes=dataset.amplitudes.squeeze())
 
 
 
 .. image-sg:: /gallery/images/sphx_glr_amplitude_retrieval_002.png
-   :alt: Gram matrix (cond ≈ 1.00e+00), Amplitudes
+   :alt: b=0, #peaks=2, b=1, #peaks=4, b=2, #peaks=3, b=3, #peaks=4
    :srcset: /gallery/images/sphx_glr_amplitude_retrieval_002.png
    :class: sphx-glr-single-img
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
 
 
-        True Centers:
-        [[0.54714703 0.39898967]]
-        Measured Centers:
-        [0.39849624 0.54636591]
-        True Amplitudes:
-        [[67.24797022 88.2661834 ]]
-        Solved Amplitudes:
-        [180.86995439 137.56375898]
 
-    
-    /opt/hostedtoolcache/Python/3.11.13/x64/lib/python3.11/site-packages/DeepPeak/algorithms/amplitude/closed_form.py:160: UserWarning: Glyph 8776 (\N{ALMOST EQUAL TO}) missing from font(s) cmr10.
-      plt.tight_layout()
+.. GENERATED FROM PYTHON SOURCE LINES 49-50
+
+Solve for amplitudes
+
+.. GENERATED FROM PYTHON SOURCE LINES 50-55
+
+.. code-block:: Python
+
+    solver = ClosedFormSolver(sigma=dataset.widths.mean().squeeze())
+
+    result = solver.run_batch(centers=batched_peak_detector.peak_times, center_samples=batched_peak_detector.peak_amplitude_raw)
+
+    result.compare_plot(true_amplitudes=dataset.amplitudes)
+
+
+
+.. image-sg:: /gallery/images/sphx_glr_amplitude_retrieval_003.png
+   :alt: amplitude retrieval
+   :srcset: /gallery/images/sphx_glr_amplitude_retrieval_003.png
+   :class: sphx-glr-single-img
+
 
 
 
@@ -140,7 +126,7 @@ Configure and run the detector
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.482 seconds)
+   **Total running time of the script:** (0 minutes 1.642 seconds)
 
 
 .. _sphx_glr_download_gallery_amplitude_retrieval.py:

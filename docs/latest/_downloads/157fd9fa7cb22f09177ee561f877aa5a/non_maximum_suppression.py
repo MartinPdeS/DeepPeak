@@ -16,7 +16,7 @@ SEQUENCE_LENGTH = 400
 
 gaussian_width = 0.03
 
-generator = SignalDatasetGenerator(n_samples=1, sequence_length=SEQUENCE_LENGTH)
+generator = SignalDatasetGenerator(n_samples=200, sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     signal_type=Kernel.GAUSSIAN,
@@ -28,7 +28,7 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-dataset.plot()
+# dataset.plot()
 
 # %%
 # Configure and run the detector
@@ -39,6 +39,12 @@ peak_locator = NonMaximumSuppression(
     kernel_truncation_radius_in_sigmas=3,
 )
 
-peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals.squeeze())
+batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
 
-peak_locator.plot()
+# %%
+# Plot the results
+batch.plot_histogram_counts()
+
+# %%
+# Plot the results
+batch.plot(ncols=3, max_plots=6)
