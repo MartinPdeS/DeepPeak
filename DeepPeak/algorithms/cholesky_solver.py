@@ -1,14 +1,9 @@
-from __future__ import annotations
 import numpy as np
 from numpy.typing import NDArray
-import matplotlib.pyplot as plt
 
-from DeepPeak.algorithms.amplitude.base import BaseAmplitudeSolver
+from DeepPeak.algorithms.base import BaseAmplitudeSolver
 
 
-# =============================================================================
-# Solver 2: Batched Cholesky (robust; supports small regularization)
-# =============================================================================
 class CholeskySolver(BaseAmplitudeSolver):
     r"""
     Cholesky-based amplitude solver for A ≤ 3 peaks with equal width $\sigma$.
@@ -32,11 +27,7 @@ class CholeskySolver(BaseAmplitudeSolver):
         self.last_gram_: NDArray[np.float64] | None = None
         self.last_amplitudes_: NDArray[np.float64] | None = None
 
-    def run(
-        self,
-        centers: NDArray[np.float64],
-        matched_responses: NDArray[np.float64],
-    ) -> NDArray[np.float64]:
+    def run(self, centers: NDArray[np.float64], matched_responses: NDArray[np.float64]) -> NDArray[np.float64]:
         """
         Solve (H + λ I) a = m.
 
@@ -76,43 +67,3 @@ class CholeskySolver(BaseAmplitudeSolver):
         self.last_amplitudes_ = a
 
         return a[0] if squeeze else a
-
-    def plot(
-        self,
-        sample_index: int = 0,
-        true_amplitudes: NDArray[np.float64] | None = None,
-        ax: tuple[plt.Axes, plt.Axes] | None = None,
-        show: bool = True,
-    ) -> None:
-        """
-        Plot the Gram matrix heatmap and the recovered amplitudes (bar plot) for one sample.
-        """
-        if self.last_gram_ is None or self.last_amplitudes_ is None:
-            raise RuntimeError("Run the solver first, then call plot().")
-
-        H = self.last_gram_[sample_index]
-        a = self.last_amplitudes_[sample_index]
-        cond = np.linalg.cond(H)
-
-        if ax is None:
-            fig, (axH, axB) = plt.subplots(1, 2, figsize=(9, 3.6))
-        else:
-            axH, axB = ax
-
-        im = axH.imshow(H, vmin=0, vmax=1, cmap="viridis")
-        axH.set_title(f"Gram matrix (cond ≈ {cond:.2e})  λ={self.regularization:g}")
-        axH.set_xticks(range(H.shape[0]))
-        axH.set_yticks(range(H.shape[0]))
-        plt.colorbar(im, ax=axH, fraction=0.046, pad=0.04)
-
-        idx = np.arange(a.shape[0])
-        axB.bar(idx - 0.15, a, width=0.3, label="estimated")
-        if true_amplitudes is not None:
-            axB.bar(idx + 0.15, true_amplitudes, width=0.3, label="true", alpha=0.7)
-        axB.set_title("Amplitudes")
-        axB.set_xticks(idx)
-        axB.legend()
-
-        if show and ax is None:
-            plt.tight_layout()
-            plt.show()

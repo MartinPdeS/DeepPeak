@@ -1,8 +1,289 @@
-from __future__ import annotations
-
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.typing import NDArray
+from MPSPlots import helper
+from dataclasses import dataclass
+
+
+@dataclass
+class SingleResult:
+    """
+    Container for single-signal NMS results with analysis & plotting utilities.
+    Returned by `NonMaximumSuppression.run(...)`.
+
+    Parameters
+    ----------
+    detector : NonMaximumSuppression
+        The detector instance used to generate these results.
+    signal : ndarray, shape (N,)
+        Input signal.
+    time_samples : ndarray, shape (N,)
+        Uniform sample times.
+    matched_filter_output : ndarray, shape (N,)
+        Matched filter output.
+    gaussian_kernel : ndarray, shape (L,)
+        The Gaussian kernel used for matched filtering.
+    threshold_used : float
+        The threshold value used for peak detection.
+    suppression_half_window_in_samples : int
+        The half-width of the suppression window (in samples).
+    peak_indices : ndarray, shape (K,)
+        Indices of the detected peaks.
+    peak_times : ndarray, shape (K,)
+        Times of the detected peaks.
+    peak_amplitude_raw : ndarray, shape (K,)
+        Signal values at the detected peak indices.
+    peak_amplitude_matched : ndarray, shape (K,)
+        Matched-filter output values at the detected peak indices.
+    """
+
+    detector: "NonMaximumSuppression"
+    signal: NDArray[np.float64]
+    time_samples: NDArray[np.float64]
+    matched_filter_output: NDArray[np.float64]
+    gaussian_kernel: NDArray[np.float64]
+    threshold_used: float
+    suppression_half_window_in_samples: int
+    peak_indices: NDArray[np.int_]
+    peak_times: NDArray[np.float64]
+    peak_amplitude_raw: NDArray[np.float64]
+    peak_amplitude_matched: NDArray[np.float64]
+
+    # -------- analysis helpers --------
+    @property
+    def sequence_length(self) -> int:
+        return int(self.signal.size)
+
+    @property
+    def number_of_peaks(self) -> int:
+        return int(self.peak_indices.size)
+
+    def summary(self) -> dict:
+        """Quick diagnostic summary for this sample."""
+        return {
+            "N": self.sequence_length,
+            "K_detected": self.number_of_peaks,
+            "threshold_used": float(self.threshold_used),
+            "win_samples": int(self.suppression_half_window_in_samples),
+            "sigma": float(self.detector.gaussian_sigma),
+            "max_matched": float(np.max(self.matched_filter_output)) if self.sequence_length else np.nan,
+        }
+
+    def to_dict(self) -> dict[str, object]:
+        """Export as a plain dict (compatible with previous API)."""
+        return {
+            "signal": self.signal,
+            "time_samples": self.time_samples,
+            "matched_filter_output": self.matched_filter_output,
+            "gaussian_kernel": self.gaussian_kernel,
+            "threshold_used": self.threshold_used,
+            "suppression_half_window_in_samples": self.suppression_half_window_in_samples,
+            "peak_indices": self.peak_indices,
+            "peak_times": self.peak_times,
+            "peak_amplitude": self.peak_amplitude_raw,  # raw signal at indices
+            "peak_amplitude_matched": self.peak_amplitude_matched,
+        }
+
+    # -------- plotting --------
+    @helper.post_mpl_plot
+    def plot(self, *, show_matched_filter: bool = True, show_peaks: bool = True) -> plt.Figure:
+        """Signal (+ optional MF) with vertical lines at detected peak times."""
+        t = self.time_samples
+        y = self.signal
+        r = self.matched_filter_output
+        peaks_t = self.peak_times
+
+        fig, ax = plt.subplots(1, 1, figsize=(6.5, 3.6))
+        ax.plot(t, y, label="signal")
+        if show_matched_filter:
+            ax.plot(t, r, label="matched filter")
+
+        if show_peaks and peaks_t.size:
+            for m in peaks_t:
+                ax.axvline(m, linestyle="--", alpha=0.6)
+            # single legend entry for peaks (avoid duplicates)
+            peak_proxy = plt.Line2D([0], [0], linestyle="--", color="C2", alpha=0.6)
+            handles, labels = ax.get_legend_handles_labels()
+            handles.append(peak_proxy)
+            labels.append("peaks")
+            ax.legend(handles, labels, loc="best")
+        else:
+            ax.legend(loc="best")
+
+        ax.set(title=f"Detected peaks: {self.number_of_peaks}", xlabel="t", ylabel="amplitude")
+        return fig
+
+
+@dataclass
+class BatchResult:
+    """
+    Container for batched NMS results with analysis & plotting utilities.
+    Returned by `NonMaximumSuppression.run_batch(...)`.
+
+    Parameters
+    ----------
+
+    detector : NonMaximumSuppression
+        The detector instance used to generate these results.
+    signals : ndarray, shape (B, N)
+        Input signals.
+    time_samples : ndarray, shape (N,)
+        Uniform sample times.
+    matched_filter_output : ndarray, shape (B, N)
+        Matched filter outputs.
+    gaussian_kernel : ndarray, shape (L,)
+        The Gaussian kernel used for matched filtering.
+    threshold_used : ndarray, shape (B,)
+        The thresholds used for peak detection.
+    suppression_half_window_in_samples : int
+        The half-window size used for non-maximum suppression.
+    peak_indices : ndarray, shape (B, K)
+        Detected peak indices (sample-aligned), -1 for missing peaks.
+    peak_times : ndarray, shape (B, K)
+        Detected peak times (sample-aligned), NaN for missing peaks.
+    peak_amplitude_raw : ndarray, shape (B, K)
+        Signal values at detected peak indices, NaN for missing peaks.
+    """
+
+    detector: "NonMaximumSuppression"
+    signals: NDArray[np.float64]
+    time_samples: NDArray[np.float64]
+    matched_filter_output: NDArray[np.float64]
+    gaussian_kernel: NDArray[np.float64]
+    threshold_used: NDArray[np.float64]
+    suppression_half_window_in_samples: int
+    peak_indices: NDArray[np.int_]
+    peak_times: NDArray[np.float64]
+    peak_amplitude_raw: NDArray[np.float64]
+
+    # ---------- analysis helpers ----------
+    @property
+    def batch_size(self) -> int:
+        return int(self.signals.shape[0])
+
+    @property
+    def sequence_length(self) -> int:
+        return int(self.signals.shape[1])
+
+    @property
+    def number_of_peaks(self) -> int:
+        return int(self.peak_times.shape[1])
+
+    @property
+    def peak_count(self) -> NDArray[np.int_]:
+        """Number of detected peaks per sample, shape (B,)."""
+        return np.sum(~np.isnan(self.peak_times), axis=1).astype(int)
+
+    def summary(self) -> dict:
+        """Quick diagnostic summary."""
+        counts = self.peak_count
+        return {
+            "batch_size": self.batch_size,
+            "sequence_length": self.sequence_length,
+            "K": self.number_of_peaks,
+            "mean_peaks": float(np.mean(counts)),
+            "std_peaks": float(np.std(counts)),
+            "min_peaks": int(np.min(counts)),
+            "max_peaks": int(np.max(counts)),
+            "threshold_min": float(np.min(self.threshold_used)),
+            "threshold_max": float(np.max(self.threshold_used)),
+            "win_samples": int(self.suppression_half_window_in_samples),
+            "sigma": float(self.detector.gaussian_sigma),
+        }
+
+    def to_dict(self) -> dict[str, object]:
+        """Export as a plain dict (e.g., for serialization)."""
+        return {
+            "signals": self.signals,
+            "time_samples": self.time_samples,
+            "matched_filter_output": self.matched_filter_output,
+            "gaussian_kernel": self.gaussian_kernel,
+            "threshold_used": self.threshold_used,
+            "suppression_half_window_in_samples": self.suppression_half_window_in_samples,
+            "peak_indices": self.peak_indices,
+            "peak_times": self.peak_times,
+            "peak_amplitude_raw": self.peak_amplitude_raw,
+        }
+
+    # ---------- plotting ----------
+    @helper.post_mpl_plot
+    def plot(
+        self,
+        indices: NDArray[np.int_] | None = None,
+        *,
+        ncols: int = 1,
+        show_matched_filter: bool = True,
+        max_plots: int | None = 12,
+    ) -> plt.Figure:
+        """
+        Small multiples of several samples.
+
+        Parameters
+        ----------
+        indices : array of int, optional
+            Which samples to plot. If None, the first ``max_plots`` samples are used.
+        ncols : int
+            Number of columns for the plot grid.
+        show_matched_filter : bool
+            Whether to overlay the matched-filter output.
+        max_plots : int, optional
+            Maximum number of samples to plot if ``indices`` is None. If None, plot all samples.
+        """
+        if indices is None:
+            Bsel = min(self.batch_size, max_plots or self.batch_size)
+            idx = np.arange(Bsel, dtype=int)
+        else:
+            idx = np.asarray(indices, dtype=int)
+        n = idx.size
+        ncols = max(1, int(ncols))
+        nrows = int(np.ceil(n / ncols))
+
+        fig, axes = plt.subplots(nrows, ncols, figsize=(6.5 * ncols, 2.8 * nrows), squeeze=False)
+        axes_flat = axes.ravel()
+
+        for k, ax in enumerate(axes_flat):
+            if k >= n:
+                ax.axis("off")
+                continue
+            b = idx[k]
+            t = self.time_samples
+            y = self.signals[b]
+            r = self.matched_filter_output[b]
+            peaks_t = self.peak_times[b]
+
+            ax.plot(t, y, label="signal")
+            if show_matched_filter:
+                ax.plot(t, r, label="matched filter")
+            if np.isfinite(peaks_t).any():
+                for m in peaks_t[np.isfinite(peaks_t)]:
+                    ax.axvline(m, linestyle="--", alpha=0.6)
+            ax.set_title(f"b={b}, #peaks={np.sum(np.isfinite(peaks_t))}")
+            ax.set_xlabel("t")
+            ax.set_ylabel("amp")
+            if k == 0:
+                ax.legend(loc="best")
+
+        fig.tight_layout()
+        return fig
+
+    @helper.post_mpl_plot
+    def plot_histogram_counts(self, bins: int = 1) -> plt.Figure:
+        """
+        Histogram of detected peak counts per sample.
+
+        Parameters
+        ----------
+        bins : int
+            Number of bins to use for the histogram.
+        """
+        counts = self.peak_count
+        # bins default: integers from 0..K
+        if bins == 1:
+            bins = np.arange(-0.5, self.number_of_peaks + 1.5, 1)
+        fig, ax = plt.subplots(1, 1, figsize=(5.0, 3.4))
+        ax.hist(counts, bins=bins, edgecolor="black", alpha=0.8)
+        ax.set(title="Detected peaks per sample", xlabel="#peaks", ylabel="frequency")
+        return fig
 
 
 class NonMaximumSuppression:
@@ -56,44 +337,30 @@ class NonMaximumSuppression:
         self.peak_heights_: NDArray[np.float64] | None = None
         self.threshold_used_: float | None = None
         self.suppression_half_window_in_samples_: int | None = None
-        self.results: dict[str, object] | None = None
 
-    def run(self, time_samples: NDArray[np.float64], signal: NDArray[np.float64]) -> dict[str, object]:
+    def run(self, time_samples: NDArray[np.float64], signal: NDArray[np.float64]) -> SingleResult:
         r"""
-        Run the detection pipeline (matched filter + non-maximum suppression).
+        Run the detection pipeline (matched filter + non-maximum suppression) on a single signal.
 
         Parameters
         ----------
-        time_samples : array
-            Uniform sample times :math:`t[n]` with spacing :math:`\Delta t`.
-        signal : array
-            Input signal samples :math:`y[n]`.
+        time_samples : ndarray, shape (N,)
+            Uniform sample times.
+        signal : ndarray, shape (N,)
+            Input signal.
 
         Returns
         -------
-        dict
-            Results including coarse peak times (sample-aligned), their heights,
-            the matched filter output, and configuration used.
-
-        Notes
-        -----
-        Matched filter correlation:
-
-        .. math::
-
-            r[n] = \sum_m y[m] \, g[m-n]
-
-        Non-maximum suppression keeps peaks :math:`n` such that
-
-        .. math::
-
-            r[n] = \max_{|k-n|\leq W} r[k], \qquad r[n] \ge \tau.
+        SingleResult
+            Rich result object with analysis and plotting utilities.
         """
+        signal = signal.squeeze()
+        time_samples = time_samples.squeeze()
         assert signal.ndim == 1 and time_samples.ndim == 1 and len(signal) == len(time_samples), "signal and time_samples must be one-dimensional arrays of the same length"
 
         sample_interval = float(time_samples[1] - time_samples[0])
 
-        # 1) Build unit-energy Gaussian kernel and apply matched filter (correlation)
+        # 1) Matched filter
         gaussian_kernel = self._build_gaussian_kernel(
             sample_interval=sample_interval,
             gaussian_sigma=self.gaussian_sigma,
@@ -101,13 +368,9 @@ class NonMaximumSuppression:
         )
         matched_filter_output = self._correlate(signal, gaussian_kernel)
 
-        # 2) Determine suppression window and threshold
-        if self.minimum_separation is None:
-            minimum_separation = self.gaussian_sigma
-        else:
-            minimum_separation = self.minimum_separation
-
-        suppression_half_window_in_samples = int(max(1, np.round(minimum_separation / sample_interval / 2.0)))
+        # 2) Window & threshold
+        minimum_separation = self.gaussian_sigma if self.minimum_separation is None else self.minimum_separation
+        win = int(max(1, np.round(minimum_separation / sample_interval / 2.0)))
 
         if self.threshold == "auto":
             noise_sigma = self._estimate_noise_std(matched_filter_output)
@@ -115,70 +378,43 @@ class NonMaximumSuppression:
         else:
             threshold_value = float(self.threshold)
 
-        # 3) Non-maximum suppression (coarse indices only)
+        # 3) NMS
         peak_indices = self._non_maximum_suppression(
             values=matched_filter_output,
-            half_window=suppression_half_window_in_samples,
+            half_window=win,
             threshold=threshold_value,
             max_peaks=self.maximum_number_of_pulses,
         )
 
-        # Coarse peak times and heights (no sub-sample refinement)
-        peak_times = time_samples[peak_indices] if peak_indices.size else np.empty(0)
-        peak_heights = matched_filter_output[peak_indices] if peak_indices.size else np.empty(0)
+        # Sort peaks by time
+        if peak_indices.size:
+            order = np.argsort(time_samples[peak_indices])
+            peak_indices = peak_indices[order]
+            peak_times = time_samples[peak_indices]
+            peak_heights_mf = matched_filter_output[peak_indices]
+            peak_heights_raw = signal[peak_indices]
+        else:
+            peak_times = np.empty(0, dtype=float)
+            peak_heights_mf = np.empty(0, dtype=float)
+            peak_heights_raw = np.empty(0, dtype=float)
 
-        # Save results on the instance
-        self.gaussian_kernel_ = gaussian_kernel
-        self.matched_filter_output_ = matched_filter_output
-        self.peak_indices_ = np.sort(peak_indices)
-        order = np.argsort(peak_times)
-        self.peak_times_ = peak_times[order]
-        self.peak_heights_ = peak_heights[order]
-        self.threshold_used_ = float(threshold_value)
-        self.suppression_half_window_in_samples_ = int(suppression_half_window_in_samples)
-
-        self.results = {
-            "signal": signal,
-            "time_samples": time_samples,
-            "peak_indices": self.peak_indices_,
-            "peak_times": self.peak_times_,
-            "peak_amplitude": self.peak_heights_,
-            # "peak_amplitude": signal[peak_indices],
-            "matched_filter_output": matched_filter_output,
-            "gaussian_kernel": gaussian_kernel,
-            "threshold_used": float(threshold_value),
-            "suppression_half_window_in_samples": int(suppression_half_window_in_samples),
-        }
-        return self.results
-
-    def plot(self) -> None:
-        r"""
-        Plot the input signal, matched-filter output, and coarse peak locations.
-        """
-        from MPSPlots.styles import mps as plot_style
-
-        if not getattr(self, "results", None):
-            raise ValueError("Computation not done yet, use .run() first.")
-
-        with plt.style.context(plot_style):
-            t = self.results["time_samples"]
-            y = self.results["signal"]
-            r = self.results["matched_filter_output"]
-            peaks_t = self.results["peak_times"]
-
-            plt.figure()
-            plt.plot(t, y, label="signal y(t)")
-            plt.plot(t, r, label="matched filter output r(t)")
-            for m in peaks_t:
-                plt.axvline(m, linestyle="--", alpha=0.6, label=None)
-            plt.title("Equal-width Gaussian pulse detection (coarse)")
-            plt.xlabel("t")
-            plt.ylabel("amplitude")
-            plt.legend()
-            plt.show()
+        # Build rich result
+        result = SingleResult(
+            detector=self,
+            signal=signal,
+            time_samples=time_samples,
+            matched_filter_output=matched_filter_output,
+            gaussian_kernel=gaussian_kernel,
+            threshold_used=float(threshold_value),
+            suppression_half_window_in_samples=int(win),
+            peak_indices=peak_indices,
+            peak_times=peak_times,
+            peak_amplitude_raw=peak_heights_raw,
+            peak_amplitude_matched=peak_heights_mf,
+        )
+        return result
 
     # ---------------- Static helper methods ----------------
-
     @staticmethod
     def full_width_half_maximum_to_sigma(fwhm: float) -> float:
         r"""
@@ -188,6 +424,11 @@ class NonMaximumSuppression:
 
             \text{FWHM} = 2 \sqrt{2 \ln 2} \,\sigma \;\;\Rightarrow\;\;
             \sigma = \frac{\text{FWHM}}{2\sqrt{2\ln 2}}
+
+        Parameters
+        ----------
+        fwhm : float
+            Full width at half maximum.
         """
         return fwhm / (2.0 * np.sqrt(2.0 * np.log(2.0)))
 
@@ -209,6 +450,15 @@ class NonMaximumSuppression:
 
         where :math:`L = \left\lceil \dfrac{\text{radius}\,\sigma}{\Delta t} \right\rceil`
         and the discrete energy satisfies :math:`\sum_k g[k]^2 = 1`.
+
+        Parameters
+        ----------
+        sample_interval : float
+            Sample spacing :math:`\Delta t`.
+        gaussian_sigma : float
+            Gaussian standard deviation :math:`\sigma`.
+        truncation_radius_in_sigmas : float
+            Kernel radius in multiples of :math:`\sigma`.
         """
         half_length = int(np.ceil(truncation_radius_in_sigmas * gaussian_sigma / sample_interval))
         time_axis = np.arange(-half_length, half_length + 1, dtype=float) * sample_interval
@@ -226,6 +476,13 @@ class NonMaximumSuppression:
             r[n] = \sum_m y[m] \, g[m-n].
 
         Implemented as convolution with the reversed kernel.
+
+        Parameters
+        ----------
+        signal : array
+            Input signal samples :math:`y[n]`.
+        kernel : array
+            Correlation kernel :math:`g[k]`.
         """
         return np.convolve(signal, kernel[::-1], mode="same")
 
@@ -243,6 +500,17 @@ class NonMaximumSuppression:
         where :math:`W` is the half-window and :math:`\tau` is the threshold.
 
         Returns at most ``max_peaks`` indices with the largest responses.
+
+        Parameters
+        ----------
+        values : ndarray, shape (N,)
+            Input values :math:`r[n]`.
+        half_window : int
+            Half-window :math:`W` in samples (must be ≥ 1).
+        threshold : float
+            Minimum value :math:`\tau` to be considered a peak.
+        max_peaks : int
+            Maximum number of peaks to return.  If more are found, the top ``max_peaks``
         """
         if half_window < 1:
             core = (values[1:-1] > values[:-2]) & (values[1:-1] >= values[2:]) & (values[1:-1] >= threshold)
@@ -269,13 +537,19 @@ class NonMaximumSuppression:
         .. math::
 
             m = \text{median}(x), \quad MAD = \text{median}(|x-m|), \quad \hat\sigma_n \approx 1.4826 \, MAD
+
+        This estimator is robust to outliers (e.g., signal peaks).
+
+        Parameters
+        ----------
+        values : ndarray, shape (N,)
+            Input values (e.g., matched filter output).
         """
         m = np.median(values)
         mad = np.median(np.abs(values - m))
         return 1.4826 * mad
 
     # ---------------- Local replacement for sliding_window_view ----------------
-
     @staticmethod
     def _sliding_window_view_1d(array: NDArray[np.float64], window_length: int) -> NDArray[np.float64]:
         r"""
@@ -313,3 +587,152 @@ class NonMaximumSuppression:
         view = np.lib.stride_tricks.as_strided(array, shape=shape, strides=strides)
         view.setflags(write=False)
         return view
+
+    # ---------------- Batch methods ----------------
+    def run_batch(self, time_samples: NDArray[np.float64], signal: NDArray[np.float64]) -> BatchResult:
+        r"""
+        Run the detection pipeline on one or many signals.
+
+        Parameters
+        ----------
+        time_samples : ndarray, shape (N,)
+            Shared uniform sample times.
+        signal : ndarray, shape (N,) or (B, N)
+            Single signal or batch.
+
+        Returns
+        -------
+        BatchResult
+            Rich result object containing arrays, analysis helpers, and plotting methods.
+        """
+        # ---- coerce shapes
+        time_samples = np.asarray(time_samples, dtype=float)
+        assert time_samples.ndim == 1, "time_samples must be a 1D array (shared grid)."
+        sig = np.asarray(signal, dtype=float)
+        if sig.ndim == 1:
+            sig = sig[None, :]
+        assert sig.ndim == 2, "signal must have shape (N,) or (B, N)"
+        B, N = sig.shape
+        assert N == time_samples.size, "signal and time_samples length mismatch."
+
+        dt = float(time_samples[1] - time_samples[0])
+
+        # ---- matched filter
+        g = self._build_gaussian_kernel(
+            sample_interval=dt,
+            gaussian_sigma=self.gaussian_sigma,
+            truncation_radius_in_sigmas=self.kernel_truncation_radius_in_sigmas,
+        )
+        r = self._correlate_batch(sig, g[::-1])  # (B, N)
+
+        # ---- window & threshold per sample
+        min_sep = self.gaussian_sigma if self.minimum_separation is None else self.minimum_separation
+        win = int(max(1, np.round(min_sep / dt / 2.0)))  # NMS half-window
+
+        if self.threshold == "auto":
+            noise_sigma = self._robust_noise_std_batch(r)  # (B,)
+            tau = 4.5 * noise_sigma
+        else:
+            tau = np.full(B, float(self.threshold), dtype=float)
+
+        # ---- NMS (batched, vectorized)
+        padded = np.pad(r, ((0, 0), (win, win)), mode="edge")  # (B, N + 2*win)
+        blocks = self._sliding_window_last_axis(padded, 2 * win + 1)  # (B, N, 2*win+1)
+        locmax = blocks.max(axis=-1)  # (B, N)
+
+        mask = (r >= locmax) & (r >= tau[:, None])  # (B, N)
+
+        K = int(self.maximum_number_of_pulses)
+        masked_vals = np.where(mask, r, -np.inf)  # (B, N)
+        idx_sorted_desc = np.argsort(masked_vals, axis=1)[:, ::-1]  # (B, N)
+        idx_topk = idx_sorted_desc[:, : min(K, N)]  # (B, K')
+        vals_topk = np.take_along_axis(masked_vals, idx_topk, axis=1)  # (B, K')
+        valid_topk = np.isfinite(vals_topk)  # (B, K')
+
+        # Pad to K
+        if idx_topk.shape[1] < K:
+            pad_w = K - idx_topk.shape[1]
+            idx_topk = np.pad(idx_topk, ((0, 0), (0, pad_w)), constant_values=0)
+            valid_topk = np.pad(valid_topk, ((0, 0), (0, pad_w)), constant_values=False)
+
+        bigN = N + 1
+        idx_for_sort = np.where(valid_topk, idx_topk, bigN)
+        idx_time_sorted = np.sort(idx_for_sort, axis=1)  # (B, K)
+        valid_sorted = idx_time_sorted < N  # (B, K)
+
+        # Final peak indices
+        peak_indices = np.where(valid_sorted, idx_time_sorted, -1).astype(int)  # (B, K)
+
+        # Safe gathers (avoid OOB), then mask
+        safe_idx = np.where(valid_sorted, idx_time_sorted, 0)
+        times_at_safe = time_samples[safe_idx]  # (B, K)
+        peak_times = np.where(valid_sorted, times_at_safe, np.nan)
+
+        amps_at_safe = np.take_along_axis(sig, safe_idx, axis=1)  # (B, K)
+        peak_amplitudes = np.where(valid_sorted, amps_at_safe, np.nan)
+
+        # ---- pack into BatchResult
+        result = BatchResult(
+            detector=self,
+            signals=sig,
+            time_samples=time_samples,
+            matched_filter_output=r,
+            gaussian_kernel=g,
+            threshold_used=tau,
+            suppression_half_window_in_samples=win,
+            peak_indices=peak_indices,
+            peak_times=peak_times,
+            peak_amplitude_raw=peak_amplitudes,
+        )
+        return result
+
+    @staticmethod
+    def _sliding_window_last_axis(x: np.ndarray, window: int) -> np.ndarray:
+        """
+        Return a strided sliding window view over the last axis.
+
+        x : (B, N)
+        window : int
+        returns : (B, N - window + 1, window)
+        """
+        if x.ndim != 2:
+            raise ValueError("x must be 2D (B, N).")
+        B, N = x.shape
+        if not (1 <= window <= N):
+            raise ValueError("window must satisfy 1 <= window <= N")
+        stride_b, stride_n = x.strides
+        shape = (B, N - window + 1, window)
+        strides = (stride_b, stride_n, stride_n)
+        view = np.lib.stride_tricks.as_strided(x, shape=shape, strides=strides)
+        view.setflags(write=False)
+        return view
+
+    @staticmethod
+    def _correlate_batch(signals: np.ndarray, kernel: np.ndarray) -> np.ndarray:
+        """
+        Batched 'same' correlation using zero-padding (no Python loops).
+
+        signals : (B, N)
+        kernel  : (K,)  (pass REVERSED kernel for correlation, i.e. g[::-1])
+        returns : (B, N)
+        """
+        signals = np.asarray(signals, dtype=float)
+        kernel = np.asarray(kernel, dtype=float)
+        K = kernel.size
+        pad = K // 2  # odd K assumed (your Gaussian is 2L+1)
+        padded = np.pad(signals, ((0, 0), (pad, pad)), mode="constant")
+        # windows: (B, N, K)
+        windows = NonMaximumSuppression._sliding_window_last_axis(padded, K)
+        # dot each window with kernel -> (B, N)
+        return np.einsum("b n k, k -> b n", windows, kernel)
+
+    @staticmethod
+    def _robust_noise_std_batch(values: np.ndarray) -> np.ndarray:
+        """
+        Robust per-row noise estimate via MAD: sigma ≈ 1.4826 * median(|x - median(x)|).
+        values : (B, N)
+        returns : (B,)
+        """
+        med = np.median(values, axis=1, keepdims=True)
+        mad = np.median(np.abs(values - med), axis=1)
+        return 1.4826 * mad
