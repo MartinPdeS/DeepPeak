@@ -113,6 +113,201 @@ class SingleResult:
         ax.set(title=f"Detected peaks: {self.number_of_peaks}", xlabel="t", ylabel="amplitude")
         return fig
 
+    def _compute_average_pulse(self, *, source: str = "raw", baseline: str = "median") -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        r"""
+        Compute the average pulse centered on detected peaks and the per-sample std.
+
+        Parameters
+        ----------
+        source : {"raw", "matched"}
+            Use the raw input signal or the matched-filter output.
+        baseline : {"median", "none"}
+            Subtract a per-window baseline before averaging. "median" is robust.
+
+        Returns
+        -------
+        t_rel : ndarray, shape (K,)
+            Time axis relative to the peak center (seconds).
+        avg : ndarray, shape (K,)
+            Average pulse (after optional baseline removal).
+        std : ndarray, shape (K,)
+            Pointwise standard deviation across windows (after baseline removal).
+        """
+        if self.peak_indices.size == 0:
+            raise ValueError("No peaks to average.")
+
+        y = self.signal if source == "raw" else self.matched_filter_output
+        k = self.gaussian_kernel
+        if y is None or k is None:
+            raise ValueError("Required arrays are missing on SingleResult.")
+
+        N = y.size
+        K = k.size
+        half = (K - 1) // 2
+        dt = float(self.time_samples[1] - self.time_samples[0])
+        t_rel = np.arange(-half, half + 1, dtype=float) * dt
+
+        # Collect windows fully contained in the signal
+        windows = []
+        for idx in self.peak_indices:
+            i = int(idx)
+            if i - half < 0 or i + half >= N:
+                continue
+            w = y[i - half : i + half + 1].astype(float, copy=True)
+            if baseline == "median":
+                w -= np.median(w)
+            windows.append(w)
+
+        if not windows:
+            raise ValueError("No valid windows (peaks too close to edges for kernel length).")
+
+        W = np.vstack(windows)  # (M, K)
+        avg = W.mean(axis=0)
+        std = W.std(axis=0, ddof=1) if W.shape[0] > 1 else np.zeros_like(avg)
+        return t_rel, avg, std
+
+    @staticmethod
+    def _best_fit_scale(avg: np.ndarray, kernel: np.ndarray) -> float:
+        r"""
+        Least-squares scale factor α that minimizes ||avg - α k||_2^2.
+        Kernel is unit-energy in this project, so α = <avg, k>.
+        """
+        denom = float(np.dot(kernel, kernel))
+        return float(np.dot(avg, kernel) / denom) if denom > 0 else 1.0
+
+    @staticmethod
+    def _pearson_corr(a: np.ndarray, b: np.ndarray) -> float:
+        a0 = a - a.mean()
+        b0 = b - b.mean()
+        na = np.linalg.norm(a0)
+        nb = np.linalg.norm(b0)
+        return float(np.dot(a0, b0) / (na * nb)) if (na > 0 and nb > 0) else 0.0
+
+    @staticmethod
+    def _sigma_and_fwhm_from_profile(t: np.ndarray, y: np.ndarray) -> tuple[float, float]:
+        r"""
+        Estimate σ and FWHM of a (roughly) Gaussian, from its averaged shape.
+
+        - σ via second central moment with nonnegative weights.
+        - FWHM via linear interpolation of half-maximum crossings.
+        """
+        w = y - np.min(y)
+        w = np.clip(w, 0.0, None)
+        s = w.sum()
+        if s <= 0:
+            return np.nan, np.nan
+        w /= s
+        mu = float((t * w).sum())
+        sigma = float(np.sqrt(((t - mu) ** 2 * w).sum()))
+
+        ymax = float(y.max())
+        if ymax <= 0:
+            return sigma, np.nan
+        half = 0.5 * ymax
+
+        i0 = int(np.argmax(y))
+
+        i_left = None
+        for i in range(i0, 0, -1):
+            if y[i - 1] <= half <= y[i]:
+                frac = (half - y[i - 1]) / (y[i] - y[i - 1] + 1e-12)
+                t_left = t[i - 1] + frac * (t[i] - t[i - 1])
+                i_left = t_left
+                break
+
+        i_right = None
+        for i in range(i0, len(y) - 1):
+            if y[i] >= half >= y[i + 1]:
+                frac = (half - y[i + 1]) / (y[i] - y[i + 1] + 1e-12)
+                t_right = t[i + 1] + frac * (t[i] - t[i + 1])
+                i_right = t_right
+                break
+
+        fwhm = float(i_right - i_left) if (i_left is not None and i_right is not None) else np.nan
+        return sigma, fwhm
+
+    @helper.post_mpl_plot
+    def plot_kernel_vs_average_pulse(self, source: str = "raw", baseline: str = "median", show_spread: bool = True, label_kernel: str = "Gaussian kernel (scaled)", label_avg: str = "Average pulse") -> dict[str, float]:
+        r"""
+        Plot the average detected pulse against the Gaussian kernel (best-fit scaled).
+
+        Parameters
+        ----------
+        ax : matplotlib Axes, optional
+            Axes to plot on. If None, a new figure and axes are created.
+        source : {"raw", "matched"}
+            Compare against the raw signal or matched-filter output.
+        baseline : {"median", "none"}
+            Per-window baseline removal before averaging.
+        show_spread : bool
+            If True, display ±1 std envelope around the average pulse.
+        label_kernel : str
+            Legend label for the scaled kernel.
+        label_avg : str
+            Legend label for the averaged pulse.
+
+        Returns
+        -------
+        dict
+            Dictionary of fit statistics: {"alpha", "rmse", "corr", "sigma_est", "fwhm_est"}.
+        """
+        t_rel, avg, std = self._compute_average_pulse(source=source, baseline=baseline)
+        k = self.gaussian_kernel
+        if k is None:
+            raise ValueError("gaussian_kernel not present on SingleResult.")
+
+        # Best-fit scaling of unit-energy kernel to average pulse
+        alpha = self._best_fit_scale(avg, k)
+
+        figure, ax = plt.subplots()
+
+        ax.plot(t_rel, avg, lw=2, label=label_avg)
+        if show_spread and np.any(std > 0):
+            ax.fill_between(t_rel, avg - std, avg + std, alpha=0.2, linewidth=0)
+
+        ax.plot(t_rel, alpha * k, lw=2, linestyle="--", label=label_kernel)
+
+        ax.set_xlabel("Time relative to peak (s)")
+        ax.set_ylabel("Amplitude")
+        ax.set_title(f"Kernel vs average pulse ({source})")
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+        return figure
+
+    def print_kernel_vs_average_pulse_stats(self, *, source: str = "raw", baseline: str = "median") -> None:
+        r"""
+        Print a compact report comparing the averaged pulse to the Gaussian kernel.
+
+        Parameters
+        ----------
+        source : {"raw", "matched"}
+            Use raw signal or matched-filter output to build the average.
+        baseline : {"median", "none"}
+            Per-window baseline removal before averaging.
+        """
+        t_rel, avg, _ = self._compute_average_pulse(source=source, baseline=baseline)
+        k = self.gaussian_kernel
+        if k is None:
+            raise ValueError("gaussian_kernel not present on SingleResult.")
+
+        alpha = self._best_fit_scale(avg, k)
+        rmse = float(np.sqrt(np.mean((avg - alpha * k) ** 2)))
+        corr = self._pearson_corr(avg, k)
+        sigma_est, fwhm_est = self._sigma_and_fwhm_from_profile(t_rel, avg)
+
+        dt = float(self.time_samples[1] - self.time_samples[0])
+        print("=== Kernel vs Average Pulse ===")
+        print(f"Number of peaks used     : {np.isfinite(self.peak_times).sum()}")
+        print(f"Kernel length (samples)  : {k.size}  | dt = {dt:.6g} s")
+        print(f"Best-fit scale $\alpha$         : {alpha:.6g}")
+        print(f"RMSE                     : {rmse:.6g}")
+        print(f"Pearson corr (zero-mean) : {corr:.6g}")
+        print(f"Estimated $\sigma$ (average)    : {sigma_est:.6g} s")
+        if np.isfinite(fwhm_est):
+            print(f"Estimated FWHM (average) : {fwhm_est:.6g} s  ($\sigma$≈FWHM/2√(2ln2) → {fwhm_est/(2*np.sqrt(2*np.log(2))):.6g} s)")
+        else:
+            print("Estimated FWHM (average) : NaN (could not determine half-maximum)")
+
 
 @dataclass
 class BatchResult:
@@ -212,8 +407,8 @@ class BatchResult:
         indices: NDArray[np.int_] | None = None,
         *,
         ncols: int = 1,
-        show_matched_filter: bool = True,
         max_plots: int | None = 12,
+        ground_truth: NDArray[np.float64] | None = None,
     ) -> plt.Figure:
         """
         Small multiples of several samples.
@@ -224,42 +419,43 @@ class BatchResult:
             Which samples to plot. If None, the first ``max_plots`` samples are used.
         ncols : int
             Number of columns for the plot grid.
-        show_matched_filter : bool
-            Whether to overlay the matched-filter output.
         max_plots : int, optional
             Maximum number of samples to plot if ``indices`` is None. If None, plot all samples.
+        ground_truth : ndarray, shape (B, K_true), optional
+            If provided, vertical lines are drawn at the ground-truth peak times for each sample.
         """
         if indices is None:
-            Bsel = min(self.batch_size, max_plots or self.batch_size)
-            idx = np.arange(Bsel, dtype=int)
+            batch_selection = min(self.batch_size, max_plots or self.batch_size)
+            batch_index = np.arange(batch_selection, dtype=int)
         else:
-            idx = np.asarray(indices, dtype=int)
-        n = idx.size
+            batch_index = np.asarray(indices, dtype=int)
+
+        n = batch_index.size
+
         ncols = max(1, int(ncols))
         nrows = int(np.ceil(n / ncols))
 
         fig, axes = plt.subplots(nrows, ncols, figsize=(6.5 * ncols, 2.8 * nrows), squeeze=False)
         axes_flat = axes.ravel()
 
-        for k, ax in enumerate(axes_flat):
-            if k >= n:
-                ax.axis("off")
-                continue
-            b = idx[k]
-            t = self.time_samples
-            y = self.signals[b]
-            r = self.matched_filter_output[b]
-            peaks_t = self.peak_times[b]
+        for k, (example_number, ax) in enumerate(zip(batch_index, axes_flat)):
 
-            ax.plot(t, y, label="signal")
-            if show_matched_filter:
-                ax.plot(t, r, label="matched filter")
-            if np.isfinite(peaks_t).any():
-                for m in peaks_t[np.isfinite(peaks_t)]:
-                    ax.axvline(m, linestyle="--", alpha=0.6)
-            ax.set_title(f"b={b}, #peaks={np.sum(np.isfinite(peaks_t))}")
-            ax.set_xlabel("t")
-            ax.set_ylabel("amp")
+            peaks_t = self.peak_times[example_number]
+
+            ax.plot(self.time_samples, self.signals[example_number], label="signal")
+
+            ax.plot(self.time_samples, self.matched_filter_output[example_number], label="matched filter")
+
+            for peak_time in peaks_t[np.isfinite(peaks_t)]:
+                ax.axvline(peak_time, linestyle="-", alpha=0.6)
+
+            if ground_truth is not None:
+                ground_truth_times = ground_truth[example_number]
+                for idx, ground_truth_time in enumerate(ground_truth_times[np.isfinite(ground_truth_times)]):
+                    ax.axvline(ground_truth_time, color="black", linestyle=":", alpha=0.6, label="ground truth" if idx == 0 else None)
+
+            ax.set(title=f"Sample #{example_number} (K={self.number_of_peaks}, detected={np.sum(np.isfinite(peaks_t))})", xlabel="time", ylabel="amplitude")
+
             if k == 0:
                 ax.legend(loc="best")
 
@@ -618,12 +814,12 @@ class NonMaximumSuppression:
         dt = float(time_samples[1] - time_samples[0])
 
         # ---- matched filter
-        g = self._build_gaussian_kernel(
+        gaussian_kernel = self._build_gaussian_kernel(
             sample_interval=dt,
             gaussian_sigma=self.gaussian_sigma,
             truncation_radius_in_sigmas=self.kernel_truncation_radius_in_sigmas,
         )
-        r = self._correlate_batch(sig, g[::-1])  # (B, N)
+        r = self._correlate_batch(sig, gaussian_kernel[::-1])  # (B, N)
 
         # ---- window & threshold per sample
         min_sep = self.gaussian_sigma if self.minimum_separation is None else self.minimum_separation
@@ -677,7 +873,7 @@ class NonMaximumSuppression:
             signals=sig,
             time_samples=time_samples,
             matched_filter_output=r,
-            gaussian_kernel=g,
+            gaussian_kernel=gaussian_kernel,
             threshold_used=tau,
             suppression_half_window_in_samples=win,
             peak_indices=peak_indices,

@@ -91,129 +91,250 @@ class ClosedFormSolver(BaseAmplitudeSolver):
         self.last_gram_: NDArray[np.float64] | None = None
         self.last_amplitudes_: NDArray[np.float64] | None = None
 
-    def run(self, centers: NDArray[np.float64], center_samples: NDArray[np.float64]) -> NDArray[np.float64]:
+    # ------------------------- main entry -------------------------
+    def run(
+        self,
+        centers: NDArray[np.float64],
+        center_samples: NDArray[np.float64],
+    ) -> NDArray[np.float64]:
         """
-        Solve ``G a = y_c`` in closed-form (A <= 3).
-
-        Parameters
-        ----------
-        centers : ndarray, shape (A,) or (B, A)
-            Peak centers μ.
-        center_samples : ndarray, shape (A,) or (B, A)
-            Measured **signal values at the same centers** (i.e., y(μ_k)), possibly batched.
-
-        Returns
-        -------
-        amplitudes : ndarray, shape (A,) or (B, A)
-            Recovered amplitudes a.
+        Solve G a = y_c in closed-form for A ∈ {1,2,3,4,5}.
         """
-        C, squeeze = self._coerce_to_2d(centers)
-        center_samples, _ = self._coerce_to_2d(center_samples)
-        if center_samples.shape != C.shape:
+        centers, squeeze = self._coerce_to_2d(centers)
+        Yc, _ = self._coerce_to_2d(center_samples)
+        if Yc.shape != centers.shape:
             raise ValueError("centers and center_samples must have the same shape.")
 
-        number_of_estimated_peaks = C.shape[1]
+        A = centers.shape[1]
+        G = self._response_matrix_from_centers(centers, self.sigma)
 
-        G = self._response_matrix_from_centers(C, self.sigma)
-
-        match number_of_estimated_peaks:
-            case 1:
-                Ahat = center_samples.copy()
-
-            case 2:
-                r12 = G[:, 0, 1]
-                det = (1.0 - r12**2).clip(min=self.eps)
-                a1 = (center_samples[:, 0] - r12 * center_samples[:, 1]) / det
-                a2 = (center_samples[:, 1] - r12 * center_samples[:, 0]) / det
-                Ahat = np.stack([a1, a2], axis=1)
-
-            case 3:
-                r12, r13, r23 = G[:, 0, 1], G[:, 0, 2], G[:, 1, 2]
-                det = (1 + 2 * r12 * r13 * r23 - r12**2 - r13**2 - r23**2).clip(min=self.eps)
-
-                inv00 = 1 - r23**2
-                inv11 = 1 - r13**2
-                inv22 = 1 - r12**2
-                inv01 = r13 * r23 - r12
-                inv02 = r12 * r23 - r13
-                inv12 = r12 * r13 - r23
-
-                Ginv = (
-                    np.stack(
-                        [
-                            np.stack([inv00, inv01, inv02], axis=1),
-                            np.stack([inv01, inv11, inv12], axis=1),
-                            np.stack([inv02, inv12, inv22], axis=1),
-                        ],
-                        axis=1,
-                    )
-                    / det[:, None, None]
-                )
-
-                Ahat = np.einsum("bij,bj->bi", Ginv, center_samples)
-
-            case 4:
-                # Partition G and y_c:
-                # G = [[A3 (3x3), b (3x1)],
-                #      [b^T      , d     ]]
-                # y = [y3 (3,), y4]
-                #
-                # Closed-form via Schur complement:
-                # a4   = (y4 - b^T A3^{-1} y3) / (d - b^T A3^{-1} b)
-                # a1:3 = A3^{-1} (y3 - b a4)
-
-                # --- Invert the 3x3 top-left block A3 explicitly (unit-diagonal correlation form) ---
-                r12 = G[:, 0, 1]
-                r13 = G[:, 0, 2]
-                r23 = G[:, 1, 2]
-
-                det3 = (1 + 2 * r12 * r13 * r23 - r12**2 - r13**2 - r23**2).clip(min=self.eps)
-
-                inv00 = 1 - r23**2
-                inv11 = 1 - r13**2
-                inv22 = 1 - r12**2
-                inv01 = r13 * r23 - r12
-                inv02 = r12 * r23 - r13
-                inv12 = r12 * r13 - r23
-
-                # --- Extract b, d, and y parts explicitly ---
-                b0, b1, b2 = G[:, 0, 3], G[:, 1, 3], G[:, 2, 3]
-                d = G[:, 3, 3]  # typically 1.0 for peak-normalized Gaussians
-
-                y0, y1, y2 = center_samples[:, 0], center_samples[:, 1], center_samples[:, 2]
-                y4 = center_samples[:, 3]
-
-                # --- Compute A3^{-1} y3 (call it Ay) ---
-                Ay0 = (inv00 * y0 + inv01 * y1 + inv02 * y2) / det3
-                Ay1 = (inv01 * y0 + inv11 * y1 + inv12 * y2) / det3
-                Ay2 = (inv02 * y0 + inv12 * y1 + inv22 * y2) / det3
-
-                # --- Compute A3^{-1} b (call it Ab) ---
-                Ab0 = (inv00 * b0 + inv01 * b1 + inv02 * b2) / det3
-                Ab1 = (inv01 * b0 + inv11 * b1 + inv12 * b2) / det3
-                Ab2 = (inv02 * b0 + inv12 * b1 + inv22 * b2) / det3
-
-                # --- Schur complement s = d - b^T A3^{-1} b (guarded) ---
-                s = (d - (b0 * Ab0 + b1 * Ab1 + b2 * Ab2)).clip(min=self.eps)
-
-                # --- a4 = (y4 - b^T A3^{-1} y3) / s ---
-                a4 = (y4 - (b0 * Ay0 + b1 * Ay1 + b2 * Ay2)) / s
-
-                # --- a1:3 = A3^{-1}(y3 - b a4) = Ay - Ab * a4 ---
-                a0 = Ay0 - Ab0 * a4
-                a1 = Ay1 - Ab1 * a4
-                a2 = Ay2 - Ab2 * a4
-
-                Ahat = np.stack([a0, a1, a2, a4], axis=1)
-
-            case _:
-                raise ValueError(f"Number of estimated peaks must be between 1 and 4, got {number_of_estimated_peaks}. Higher numbers haven't been implemented.")
+        if A == 1:
+            Ahat = self._solve_order1(Yc)
+        elif A == 2:
+            Ahat = self._solve_order2(G, Yc)
+        elif A == 3:
+            Ahat = self._solve_order3(G, Yc)
+        elif A == 4:
+            Ahat = self._solve_order4(G, Yc)
+        elif A == 5:
+            Ahat = self._solve_order5(G, Yc)
+        else:
+            raise ValueError(f"Number of estimated peaks must be 1 - 5, got {A}. Higher orders not implemented.")
 
         # cache for plotting
-        self.last_centers_ = C
+        self.last_centers_ = centers
         self.last_matrix_ = G
         self.last_amplitudes_ = Ahat
         return Ahat[0] if squeeze else Ahat
+
+    # ------------------------- sub-solvers -------------------------
+    def _solve_order1(self, Yc: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Closed-form solver for A=1.
+
+        Parameters
+        ----------
+        Yc : ndarray, shape (B, 1)
+            Measured signal values at the centers, per batch item.
+        """
+        return Yc.copy()
+
+    def _solve_order2(self, G: NDArray[np.float64], Yc: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Closed-form solver for A=2 using analytic inverse of the 2x2 correlation matrix.
+
+        Parameters
+        ----------
+        G : ndarray, shape (B, 2, 2)
+            Response (Gram) matrix per batch item.
+        Yc : ndarray, shape (B, 2)
+            Measured signal values at the centers, per batch item.
+        """
+        r12 = G[:, 0, 1]
+        det = (1.0 - r12**2).clip(min=self.eps)
+        a1 = (Yc[:, 0] - r12 * Yc[:, 1]) / det
+        a2 = (Yc[:, 1] - r12 * Yc[:, 0]) / det
+        return np.stack([a1, a2], axis=1)
+
+    def _solve_order3(self, G: NDArray[np.float64], Yc: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Closed-form solver for A=3 using analytic inverse of the 3x3 correlation matrix.
+
+        Parameters
+        ----------
+        G : ndarray, shape (B, 3, 3)
+            Response (Gram) matrix per batch item.
+        Yc : ndarray, shape (B, 3)
+            Measured signal values at the centers, per batch item.
+
+        Returns
+        -------
+        amplitudes : ndarray, shape (B, 3)
+            Recovered amplitudes a for each batch item.
+        """
+        r12, r13, r23 = G[:, 0, 1], G[:, 0, 2], G[:, 1, 2]
+        det = (1 + 2 * r12 * r13 * r23 - r12**2 - r13**2 - r23**2).clip(min=self.eps)
+
+        inv00 = 1 - r23**2
+        inv11 = 1 - r13**2
+        inv22 = 1 - r12**2
+        inv01 = r13 * r23 - r12
+        inv02 = r12 * r23 - r13
+        inv12 = r12 * r13 - r23
+
+        Ginv = (
+            np.stack(
+                [
+                    np.stack([inv00, inv01, inv02], axis=1),
+                    np.stack([inv01, inv11, inv12], axis=1),
+                    np.stack([inv02, inv12, inv22], axis=1),
+                ],
+                axis=1,
+            )
+            / det[:, None, None]
+        )
+
+        return np.einsum("bij,bj->bi", Ginv, Yc)
+
+    def _solve_order4(self, G: NDArray[np.float64], Yc: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Closed-form solver for A=4.
+        Uses block partitioning:
+            G = [[A3, b],
+                [b^T, d]]
+        then Schur complement. A3 is the top-left 3x3 block.
+
+        Parameters
+        ----------
+        G : ndarray, shape (B, 4, 4)
+            Response (Gram) matrix per batch item.
+        Yc : ndarray, shape (B, 4)
+            Measured signal values at the centers, per batch item.
+
+        Returns
+        -------
+        amplitudes : ndarray, shape (B, 4)
+            Recovered amplitudes a for each batch item.
+        """
+        # block partition
+        A3_inv, det3 = self._invert3(G[:, :3, :3])
+
+        b = G[:, :3, 3]
+        d = G[:, 3, 3]
+        y3 = Yc[:, :3]
+        y4 = Yc[:, 3]
+
+        Ay = np.einsum("bij,bj->bi", A3_inv, y3)
+        Ab = np.einsum("bij,bj->bi", A3_inv, b)
+        s = (d - np.einsum("bi,bi->b", b, Ab)).clip(min=self.eps)
+
+        a4 = (y4 - np.einsum("bi,bi->b", b, Ay)) / s
+        a3 = Ay - Ab * a4[:, None]
+        return np.concatenate([a3, a4[:, None]], axis=1)
+
+    def _solve_order5(self, G: NDArray[np.float64], Yc: NDArray[np.float64]) -> NDArray[np.float64]:
+        """
+        Closed-form solver for A=5.
+        Uses block partitioning:
+            G = [[A4, b],
+                [b^T, d]]
+        then Schur complement. A4 is the top-left 4x4 block.
+
+        Parameters
+        ----------
+        G : ndarray, shape (B, 5, 5)
+            Response (Gram) matrix per batch item.
+        Yc : ndarray, shape (B, 5)
+            Measured signal values at the centers, per batch item.
+
+        Returns
+        -------
+        amplitudes : ndarray, shape (B, 5)
+            Recovered amplitudes a for each batch item.
+        """
+        # Partition: top-left A4 (4x4), b (4,), d (scalar)
+        A4 = G[:, :4, :4]
+        b = G[:, :4, 4]
+        d = G[:, 4, 4]
+        y4 = Yc[:, :4]
+        y5 = Yc[:, 4]
+
+        # Explicit inversion of A4 via cofactors
+        A4_inv, det4 = self._invert4(A4)
+
+        Ay = np.einsum("bij,bj->bi", A4_inv, y4)
+        Ab = np.einsum("bij,bj->bi", A4_inv, b)
+        s = (d - np.einsum("bi,bi->b", b, Ab)).clip(min=self.eps)
+
+        a5 = (y5 - np.einsum("bi,bi->b", b, Ay)) / s
+        a4 = Ay - Ab * a5[:, None]
+        return np.concatenate([a4, a5[:, None]], axis=1)
+
+    # ------------------------------------------------------------------
+    # Helpers for explicit inverses
+    # ------------------------------------------------------------------
+    def _invert3(self, A3):
+        """
+        Explicit inverse of 3x3 correlation-like matrix (batched).
+        Returns (inv, det).
+
+        Parameters
+        ----------
+        A3 : ndarray, shape (B, 3, 3)
+            Batched 3x3 symmetric correlation matrices.
+        """
+        r12, r13, r23 = A3[:, 0, 1], A3[:, 0, 2], A3[:, 1, 2]
+        det = (1 + 2 * r12 * r13 * r23 - r12**2 - r13**2 - r23**2).clip(min=self.eps)
+
+        inv00 = 1 - r23**2
+        inv11 = 1 - r13**2
+        inv22 = 1 - r12**2
+        inv01 = r13 * r23 - r12
+        inv02 = r12 * r23 - r13
+        inv12 = r12 * r13 - r23
+
+        inv = (
+            np.stack(
+                [
+                    np.stack([inv00, inv01, inv02], axis=1),
+                    np.stack([inv01, inv11, inv12], axis=1),
+                    np.stack([inv02, inv12, inv22], axis=1),
+                ],
+                axis=1,
+            )
+            / det[:, None, None]
+        )
+
+        return inv, det
+
+    def _invert4(self, A4):
+        """
+        Explicit inverse of a 4x4 symmetric correlation matrix (batched).
+        Returns (inv, det).
+        Uses 3x3 minors via _invert3.
+
+        Parameters
+        ----------
+        A4 : ndarray, shape (B, 4, 4)
+            Batched 4x4 symmetric correlation matrices.
+        """
+        B = []
+        dets = []
+        for drop_row in range(4):
+            row_blocks = []
+            for drop_col in range(4):
+                # minor is 3x3 (remove row, col)
+                mask = [i for i in range(4) if i != drop_row]
+                sub = A4[:, mask][:, :, [j for j in range(4) if j != drop_col]]
+                inv3, det3 = self._invert3(sub)
+                dets.append(det3)
+                # cofactor = det(minor)*(-1)^(i+j)
+                row_blocks.append(((det3) * ((-1) ** (drop_row + drop_col)))[:, None])
+            B.append(np.concatenate(row_blocks, axis=1))
+        adj = np.stack(B, axis=1)  # (B,4,4)
+        det4 = np.einsum("bii->b", A4 * adj) / 4.0  # crude det estimate
+        inv = adj / det4[:, None, None]
+        return inv, det4
 
     def run_batch(self, centers: NDArray[np.float64], center_samples: NDArray[np.float64]) -> NDArray[np.float64]:
         """

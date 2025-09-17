@@ -1,14 +1,14 @@
 """
-Non-Maximum Suppression for Gaussian Pulse Detection
-====================================================
+Zero Crossing Peak Detection Example
+====================================
 
-This example demonstrates the use of the NonMaximumSuppression class to detect
-Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset
-of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
+This example demonstrates the use of the ZeroCrossing class to detect
+zero-crossing points in a one-dimensional signal. It generates a synthetic dataset
+of Gaussian pulses, applies the zero-crossing detection algorithm, and plots
 the results.
 """
 
-from DeepPeak.algorithms import NonMaximumSuppression
+from DeepPeak.algorithms import ZeroCrossing
 from DeepPeak.signals import Kernel, SignalDatasetGenerator
 
 NUM_PEAKS = 3
@@ -33,17 +33,11 @@ dataset.plot()
 
 # %%
 # Configure and run the detector
-peak_locator = NonMaximumSuppression(
+peak_locator = ZeroCrossing(
     gaussian_sigma=0.005,
     threshold="auto",
-    maximum_number_of_pulses=5,
-    kernel_truncation_radius_in_sigmas=3,
+    threshold_k=3.0,
 )
-
-
-result = peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals[0])
-
-# result.plot_kernel_vs_average_pulse()
 
 batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
 
@@ -53,4 +47,8 @@ batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.sig
 
 # %%
 # Plot the results
-batch.plot(ncols=3, max_plots=6, ground_truth=dataset.positions)
+batch.plot(
+    ncols=3,
+    max_plots=6,
+    # ground_truth=dataset.positions
+)
