@@ -63,6 +63,12 @@ the results.
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <Figure size 800x1200 with 4 Axes>
 
 
 
@@ -90,11 +96,17 @@ Configure and run the detector
 
 
 .. image-sg:: /gallery/images/sphx_glr_amplitude_retrieval_002.png
-   :alt: b=0, #peaks=2, b=1, #peaks=4, b=2, #peaks=3, b=3, #peaks=4
+   :alt: Sample #0 (K=4, detected=3), Sample #1 (K=4, detected=3), Sample #2 (K=4, detected=3), Sample #3 (K=4, detected=4)
    :srcset: /gallery/images/sphx_glr_amplitude_retrieval_002.png
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <Figure size 650x1120 with 4 Axes>
 
 
 
@@ -120,13 +132,19 @@ Solve for amplitudes
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <Figure size 800x500 with 4 Axes>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.642 seconds)
+   **Total running time of the script:** (0 minutes 1.644 seconds)
 
 
 .. _sphx_glr_download_gallery_amplitude_retrieval.py:

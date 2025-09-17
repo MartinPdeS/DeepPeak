@@ -14,9 +14,9 @@ from DeepPeak.signals import Kernel, SignalDatasetGenerator
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 400
 
-gaussian_width = 0.03
+gaussian_width = 0.02
 
-generator = SignalDatasetGenerator(n_samples=200, sequence_length=SEQUENCE_LENGTH)
+generator = SignalDatasetGenerator(n_samples=6, sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     signal_type=Kernel.GAUSSIAN,
@@ -27,24 +27,29 @@ dataset = generator.generate(
     noise_std=2,  # Add some noise
     categorical_peak_count=False,
 )
+print(dataset)
 
-# dataset.plot()
+dataset.plot()
 
 # %%
 # Configure and run the detector
 peak_locator = NonMaximumSuppression(
-    gaussian_sigma=0.003,
+    gaussian_sigma=0.005,
     threshold="auto",
     maximum_number_of_pulses=5,
     kernel_truncation_radius_in_sigmas=3,
 )
 
+
+result = peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals[0])
+result.plot()
+
 batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
 
 # %%
 # Plot the results
-batch.plot_histogram_counts()
+# batch.plot_histogram_counts()
 
 # %%
 # Plot the results
-batch.plot(ncols=3, max_plots=6)
+batch.plot(ncols=3, max_plots=6, ground_truth=dataset.positions)

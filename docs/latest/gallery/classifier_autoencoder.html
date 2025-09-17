@@ -411,6 +411,7 @@
 <li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_crossing.html">Zero Crossing Peak Detection Example</a></li>
 </ul>
 </div>
 </nav></div>
@@ -524,7 +525,10 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_classifier_autoencoder_001.png" srcset="../_images/sphx_glr_classifier_autoencoder_001.png" alt="classifier autoencoder" class = "sphx-glr-single-img"/></section>
+<img src="../_images/sphx_glr_classifier_autoencoder_001.png" srcset="../_images/sphx_glr_classifier_autoencoder_001.png" alt="classifier autoencoder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
+</pre></div>
+</div>
+</section>
 <section id="build-and-summarize-the-wavenet-classifier">
 <h2>Build and summarize the WaveNet classifier<a class="headerlink" href="#build-and-summarize-the-wavenet-classifier" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span> <span class="o">=</span> <span class="n">Autoencoder</span><span class="p">(</span>
@@ -593,20 +597,20 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0000e+00 - loss: 0.6994
-2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 326ms/step - BinaryIoU: 0.0094 - loss: 0.6862 - val_BinaryIoU: 0.3186 - val_loss: 0.6689
+1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0431 - loss: 0.7371
+2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 335ms/step - BinaryIoU: 0.0424 - loss: 0.7210 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6424
 Epoch 2/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.1489 - loss: 0.6279
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.1397 - loss: 0.6224 - val_BinaryIoU: 0.0432 - val_loss: 0.6151
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6782
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6720 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6305
 Epoch 3/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0290 - loss: 0.5748
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0244 - loss: 0.5662 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5506
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6407
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6358 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6281
 Epoch 4/4
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0015 - loss: 0.5217
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0049 - loss: 0.5190 - val_BinaryIoU: 0.4006 - val_loss: 0.5057
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6017
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5996 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6178
 </pre></div>
 </div>
 </section>
@@ -624,7 +628,7 @@ Epoch 4/4
 <img src="../_images/sphx_glr_classifier_autoencoder_003.png" srcset="../_images/sphx_glr_classifier_autoencoder_003.png" alt="Predicted Region of Interest" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1200x500 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.354 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.702 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-autoencoder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/027ad6dec8c2fb9e539fbd7af3497d66/classifier_autoencoder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_autoencoder.ipynb</span></code></a></p>

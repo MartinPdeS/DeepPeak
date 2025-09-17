@@ -411,6 +411,7 @@
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_crossing.html">Zero Crossing Peak Detection Example</a></li>
 </ul>
 </div>
 </nav></div>
@@ -524,7 +525,10 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_classifier_wavenet_001.png" srcset="../_images/sphx_glr_classifier_wavenet_001.png" alt="classifier wavenet" class = "sphx-glr-single-img"/></section>
+<img src="../_images/sphx_glr_classifier_wavenet_001.png" srcset="../_images/sphx_glr_classifier_wavenet_001.png" alt="classifier wavenet" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
+</pre></div>
+</div>
+</section>
 <section id="build-and-summarize-the-wavenet-classifier">
 <h2>Build and summarize the WaveNet classifier<a class="headerlink" href="#build-and-summarize-the-wavenet-classifier" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span> <span class="o">=</span> <span class="n">WaveNet</span><span class="p">(</span>
@@ -639,84 +643,84 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 4s 4s/step - BinaryIoU: 0.0758 - accuracy: 0.4113 - loss: 1.2917
-2/2 ━━━━━━━━━━━━━━━━━━━━ 5s 508ms/step - BinaryIoU: 0.0729 - accuracy: 0.5089 - loss: 1.2454 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.7316
+1/2 ━━━━━━━━━━━━━━━━━━━━ 4s 4s/step - BinaryIoU: 0.0760 - accuracy: 0.4409 - loss: 0.7884
+2/2 ━━━━━━━━━━━━━━━━━━━━ 5s 537ms/step - BinaryIoU: 0.0745 - accuracy: 0.5430 - loss: 0.8226 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.7587
 Epoch 2/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9486 - loss: 0.9094
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9486 - loss: 0.9116 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.6727
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 105ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9491 - loss: 0.9220
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.9263 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.6976
 Epoch 3/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9476 - loss: 0.8899
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.8651 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.6291
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9472 - loss: 0.9173
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.8776 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.6461
 Epoch 4/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9512 - loss: 0.8125
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.8296 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.5931
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 104ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9484 - loss: 0.8570
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.8347 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.6101
 Epoch 5/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9488 - loss: 0.8086
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7955 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.5564
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9499 - loss: 0.7965
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.8047 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.5957
 Epoch 6/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7646
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7624 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.4984
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 104ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9488 - loss: 0.8037
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7927 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.5938
 Epoch 7/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 104ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9495 - loss: 0.7424
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 120ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7114 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.3093
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9515 - loss: 0.7594
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7894 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.5919
 Epoch 8/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9495 - loss: 0.4853
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0907 - accuracy: 0.9517 - loss: 0.4560 - val_BinaryIoU: 0.3158 - val_accuracy: 0.9382 - val_loss: 0.2260
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9495 - loss: 0.7887
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7859 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.5761
 Epoch 9/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.3069 - accuracy: 0.9159 - loss: 0.3560
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.2970 - accuracy: 0.9157 - loss: 0.3519 - val_BinaryIoU: 0.1603 - val_accuracy: 0.9673 - val_loss: 0.1153
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9499 - loss: 0.7675
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7738 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.5320
 Epoch 10/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.1941 - accuracy: 0.9575 - loss: 0.1740
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.1582 - accuracy: 0.9564 - loss: 0.1870 - val_BinaryIoU: 0.0192 - val_accuracy: 0.9618 - val_loss: 0.1001
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9489 - loss: 0.7491
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.7404 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.4101
 Epoch 11/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0061 - accuracy: 0.9494 - loss: 0.1476
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - BinaryIoU: 0.1225 - accuracy: 0.9476 - loss: 0.1494 - val_BinaryIoU: 0.3776 - val_accuracy: 0.9542 - val_loss: 0.1172
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9495 - loss: 0.6333
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.5925 - val_BinaryIoU: 0.4070 - val_accuracy: 0.9578 - val_loss: 0.1010
 Epoch 12/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - BinaryIoU: 0.3831 - accuracy: 0.9380 - loss: 0.1658
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - BinaryIoU: 0.3556 - accuracy: 0.9404 - loss: 0.1584 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.0998
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.3597 - accuracy: 0.9381 - loss: 0.1459
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.3606 - accuracy: 0.9345 - loss: 0.1615 - val_BinaryIoU: 0.0429 - val_accuracy: 0.9610 - val_loss: 0.0829
 Epoch 13/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0155 - accuracy: 0.9504 - loss: 0.1431
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - BinaryIoU: 0.0296 - accuracy: 0.9507 - loss: 0.1356 - val_BinaryIoU: 0.4158 - val_accuracy: 0.9705 - val_loss: 0.0711
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - BinaryIoU: 0.0353 - accuracy: 0.9488 - loss: 0.1153
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.0287 - accuracy: 0.9493 - loss: 0.1253 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.0968
 Epoch 14/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - BinaryIoU: 0.4619 - accuracy: 0.9609 - loss: 0.0926
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.4558 - accuracy: 0.9592 - loss: 0.0980 - val_BinaryIoU: 0.4158 - val_accuracy: 0.9722 - val_loss: 0.0661
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 100ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9499 - loss: 0.1360
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.1078 - accuracy: 0.9498 - loss: 0.1326 - val_BinaryIoU: 0.3642 - val_accuracy: 0.9468 - val_loss: 0.1097
 Epoch 15/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - BinaryIoU: 0.4237 - accuracy: 0.9631 - loss: 0.0873
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.3944 - accuracy: 0.9618 - loss: 0.0919 - val_BinaryIoU: 0.1824 - val_accuracy: 0.9675 - val_loss: 0.0709
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - BinaryIoU: 0.3572 - accuracy: 0.9256 - loss: 0.1629
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 119ms/step - BinaryIoU: 0.3663 - accuracy: 0.9320 - loss: 0.1493 - val_BinaryIoU: 0.0000e+00 - val_accuracy: 0.9613 - val_loss: 0.0833
 Epoch 16/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - BinaryIoU: 0.2894 - accuracy: 0.9630 - loss: 0.0888
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - BinaryIoU: 0.3097 - accuracy: 0.9604 - loss: 0.0931 - val_BinaryIoU: 0.4238 - val_accuracy: 0.9698 - val_loss: 0.0723
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9504 - loss: 0.1169
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.0000e+00 - accuracy: 0.9496 - loss: 0.1220 - val_BinaryIoU: 0.0839 - val_accuracy: 0.9645 - val_loss: 0.0722
 Epoch 17/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 103ms/step - BinaryIoU: 0.4476 - accuracy: 0.9576 - loss: 0.0977
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.4253 - accuracy: 0.9572 - loss: 0.0958 - val_BinaryIoU: 0.1321 - val_accuracy: 0.9655 - val_loss: 0.0683
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0955 - accuracy: 0.9534 - loss: 0.0992
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.1762 - accuracy: 0.9533 - loss: 0.1003 - val_BinaryIoU: 0.4519 - val_accuracy: 0.9673 - val_loss: 0.0803
 Epoch 18/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - BinaryIoU: 0.2388 - accuracy: 0.9614 - loss: 0.0898
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - BinaryIoU: 0.2309 - accuracy: 0.9598 - loss: 0.0912 - val_BinaryIoU: 0.4859 - val_accuracy: 0.9772 - val_loss: 0.0589
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.4174 - accuracy: 0.9502 - loss: 0.1125
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - BinaryIoU: 0.4212 - accuracy: 0.9518 - loss: 0.1091 - val_BinaryIoU: 0.0892 - val_accuracy: 0.9642 - val_loss: 0.0712
 Epoch 19/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - BinaryIoU: 0.4684 - accuracy: 0.9672 - loss: 0.0776
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.4687 - accuracy: 0.9649 - loss: 0.0820 - val_BinaryIoU: 0.4796 - val_accuracy: 0.9745 - val_loss: 0.0611
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.1018 - accuracy: 0.9524 - loss: 0.0962
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - BinaryIoU: 0.0892 - accuracy: 0.9528 - loss: 0.0968 - val_BinaryIoU: 0.2037 - val_accuracy: 0.9677 - val_loss: 0.0671
 Epoch 20/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - BinaryIoU: 0.4771 - accuracy: 0.9634 - loss: 0.0862
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.4692 - accuracy: 0.9644 - loss: 0.0830 - val_BinaryIoU: 0.2927 - val_accuracy: 0.9710 - val_loss: 0.0611
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 101ms/step - BinaryIoU: 0.2533 - accuracy: 0.9606 - loss: 0.0876
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - BinaryIoU: 0.2940 - accuracy: 0.9596 - loss: 0.0888 - val_BinaryIoU: 0.4703 - val_accuracy: 0.9733 - val_loss: 0.0677
 </pre></div>
 </div>
 </section>
@@ -734,7 +738,7 @@ Epoch 20/20
 <img src="../_images/sphx_glr_classifier_wavenet_003.png" srcset="../_images/sphx_glr_classifier_wavenet_003.png" alt="Predicted Region of Interest" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1200x500 with 1 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 10.588 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 10.907 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-wavenet-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/b51bbbaf62ed0591b6ea1aacdcdca2b4/classifier_wavenet.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_wavenet.ipynb</span></code></a></p>

@@ -107,6 +107,12 @@ Visualize a few example signals and their regions of interest
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
+
+
+    <Figure size 800x900 with 3 Axes>
 
 
 
@@ -206,13 +212,13 @@ Train the classifier
  .. code-block:: none
 
     Epoch 1/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0000e+00 - loss: 0.6994    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 326ms/step - BinaryIoU: 0.0094 - loss: 0.6862 - val_BinaryIoU: 0.3186 - val_loss: 0.6689
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0431 - loss: 0.7371    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 335ms/step - BinaryIoU: 0.0424 - loss: 0.7210 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6424
     Epoch 2/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.1489 - loss: 0.6279    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.1397 - loss: 0.6224 - val_BinaryIoU: 0.0432 - val_loss: 0.6151
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6782    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6720 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6305
     Epoch 3/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0290 - loss: 0.5748    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0244 - loss: 0.5662 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5506
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6407    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6358 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6281
     Epoch 4/4
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0015 - loss: 0.5217    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0049 - loss: 0.5190 - val_BinaryIoU: 0.4006 - val_loss: 0.5057
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6017    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5996 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6178
 
 
 
@@ -271,7 +277,7 @@ Predict and visualize on a test signal
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 6.354 seconds)
+   **Total running time of the script:** (0 minutes 6.702 seconds)
 
 
 .. _sphx_glr_download_gallery_classifier_autoencoder.py:

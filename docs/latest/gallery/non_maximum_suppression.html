@@ -58,7 +58,7 @@
     <link rel="icon" href="../_static/thumbnail.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Theory" href="../theory.html" />
+    <link rel="next" title="Zero Crossing Peak Detection Example" href="zero_crossing.html" />
     <link rel="prev" title="Generating and Visualizing Signal Data" href="data_generation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -411,6 +411,7 @@
 <li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="zero_crossing.html">Zero Crossing Peak Detection Example</a></li>
 </ul>
 </div>
 </nav></div>
@@ -488,9 +489,9 @@ the results.</p>
 <span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">400</span>
 
-<span class="n">gaussian_width</span> <span class="o">=</span> <span class="mf">0.03</span>
+<span class="n">gaussian_width</span> <span class="o">=</span> <span class="mf">0.02</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="n">signal_type</span><span class="o">=</span><span class="n">Kernel</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">,</span>
@@ -501,30 +502,41 @@ the results.</p>
     <span class="n">noise_std</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>  <span class="c1"># Add some noise</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
-<span class="c1"># dataset.plot()</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_non_maximum_suppression_001.png" srcset="../_images/sphx_glr_non_maximum_suppression_001.png" alt="non maximum suppression" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>DataSet(signals, labels, amplitudes, positions, widths, x_values, num_peaks, region_of_interest)
+
+&lt;Figure size 800x1800 with 6 Axes&gt;
 </pre></div>
 </div>
 <p>Configure and run the detector</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">peak_locator</span> <span class="o">=</span> <span class="n">NonMaximumSuppression</span><span class="p">(</span>
-    <span class="n">gaussian_sigma</span><span class="o">=</span><span class="mf">0.003</span><span class="p">,</span>
+    <span class="n">gaussian_sigma</span><span class="o">=</span><span class="mf">0.005</span><span class="p">,</span>
     <span class="n">threshold</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span>
     <span class="n">maximum_number_of_pulses</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
     <span class="n">kernel_truncation_radius_in_sigmas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">peak_locator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">time_samples</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">result</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+
 <span class="n">batch</span> <span class="o">=</span> <span class="n">peak_locator</span><span class="o">.</span><span class="n">run_batch</span><span class="p">(</span><span class="n">time_samples</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">)</span>
 </pre></div>
 </div>
+<img src="../_images/sphx_glr_non_maximum_suppression_002.png" srcset="../_images/sphx_glr_non_maximum_suppression_002.png" alt="Detected peaks: 3" class = "sphx-glr-single-img"/><p>Plot the results
+batch.plot_histogram_counts()</p>
 <p>Plot the results</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">batch</span><span class="o">.</span><span class="n">plot_histogram_counts</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">batch</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_plots</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ground_truth</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_non_maximum_suppression_001.png" srcset="../_images/sphx_glr_non_maximum_suppression_001.png" alt="Detected peaks per sample" class = "sphx-glr-single-img"/><p>Plot the results</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">batch</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_plots</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<img src="../_images/sphx_glr_non_maximum_suppression_003.png" srcset="../_images/sphx_glr_non_maximum_suppression_003.png" alt="Sample #0 (K=5, detected=3), Sample #1 (K=5, detected=3), Sample #2 (K=5, detected=3), Sample #3 (K=5, detected=3), Sample #4 (K=5, detected=2), Sample #5 (K=5, detected=3)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1950x560 with 6 Axes&gt;
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_non_maximum_suppression_002.png" srcset="../_images/sphx_glr_non_maximum_suppression_002.png" alt="b=0, #peaks=2, b=1, #peaks=2, b=2, #peaks=2, b=3, #peaks=3, b=4, #peaks=1, b=5, #peaks=3" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.923 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.734 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-non-maximum-suppression-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/25e1135ef1ffbe32122a83c577db9e9d/non_maximum_suppression.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">non_maximum_suppression.ipynb</span></code></a></p>
