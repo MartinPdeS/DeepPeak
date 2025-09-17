@@ -6,9 +6,10 @@
 |----------------------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
 | DeepPeak/algorithms/base.py                          |       86 |       86 |       20 |        0 |      0% |     1-195 |
 | DeepPeak/algorithms/cholesky\_solver.py              |       30 |       30 |        6 |        0 |      0% |      1-69 |
-| DeepPeak/algorithms/closed\_form\_solver.py          |      151 |      151 |       24 |        0 |      0% |     1-336 |
-| DeepPeak/algorithms/non\_maximum\_suppression.py     |      276 |      276 |       44 |        0 |      0% |     1-738 |
-| DeepPeak/dataset.py                                  |       28 |       21 |       16 |        0 |     20% |     28-78 |
+| DeepPeak/algorithms/closed\_form\_solver.py          |      184 |      184 |       30 |        0 |      0% |     1-457 |
+| DeepPeak/algorithms/non\_maximum\_suppression.py     |      376 |      376 |       74 |        0 |      0% |     1-934 |
+| DeepPeak/algorithms/zero\_crossing.py                |      221 |      221 |       50 |        0 |      0% |     1-490 |
+| DeepPeak/dataset.py                                  |       35 |       22 |       14 |        0 |     31% |28-30, 34-83 |
 | DeepPeak/helper.py                                   |       18 |       11 |        4 |        0 |     32% |     33-48 |
 | DeepPeak/machine\_learning/classifier/autoencoder.py |       43 |        1 |        4 |        2 |     94% |84->exit, 93 |
 | DeepPeak/machine\_learning/classifier/base.py        |       80 |       28 |       18 |        5 |     60% |27-45, 49-50, 54-55, 59, 63-69, 107, 124-126, 135-136, 205, 211->215, 216-217 |
@@ -19,7 +20,7 @@
 | DeepPeak/signals.py                                  |      132 |       35 |       42 |       12 |     64% |106, 116, 117->120, 145-153, 165->169, 170, 176->184, 203, 209, 225-233, 280, 288->295, 333-345 |
 | DeepPeak/utils.py                                    |       71 |       71 |       14 |        0 |      0% |     1-185 |
 | DeepPeak/visualization.py                            |      202 |      202 |       70 |        0 |      0% |     1-800 |
-|                                            **TOTAL** | **1275** |  **964** |  **282** |   **23** | **22%** |           |
+|                                            **TOTAL** | **1636** | **1319** |  **366** |   **23** | **17%** |           |
 
 
 ## Setup coverage badge
