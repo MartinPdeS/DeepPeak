@@ -15,8 +15,6 @@ from DeepPeak.kernel import Gaussian
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 400
 
-gaussian_width = 0.02
-
 generator = SignalDatasetGenerator(n_samples=6, sequence_length=SEQUENCE_LENGTH)
 
 kernel = Gaussian(
@@ -38,7 +36,7 @@ dataset.plot()
 # %%
 # Configure and run the detector
 peak_locator = NonMaximumSuppression(
-    gaussian_sigma=0.02,
+    gaussian_sigma=kernel.width,
     threshold="auto",
     maximum_number_of_pulses=5,
     kernel_truncation_radius_in_sigmas=5,
@@ -51,8 +49,8 @@ batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.sig
 
 # %%
 # Plot the results
-# batch.plot_histogram_counts()
+batch.plot_histogram_counts()
 
 # %%
 # Plot the results
-batch.plot(ncols=3, max_plots=6, ground_truth=dataset.positions, show_kernel=True)
+batch.plot(ncols=3, max_plots=6, true_position=dataset.positions, show_kernel=True)

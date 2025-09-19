@@ -59,9 +59,9 @@ class Gaussian(BaseKernel):
     width: float
 
     def __post_init__(self):
-        self.amplitude = self._ensure_tuple(self.amplitude)
-        self.position = self._ensure_tuple(self.position)
-        self.width = self._ensure_tuple(self.width)
+        self._amplitude = self._ensure_tuple(self.amplitude)
+        self._position = self._ensure_tuple(self.position)
+        self._width = self._ensure_tuple(self.width)
 
     def get_kwargs(self) -> dict:
         return {
@@ -92,9 +92,9 @@ class Gaussian(BaseKernel):
         min_peaks, max_peaks = int(n_peaks[0]), int(n_peaks[1])
 
         self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
-        self.amplitudes = np.random.uniform(*self.amplitude, size=(n_samples, max_peaks))
-        self.positions = np.random.uniform(*self.position, size=(n_samples, max_peaks))
-        self.widths = np.random.uniform(*self.width, size=(n_samples, max_peaks))
+        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
+        self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
         # Keep a copy for label computation prior to NaN-masking
         self.positions_for_labels = self.positions.copy()
@@ -143,9 +143,9 @@ class Lorentzian(BaseKernel):
     width: float  # HWHM $\gamma$
 
     def __post_init__(self):
-        self.amplitude = self._ensure_tuple(self.amplitude)
-        self.position = self._ensure_tuple(self.position)
-        self.width = self._ensure_tuple(self.width)
+        self._amplitude = self._ensure_tuple(self.amplitude)
+        self._position = self._ensure_tuple(self.position)
+        self._width = self._ensure_tuple(self.width)
 
     def get_kwargs(self) -> dict:
         return {
@@ -186,9 +186,9 @@ class Lorentzian(BaseKernel):
         self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
 
         # Draw parameters (uniform in provided ranges)
-        self.amplitudes = np.random.uniform(*self.amplitude, size=(n_samples, max_peaks))
-        self.positions = np.random.uniform(*self.position, size=(n_samples, max_peaks))
-        self.widths = np.random.uniform(*self.width, size=(n_samples, max_peaks))
+        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
+        self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
         # Keep copy for labels before masking
         self.positions_for_labels = self.positions.copy()
@@ -242,9 +242,9 @@ class Square(BaseKernel):
 
     def __post_init__(self):
         # allow scalar or (low, high) tuples; unify as tuples
-        self.amplitude = self._ensure_tuple(self.amplitude)
-        self.position = self._ensure_tuple(self.position)
-        self.width = self._ensure_tuple(self.width)
+        self._amplitude = self._ensure_tuple(self.amplitude)
+        self._position = self._ensure_tuple(self.position)
+        self._width = self._ensure_tuple(self.width)
 
     def get_kwargs(self) -> dict:
         return {
@@ -285,9 +285,9 @@ class Square(BaseKernel):
         self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
 
         # Draw parameters (uniform in provided ranges)
-        self.amplitudes = np.random.uniform(*self.amplitude, size=(n_samples, max_peaks))
-        self.positions = np.random.uniform(*self.position, size=(n_samples, max_peaks))
-        self.widths = np.random.uniform(*self.width, size=(n_samples, max_peaks))
+        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
+        self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
         # Keep copy for label computation before masking
         self.positions_for_labels = self.positions.copy()
@@ -346,8 +346,8 @@ class Dirac(BaseKernel):
     position: float
 
     def __post_init__(self):
-        self.amplitude = self._ensure_tuple(self.amplitude)
-        self.position = self._ensure_tuple(self.position)
+        self._amplitude = self._ensure_tuple(self.amplitude)
+        self._position = self._ensure_tuple(self.position)
 
     def get_kwargs(self) -> dict:
         return {
@@ -388,8 +388,8 @@ class Dirac(BaseKernel):
         self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
 
         # Draw parameters
-        self.amplitudes = np.random.uniform(*self.amplitude, size=(n_samples, max_peaks))
-        self.positions = np.random.uniform(*self.position, size=(n_samples, max_peaks))
+        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
 
         # Keep copy for labels before masking
         self.positions_for_labels = self.positions.copy()
