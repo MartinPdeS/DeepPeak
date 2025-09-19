@@ -4,7 +4,8 @@ import numpy as np
 import pytest
 
 from DeepPeak.machine_learning.classifier import Autoencoder, DenseNet, WaveNet
-from DeepPeak.signals import Kernel, SignalDatasetGenerator
+from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.kernel import Gaussian
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
@@ -14,14 +15,17 @@ architectures = [DenseNet, WaveNet, Autoencoder]
 
 @pytest.fixture
 def dataset():
-    generator = SignalDatasetGenerator(n_samples=600, sequence_length=SEQUENCE_LENGTH)
-
-    dataset = generator.generate(
-        signal_type=Kernel.GAUSSIAN,
-        n_peaks=(1, NUM_PEAKS),
+    kernel = Gaussian(
         amplitude=(1, 20),
         position=(0.1, 0.9),
         width=(0.03, 0.05),
+    )
+
+    generator = SignalDatasetGenerator(n_samples=600, sequence_length=SEQUENCE_LENGTH)
+
+    dataset = generator.generate(
+        kernel=kernel,
+        n_peaks=(1, NUM_PEAKS),
         noise_std=0.1,
         categorical_peak_count=False,
         compute_region_of_interest=True,

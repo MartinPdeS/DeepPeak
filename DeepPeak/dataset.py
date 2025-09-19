@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from MPSPlots.styles import mps as plot_style
 from MPSPlots import helper
 
 

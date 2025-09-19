@@ -181,6 +181,7 @@ class ZCBatchResult:
         *,
         ncols: int = 1,
         max_plots: int | None = 12,
+        ground_truth: NDArray[np.float64] | None = None,
     ) -> plt.Figure:
         """
         Small multiples of several samples showing signal (+ optional smoothed) and detected peaks.
@@ -198,23 +199,29 @@ class ZCBatchResult:
         fig, axes = plt.subplots(nrows, ncols, figsize=(6.5 * ncols, 2.8 * nrows), squeeze=False)
         axes_flat = axes.ravel()
 
-        for k, (b, ax) in enumerate(zip(batch_index, axes_flat)):
-            peaks_t = self.peak_times[b]
-            ax.plot(self.time_samples, self.signals[b], label="signal")
+        for k, (example_number, ax) in enumerate(zip(batch_index, axes_flat)):
+            peaks_t = self.peak_times[example_number]
+            ax.plot(self.time_samples, self.signals[example_number], label="signal")
 
-            ax.plot(self.time_samples, self.smoothed_signals[b], label="smoothed")
-            ax.axhline(self.threshold_used[b], linestyle="--", alpha=0.7, label="threshold" if k == 0 else None)
+            ax.plot(self.time_samples, self.smoothed_signals[example_number], label="smoothed")
+            ax.axhline(self.threshold_used[example_number], linestyle="--", alpha=0.7, label="threshold" if k == 0 else None)
 
             for peak_time in peaks_t[np.isfinite(peaks_t)]:
                 ax.axvline(peak_time, linestyle=":", alpha=0.7)
 
             ax.set(
-                title=f"Sample #{b} (detected={np.sum(np.isfinite(peaks_t))})",
+                title=f"Sample #{example_number} (detected={np.sum(np.isfinite(peaks_t))})",
                 xlabel="time",
                 ylabel="amplitude",
             )
+
             if k == 0:
                 ax.legend(loc="best")
+
+            if ground_truth is not None:
+                ground_truth_times = ground_truth[example_number]
+                for idx, ground_truth_time in enumerate(ground_truth_times[np.isfinite(ground_truth_times)]):
+                    ax.axvline(ground_truth_time, color="black", linestyle=":", alpha=0.6, label="ground truth" if idx == 0 else None)
 
         return fig
 

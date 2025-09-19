@@ -21,7 +21,8 @@ We will:
 import numpy as np
 
 from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
-from DeepPeak.signals import Kernel, SignalDatasetGenerator
+from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak import kernel
 
 np.random.seed(42)
 
@@ -31,14 +32,17 @@ np.random.seed(42)
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
-
-dataset = generator.generate(
-    signal_type=Kernel.GAUSSIAN,
-    n_peaks=(1, NUM_PEAKS),
+kernel = kernel.Lorentzian(
     amplitude=(1, 20),
     position=(0.1, 0.9),
     width=(0.03, 0.05),
+)
+
+generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
+
+dataset = generator.generate(
+    kernel=kernel,
+    n_peaks=(1, NUM_PEAKS),
     noise_std=0.1,
     categorical_peak_count=False,
     compute_region_of_interest=True,

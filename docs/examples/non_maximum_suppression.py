@@ -9,7 +9,8 @@ the results.
 """
 
 from DeepPeak.algorithms import NonMaximumSuppression
-from DeepPeak.signals import Kernel, SignalDatasetGenerator
+from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.kernel import Gaussian
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 400
@@ -18,13 +19,16 @@ gaussian_width = 0.02
 
 generator = SignalDatasetGenerator(n_samples=6, sequence_length=SEQUENCE_LENGTH)
 
-dataset = generator.generate(
-    signal_type=Kernel.GAUSSIAN,
-    n_peaks=(3, 3),
+kernel = Gaussian(
     amplitude=(10, 300),  # Amplitude range
     position=(0.3, 0.7),  # Peak position range
-    width=gaussian_width,  # Width range
-    noise_std=2,  # Add some noise
+    width=0.02,
+)
+
+dataset = generator.generate(
+    kernel=kernel,
+    n_peaks=(3, 3),
+    noise_std=0,  # Add some noise
     categorical_peak_count=False,
 )
 print(dataset)
@@ -34,15 +38,14 @@ dataset.plot()
 # %%
 # Configure and run the detector
 peak_locator = NonMaximumSuppression(
-    gaussian_sigma=0.005,
+    gaussian_sigma=0.02,
     threshold="auto",
     maximum_number_of_pulses=5,
-    kernel_truncation_radius_in_sigmas=3,
+    kernel_truncation_radius_in_sigmas=5,
 )
 
 
 result = peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals[0])
-result.plot()
 
 batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
 
@@ -52,4 +55,4 @@ batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.sig
 
 # %%
 # Plot the results
-batch.plot(ncols=3, max_plots=6, ground_truth=dataset.positions)
+batch.plot(ncols=3, max_plots=6, ground_truth=dataset.positions, show_kernel=True)
