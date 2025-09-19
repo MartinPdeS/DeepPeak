@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for DeepPeak/algorithms/base.py: 0%</title>
+    <title>Coverage for DeepPeak/algorithms/base.py: 14%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_58284776.png">
     <link rel="stylesheet" href="style_cb_6b508a39.css" type="text/css">
     <script src="coverage_html_cb_6fb7b396.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>DeepPeak/algorithms/base.py</b>:
-            <span class="pc_cov">0%</span>
+            <span class="pc_cov">14%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -56,8 +56,8 @@
         </aside>
         <h2>
             <span class="text">86 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">0<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">86<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">15<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">71<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
             <button type="button" class="par run show_par button_toggle_par" value="par" data-shortcut="p" title="Toggle lines partially run">0<span class="text"> partial</span></button>
         </h2>
@@ -67,7 +67,7 @@
             <a id="nextFileLink" class="nav" href="z_726542d7dec6cea9_cholesky_solver_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-17 15:06 +0000
+            created at 2025-09-19 12:23 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -82,16 +82,16 @@
     </div>
 </header>
 <main id="source">
-    <p class="mis show_mis"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">import</span> <span class="nam">numpy</span> <span class="key">as</span> <span class="nam">np</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">from</span> <span class="nam">numpy</span><span class="op">.</span><span class="nam">typing</span> <span class="key">import</span> <span class="nam">NDArray</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">MPSPlots</span> <span class="key">import</span> <span class="nam">helper</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">import</span> <span class="nam">matplotlib</span><span class="op">.</span><span class="nam">pyplot</span> <span class="key">as</span> <span class="nam">plt</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t1" href="#t1">1</a></span><span class="t"><span class="key">import</span> <span class="nam">numpy</span> <span class="key">as</span> <span class="nam">np</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t2" href="#t2">2</a></span><span class="t"><span class="key">from</span> <span class="nam">numpy</span><span class="op">.</span><span class="nam">typing</span> <span class="key">import</span> <span class="nam">NDArray</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t3" href="#t3">3</a></span><span class="t"><span class="key">from</span> <span class="nam">MPSPlots</span> <span class="key">import</span> <span class="nam">helper</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t4" href="#t4">4</a></span><span class="t"><span class="key">import</span> <span class="nam">matplotlib</span><span class="op">.</span><span class="nam">pyplot</span> <span class="key">as</span> <span class="nam">plt</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t5" href="#t5">5</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">class</span> <span class="nam">BaseAmplitudeSolver</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t"><span class="key">class</span> <span class="nam">BaseAmplitudeSolver</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gram_from_centers</span><span class="op">(</span><span class="nam">centers_2d</span><span class="op">:</span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">,</span> <span class="nam">sigma</span><span class="op">:</span> <span class="nam">float</span><span class="op">)</span> <span class="op">-></span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">    <span class="key">def</span> <span class="nam">_gram_from_centers</span><span class="op">(</span><span class="nam">centers_2d</span><span class="op">:</span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">,</span> <span class="nam">sigma</span><span class="op">:</span> <span class="nam">float</span><span class="op">)</span> <span class="op">-></span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="str">        Vectorized Gram matrix from centers for a unit-energy Gaussian template:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -115,8 +115,8 @@
     <p class="mis show_mis"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">        <span class="nam">H</span><span class="op">[</span><span class="op">...</span><span class="op">,</span> <span class="nam">idx</span><span class="op">,</span> <span class="nam">idx</span><span class="op">]</span> <span class="op">=</span> <span class="num">1.0</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t">        <span class="key">return</span> <span class="nam">H</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">    <span class="key">def</span> <span class="nam">_coerce_to_2d</span><span class="op">(</span><span class="nam">x</span><span class="op">:</span> <span class="nam">np</span><span class="op">.</span><span class="nam">ndarray</span><span class="op">)</span> <span class="op">-></span> <span class="nam">tuple</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">ndarray</span><span class="op">,</span> <span class="nam">bool</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t">    <span class="key">def</span> <span class="nam">_coerce_to_2d</span><span class="op">(</span><span class="nam">x</span><span class="op">:</span> <span class="nam">np</span><span class="op">.</span><span class="nam">ndarray</span><span class="op">)</span> <span class="op">-></span> <span class="nam">tuple</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">ndarray</span><span class="op">,</span> <span class="nam">bool</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t"><span class="str">        Ensure input is 2D array (B, A). Return (x2d, was_1d).</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t38" href="#t38">38</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -140,8 +140,8 @@
     <p class="mis show_mis"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">        <span class="key">return</span> <span class="nam">x2</span><span class="op">,</span> <span class="nam">original_1d</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">    <span class="com"># --- Amplitudes-only plot ----------------------------------------------------</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">    <span class="op">@</span><span class="nam">helper</span><span class="op">.</span><span class="nam">post_mpl_plot</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">    <span class="key">def</span> <span class="nam">plot</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">true_amplitudes</span><span class="op">:</span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">,</span> <span class="nam">sample_index</span><span class="op">:</span> <span class="nam">int</span> <span class="op">=</span> <span class="num">0</span><span class="op">)</span> <span class="op">-></span> <span class="nam">plt</span><span class="op">.</span><span class="nam">Figure</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t59" href="#t59">59</a></span><span class="t">    <span class="op">@</span><span class="nam">helper</span><span class="op">.</span><span class="nam">post_mpl_plot</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t60" href="#t60">60</a></span><span class="t">    <span class="key">def</span> <span class="nam">plot</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">true_amplitudes</span><span class="op">:</span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">,</span> <span class="nam">sample_index</span><span class="op">:</span> <span class="nam">int</span> <span class="op">=</span> <span class="num">0</span><span class="op">)</span> <span class="op">-></span> <span class="nam">plt</span><span class="op">.</span><span class="nam">Figure</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t61" href="#t61">61</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t62" href="#t62">62</a></span><span class="t"><span class="str">        Plot recovered amplitudes for one sample (bar plot only).</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t63" href="#t63">63</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -218,8 +218,8 @@
     <p class="mis show_mis"><span class="n"><a id="t134" href="#t134">134</a></span><span class="t">        <span class="key">return</span> <span class="nam">fig</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t135" href="#t135">135</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t136" href="#t136">136</a></span><span class="t">    <span class="com"># --- Separate Gram heatmap ---------------------------------------------------</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">    <span class="op">@</span><span class="nam">helper</span><span class="op">.</span><span class="nam">post_mpl_plot</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">    <span class="key">def</span> <span class="nam">plot_gram</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">sample_index</span><span class="op">:</span> <span class="nam">int</span> <span class="op">=</span> <span class="num">0</span><span class="op">)</span> <span class="op">-></span> <span class="nam">plt</span><span class="op">.</span><span class="nam">Figure</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t137" href="#t137">137</a></span><span class="t">    <span class="op">@</span><span class="nam">helper</span><span class="op">.</span><span class="nam">post_mpl_plot</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t138" href="#t138">138</a></span><span class="t">    <span class="key">def</span> <span class="nam">plot_gram</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">sample_index</span><span class="op">:</span> <span class="nam">int</span> <span class="op">=</span> <span class="num">0</span><span class="op">)</span> <span class="op">-></span> <span class="nam">plt</span><span class="op">.</span><span class="nam">Figure</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t139" href="#t139">139</a></span><span class="t">        <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t140" href="#t140">140</a></span><span class="t"><span class="str">        Plot the Gram matrix heatmap for one sample.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t141" href="#t141">141</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -249,8 +249,8 @@
     <p class="pln"><span class="n"><a id="t165" href="#t165">165</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t166" href="#t166">166</a></span><span class="t">        <span class="key">return</span> <span class="nam">figure</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t167" href="#t167">167</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t168" href="#t168">168</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t169" href="#t169">169</a></span><span class="t">    <span class="key">def</span> <span class="nam">_response_matrix_from_centers</span><span class="op">(</span><span class="nam">centers_2d</span><span class="op">:</span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">,</span> <span class="nam">sigma</span><span class="op">:</span> <span class="nam">float</span><span class="op">)</span> <span class="op">-></span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t168" href="#t168">168</a></span><span class="t">    <span class="op">@</span><span class="nam">staticmethod</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t169" href="#t169">169</a></span><span class="t">    <span class="key">def</span> <span class="nam">_response_matrix_from_centers</span><span class="op">(</span><span class="nam">centers_2d</span><span class="op">:</span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">,</span> <span class="nam">sigma</span><span class="op">:</span> <span class="nam">float</span><span class="op">)</span> <span class="op">-></span> <span class="nam">NDArray</span><span class="op">[</span><span class="nam">np</span><span class="op">.</span><span class="nam">float64</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t170" href="#t170">170</a></span><span class="t">        <span class="str">r"""</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t171" href="#t171">171</a></span><span class="t"><span class="str">        Build the batched *response* matrix G for equal-width Gaussian peaks sampled at centers.</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t172" href="#t172">172</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -286,7 +286,7 @@
             <a class="nav" href="z_726542d7dec6cea9_cholesky_solver_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.10.6">coverage.py v7.10.6</a>,
-            created at 2025-09-17 15:06 +0000
+            created at 2025-09-19 12:23 +0000
         </p>
     </div>
 </footer>

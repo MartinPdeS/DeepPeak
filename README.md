@@ -4,23 +4,24 @@
 
 | Name                                                 |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
 |----------------------------------------------------- | -------: | -------: | -------: | -------: | ------: | --------: |
-| DeepPeak/algorithms/base.py                          |       86 |       86 |       20 |        0 |      0% |     1-195 |
-| DeepPeak/algorithms/cholesky\_solver.py              |       30 |       30 |        6 |        0 |      0% |      1-69 |
-| DeepPeak/algorithms/closed\_form\_solver.py          |      184 |      184 |       30 |        0 |      0% |     1-457 |
-| DeepPeak/algorithms/non\_maximum\_suppression.py     |      376 |      376 |       74 |        0 |      0% |     1-934 |
-| DeepPeak/algorithms/zero\_crossing.py                |      221 |      221 |       50 |        0 |      0% |     1-490 |
-| DeepPeak/dataset.py                                  |       35 |       22 |       14 |        0 |     31% |28-30, 34-83 |
+| DeepPeak/algorithms/base.py                          |       86 |       71 |       20 |        0 |     14% |28-32, 51-56, 74-134, 147-166, 190-195 |
+| DeepPeak/algorithms/cholesky\_solver.py              |       30 |       24 |        6 |        0 |     17% |22-28, 46-69 |
+| DeepPeak/algorithms/closed\_form\_solver.py          |      184 |      160 |       30 |        0 |     11% |48-60, 85-92, 103-128, 140, 153-157, 175-197, 220-233, 256-271, 286-308, 321-337, 360-457 |
+| DeepPeak/algorithms/non\_maximum\_suppression.py     |      308 |      234 |       58 |        0 |     20% |55, 59, 63, 74, 100-147, 195, 199, 203, 208, 212-213, 229, 269-331, 343-350, 390-403, 421-479, 497, 527-531, 551, 579-594, 612-614, 642-653, 673-751, 762-772, 783-791, 800-802 |
+| DeepPeak/algorithms/zero\_crossing.py                |      225 |      169 |       54 |        0 |     20% |51, 54, 68-108, 146, 150, 154, 159, 162-163, 189-226, 271-276, 287-335, 360-442, 458-461, 472-476, 487-497 |
+| DeepPeak/dataset.py                                  |       34 |       22 |       14 |        0 |     29% |27-29, 33-82 |
 | DeepPeak/helper.py                                   |       18 |       11 |        4 |        0 |     32% |     33-48 |
+| DeepPeak/kernel.py                                   |      160 |       12 |       24 |        7 |     89% |33, 35, 151, 213, 250, 321, 353, 408-410, 415, 431 |
 | DeepPeak/machine\_learning/classifier/autoencoder.py |       43 |        1 |        4 |        2 |     94% |84->exit, 93 |
 | DeepPeak/machine\_learning/classifier/base.py        |       80 |       28 |       18 |        5 |     60% |27-45, 49-50, 54-55, 59, 63-69, 107, 124-126, 135-136, 205, 211->215, 216-217 |
 | DeepPeak/machine\_learning/classifier/dense.py       |       32 |        1 |        6 |        2 |     92% |62->exit, 71 |
 | DeepPeak/machine\_learning/classifier/metrics.py     |       48 |       12 |        6 |        0 |     67% |18-34, 104 |
 | DeepPeak/machine\_learning/classifier/utils.py       |       38 |       38 |        2 |        0 |      0% |     1-245 |
 | DeepPeak/machine\_learning/classifier/wavenet.py     |       40 |        1 |        6 |        2 |     93% |66->exit, 77 |
-| DeepPeak/signals.py                                  |      132 |       35 |       42 |       12 |     64% |106, 116, 117->120, 145-153, 165->169, 170, 176->184, 203, 209, 225-233, 280, 288->295, 333-345 |
+| DeepPeak/signals.py                                  |       57 |        3 |       14 |        5 |     89% |83, 97->101, 127, 175, 183->190 |
 | DeepPeak/utils.py                                    |       71 |       71 |       14 |        0 |      0% |     1-185 |
 | DeepPeak/visualization.py                            |      202 |      202 |       70 |        0 |      0% |     1-800 |
-|                                            **TOTAL** | **1636** | **1319** |  **366** |   **23** | **17%** |           |
+|                                            **TOTAL** | **1656** | **1060** |  **350** |   **23** | **32%** |           |
 
 
 ## Setup coverage badge
