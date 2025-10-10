@@ -21,7 +21,8 @@ We will:
 import numpy as np
 
 from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
-from DeepPeak.signals import Kernel, SignalDatasetGenerator
+from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak import kernel
 
 np.random.seed(42)
 
@@ -31,14 +32,17 @@ np.random.seed(42)
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
-
-dataset = generator.generate(
-    signal_type=Kernel.GAUSSIAN,
-    n_peaks=(1, NUM_PEAKS),
+kernel = kernel.Lorentzian(
     amplitude=(1, 20),
     position=(0.1, 0.9),
     width=(0.03, 0.05),
+)
+
+generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
+
+dataset = generator.generate(
+    kernel=kernel,
+    n_peaks=(1, NUM_PEAKS),
     noise_std=0.1,
     categorical_peak_count=False,
     compute_region_of_interest=True,
@@ -73,7 +77,7 @@ history = dense_net.fit(
     dataset.signals,
     dataset.region_of_interest,
     validation_split=0.2,
-    epochs=4,
+    epochs=20,
     batch_size=64,
 )
 
@@ -85,4 +89,4 @@ dense_net.plot_model_history(filter_pattern="BinaryIoU")
 # %%
 # Predict and visualize on a test signal
 # --------------------------------------
-dense_net.plot_prediction(signal=dataset.signals[0:1, :], threshold=0.4)
+_ = dense_net.plot_prediction(dataset=dataset, number_of_samples=12, number_of_columns=3, threshold=0.1, randomize_signal=True)

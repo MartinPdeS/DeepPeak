@@ -21,7 +21,9 @@ We will:
 import numpy as np
 
 from DeepPeak.machine_learning.classifier import WaveNet, BinaryIoU
-from DeepPeak.signals import Kernel, SignalDatasetGenerator
+from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak import kernel
+import DeepPeak
 
 np.random.seed(42)
 
@@ -31,56 +33,60 @@ np.random.seed(42)
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
+kernel = DeepPeak.kernel.Gaussian(
+    amplitude=(10, 20),
+    position=(0.1, 0.9),
+    width=(0.04 * 1, 0.05 * 1),
+)
+
+generator = SignalDatasetGenerator(n_samples=1000, sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
-    signal_type=Kernel.GAUSSIAN,
+    kernel=kernel,
     n_peaks=(1, NUM_PEAKS),
-    amplitude=(1, 20),
-    position=(0.1, 0.9),
-    width=(0.03, 0.05),
-    noise_std=0.1,
+    noise_std=0.03,
     categorical_peak_count=False,
     compute_region_of_interest=True,
 )
 
+
 # %%
 # Visualize a few example signals and their regions of interest
 # ------------------------------------------------------------
-dataset.plot(number_of_samples=3)
+_ = dataset.plot(number_of_samples=6, number_of_columns=3)
 
 # %%
 # Build and summarize the WaveNet classifier
 # ------------------------------------------
-dense_net = WaveNet(
+wavenet = WaveNet(
     sequence_length=SEQUENCE_LENGTH,
     num_filters=64,
-    num_dilation_layers=6,
-    kernel_size=3,
+    num_dilation_layers=3,
+    kernel_size=4,
     optimizer="adam",
     loss="binary_crossentropy",
     metrics=["accuracy", BinaryIoU(threshold=0.5)],
 )
-dense_net.build()
-dense_net.summary()
+
+wavenet.build()
 
 # %%
 # Train the classifier
 # --------------------
-history = dense_net.fit(
+history = wavenet.fit(
     dataset.signals,
     dataset.region_of_interest,
     validation_split=0.2,
-    epochs=20,
+    epochs=40,
     batch_size=64,
 )
 
 # %%
 # Plot training history
 # ---------------------
-dense_net.plot_model_history()
+_ = wavenet.plot_model_history()
 
 # %%
 # Predict and visualize on a test signal
 # --------------------------------------
-dense_net.plot_prediction(signal=dataset.signals[0:1, :], threshold=0.4)
+_ = wavenet.plot_prediction(dataset=dataset, number_of_samples=12, number_of_columns=3, threshold=0.1, randomize_signal=True)

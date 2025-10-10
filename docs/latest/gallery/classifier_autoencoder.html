@@ -411,7 +411,6 @@
 <li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="zero_crossing.html">Zero Crossing Peak Detection Example</a></li>
 </ul>
 </div>
 </nav></div>
@@ -494,7 +493,8 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.machine_learning.classifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">Autoencoder</span><span class="p">,</span> <span class="n">BinaryIoU</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">SignalDatasetGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalDatasetGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
@@ -505,14 +505,17 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">200</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
-
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-    <span class="n">signal_type</span><span class="o">=</span><span class="n">Kernel</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">,</span>
-    <span class="n">n_peaks</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NUM_PEAKS</span><span class="p">),</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">Lorentzian</span><span class="p">(</span>
     <span class="n">amplitude</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span>
     <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span>
     <span class="n">width</span><span class="o">=</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
+    <span class="n">n_peaks</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NUM_PEAKS</span><span class="p">),</span>
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">compute_region_of_interest</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -525,7 +528,7 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_classifier_autoencoder_001.png" srcset="../_images/sphx_glr_classifier_autoencoder_001.png" alt="classifier autoencoder" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
+<img src="../_images/sphx_glr_classifier_autoencoder_001.png" srcset="../_images/sphx_glr_classifier_autoencoder_001.png" alt="Predicted ROI (Sample 0), Predicted ROI (Sample 1), Predicted ROI (Sample 2)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
 </pre></div>
 </div>
 </section>
@@ -590,27 +593,132 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">region_of_interest</span><span class="p">,</span>
     <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-    <span class="n">epochs</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
 <span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/4
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0431 - loss: 0.7371
-2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 335ms/step - BinaryIoU: 0.0424 - loss: 0.7210 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6424
-Epoch 2/4
+1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0475 - loss: 0.6877
+Epoch 1: val_loss improved from None to 0.62996, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 361ms/step - BinaryIoU: 0.0458 - loss: 0.6752 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6300
+Epoch 2/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6782
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6720 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6305
-Epoch 3/4
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6150
+Epoch 2: val_loss improved from 0.62996 to 0.60419, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6139 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6042
+Epoch 3/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6407
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6358 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6281
-Epoch 4/4
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5966
+Epoch 3: val_loss improved from 0.60419 to 0.59329, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5975 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5933
+Epoch 4/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6017
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5996 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6178
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5732
+Epoch 4: val_loss improved from 0.59329 to 0.58227, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5681 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5823
+Epoch 5/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5387
+Epoch 5: val_loss improved from 0.58227 to 0.54779, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5373 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5478
+Epoch 6/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5005
+Epoch 6: val_loss improved from 0.54779 to 0.48315, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4950 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.4831
+Epoch 7/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0015 - loss: 0.4553
+Epoch 7: val_loss improved from 0.48315 to 0.41717, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.0012 - loss: 0.4488 - val_BinaryIoU: 0.1484 - val_loss: 0.4172
+Epoch 8/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0110 - loss: 0.4037
+Epoch 8: val_loss improved from 0.41717 to 0.37200, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.0161 - loss: 0.3954 - val_BinaryIoU: 0.5971 - val_loss: 0.3720
+Epoch 9/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.2020 - loss: 0.3136
+Epoch 9: val_loss improved from 0.37200 to 0.28677, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.2267 - loss: 0.3075 - val_BinaryIoU: 0.5141 - val_loss: 0.2868
+Epoch 10/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.2835 - loss: 0.2435
+Epoch 10: val_loss improved from 0.28677 to 0.17883, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.3017 - loss: 0.2323 - val_BinaryIoU: 0.5345 - val_loss: 0.1788
+Epoch 11/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.3174 - loss: 0.1786
+Epoch 11: val_loss improved from 0.17883 to 0.14196, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.3209 - loss: 0.1660 - val_BinaryIoU: 0.4291 - val_loss: 0.1420
+Epoch 12/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.4482 - loss: 0.1250
+Epoch 12: val_loss improved from 0.14196 to 0.12198, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.4486 - loss: 0.1266 - val_BinaryIoU: 0.3794 - val_loss: 0.1220
+Epoch 13/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.4561 - loss: 0.1053
+Epoch 13: val_loss improved from 0.12198 to 0.09085, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.4528 - loss: 0.1062 - val_BinaryIoU: 0.4401 - val_loss: 0.0909
+Epoch 14/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.4478 - loss: 0.1055
+Epoch 14: val_loss improved from 0.09085 to 0.08907, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.4441 - loss: 0.1064 - val_BinaryIoU: 0.4425 - val_loss: 0.0891
+Epoch 15/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.5105 - loss: 0.0823
+Epoch 15: val_loss did not improve from 0.08907
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.5030 - loss: 0.0859 - val_BinaryIoU: 0.4489 - val_loss: 0.0901
+Epoch 16/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.4442 - loss: 0.0976
+Epoch 16: val_loss improved from 0.08907 to 0.08446, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.4312 - loss: 0.0942 - val_BinaryIoU: 0.1514 - val_loss: 0.0845
+Epoch 17/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.3391 - loss: 0.0910
+Epoch 17: val_loss improved from 0.08446 to 0.08088, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.3279 - loss: 0.0913 - val_BinaryIoU: 0.0984 - val_loss: 0.0809
+Epoch 18/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.2049 - loss: 0.0894
+Epoch 18: val_loss improved from 0.08088 to 0.07862, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.2140 - loss: 0.0844 - val_BinaryIoU: 0.1724 - val_loss: 0.0786
+Epoch 19/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.2497 - loss: 0.0811
+Epoch 19: val_loss improved from 0.07862 to 0.07486, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.2497 - loss: 0.0789 - val_BinaryIoU: 0.5426 - val_loss: 0.0749
+Epoch 20/20
+
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.3798 - loss: 0.0837
+Epoch 20: val_loss improved from 0.07486 to 0.07217, saving model to /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
+
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 94ms/step - BinaryIoU: 0.4023 - loss: 0.0814 - val_BinaryIoU: 0.5885 - val_loss: 0.0722
+Restored best model weights from /tmp/wavenet_ckpt_r8xel99f/best.weights.h5
 </pre></div>
 </div>
 </section>
@@ -619,16 +727,16 @@ Epoch 4/4
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_model_history</span><span class="p">(</span><span class="n">filter_pattern</span><span class="o">=</span><span class="s2">&quot;BinaryIoU&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_classifier_autoencoder_002.png" srcset="../_images/sphx_glr_classifier_autoencoder_002.png" alt="BinaryIoU" class = "sphx-glr-single-img"/></section>
+<img src="../_images/sphx_glr_classifier_autoencoder_002.png" srcset="../_images/sphx_glr_classifier_autoencoder_002.png" alt="BinaryIoU" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x300 with 1 Axes&gt;
+</pre></div>
+</div>
+</section>
 <section id="predict-and-visualize-on-a-test-signal">
 <h2>Predict and visualize on a test signal<a class="headerlink" href="#predict-and-visualize-on-a-test-signal" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_prediction</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">_</span> <span class="o">=</span> <span class="n">dense_net</span><span class="o">.</span><span class="n">plot_prediction</span><span class="p">(</span><span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">number_of_columns</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">randomize_signal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_classifier_autoencoder_003.png" srcset="../_images/sphx_glr_classifier_autoencoder_003.png" alt="Predicted Region of Interest" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1200x500 with 1 Axes&gt;
-</pre></div>
-</div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 6.702 seconds)</p>
+<img src="../_images/sphx_glr_classifier_autoencoder_003.png" srcset="../_images/sphx_glr_classifier_autoencoder_003.png" alt="Predicted ROI (Sample 6), Predicted ROI (Sample 80), Predicted ROI (Sample 91), Predicted ROI (Sample 81), Predicted ROI (Sample 82), Predicted ROI (Sample 98), Predicted ROI (Sample 78), Predicted ROI (Sample 73), Predicted ROI (Sample 59), Predicted ROI (Sample 48), Predicted ROI (Sample 75), Predicted ROI (Sample 38)" class = "sphx-glr-single-img"/><p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 11.618 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-autoencoder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/027ad6dec8c2fb9e539fbd7af3497d66/classifier_autoencoder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_autoencoder.ipynb</span></code></a></p>

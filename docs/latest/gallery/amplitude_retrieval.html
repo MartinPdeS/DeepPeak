@@ -411,7 +411,6 @@
 <li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="zero_crossing.html">Zero Crossing Peak Detection Example</a></li>
 </ul>
 </div>
 </nav></div>
@@ -485,21 +484,25 @@ of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">NonMaximumSuppression</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClosedFormSolver</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">Kernel</span><span class="p">,</span> <span class="n">SignalDatasetGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalDatasetGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel</span>
 
 <span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">400</span>
 <span class="n">NSAMPLES</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">gaussian_width</span> <span class="o">=</span> <span class="mf">0.03</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">NSAMPLES</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
-
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
-    <span class="n">signal_type</span><span class="o">=</span><span class="n">Kernel</span><span class="o">.</span><span class="n">GAUSSIAN</span><span class="p">,</span>
-    <span class="n">n_peaks</span><span class="o">=</span><span class="n">NUM_PEAKS</span><span class="p">,</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">Lorentzian</span><span class="p">(</span>
     <span class="n">amplitude</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>  <span class="c1"># Amplitude range</span>
     <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span>  <span class="c1"># Peak position range</span>
     <span class="n">width</span><span class="o">=</span><span class="n">gaussian_width</span><span class="p">,</span>  <span class="c1"># Width range</span>
+<span class="p">)</span>
+
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">NSAMPLES</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
+    <span class="n">n_peaks</span><span class="o">=</span><span class="n">NUM_PEAKS</span><span class="p">,</span>
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>  <span class="c1"># Add some noise</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -507,7 +510,7 @@ the results.</p>
 <span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_amplitude_retrieval_001.png" srcset="../_images/sphx_glr_amplitude_retrieval_001.png" alt="amplitude retrieval" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x1200 with 4 Axes&gt;
+<img src="../_images/sphx_glr_amplitude_retrieval_001.png" srcset="../_images/sphx_glr_amplitude_retrieval_001.png" alt="Predicted ROI (Sample 0), Predicted ROI (Sample 1), Predicted ROI (Sample 2)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>Configure and run the detector</p>
@@ -523,7 +526,7 @@ the results.</p>
 <span class="n">batched_peak_detector</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_amplitude_retrieval_002.png" srcset="../_images/sphx_glr_amplitude_retrieval_002.png" alt="Sample #0 (K=4, detected=3), Sample #1 (K=4, detected=3), Sample #2 (K=4, detected=3), Sample #3 (K=4, detected=4)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 650x1120 with 4 Axes&gt;
+<img src="../_images/sphx_glr_amplitude_retrieval_002.png" srcset="../_images/sphx_glr_amplitude_retrieval_002.png" alt="Sample #0 (K=4, detected=0), Sample #1 (K=4, detected=3), Sample #2 (K=4, detected=3), Sample #3 (K=4, detected=3)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 650x1120 with 4 Axes&gt;
 </pre></div>
 </div>
 <p>Solve for amplitudes</p>
@@ -537,7 +540,7 @@ the results.</p>
 <img src="../_images/sphx_glr_amplitude_retrieval_003.png" srcset="../_images/sphx_glr_amplitude_retrieval_003.png" alt="amplitude retrieval" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x500 with 4 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.644 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.436 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-amplitude-retrieval-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/18c5d7407121c594154c1cc173fa8eaa/amplitude_retrieval.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">amplitude_retrieval.ipynb</span></code></a></p>

@@ -26,28 +26,30 @@ Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset
 of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-34
+.. GENERATED FROM PYTHON SOURCE LINES 10-36
 
 .. code-block:: Python
 
 
     from DeepPeak.algorithms import NonMaximumSuppression
-    from DeepPeak.signals import Kernel, SignalDatasetGenerator
+    from DeepPeak.signals import SignalDatasetGenerator
+    from DeepPeak.kernel import Gaussian
 
     NUM_PEAKS = 3
     SEQUENCE_LENGTH = 400
 
-    gaussian_width = 0.02
-
     generator = SignalDatasetGenerator(n_samples=6, sequence_length=SEQUENCE_LENGTH)
 
-    dataset = generator.generate(
-        signal_type=Kernel.GAUSSIAN,
-        n_peaks=(3, 3),
+    kernel = Gaussian(
         amplitude=(10, 300),  # Amplitude range
         position=(0.3, 0.7),  # Peak position range
-        width=gaussian_width,  # Width range
-        noise_std=2,  # Add some noise
+        width=0.02,
+    )
+
+    dataset = generator.generate(
+        kernel=kernel,
+        n_peaks=(3, 3),
+        noise_std=0,  # Add some noise
         categorical_peak_count=False,
     )
     print(dataset)
@@ -58,7 +60,7 @@ the results.
 
 
 .. image-sg:: /gallery/images/sphx_glr_non_maximum_suppression_001.png
-   :alt: non maximum suppression
+   :alt: Predicted ROI (Sample 0), Predicted ROI (Sample 1), Predicted ROI (Sample 2)
    :srcset: /gallery/images/sphx_glr_non_maximum_suppression_001.png
    :class: sphx-glr-single-img
 
@@ -67,64 +69,81 @@ the results.
 
  .. code-block:: none
 
-    DataSet(signals, labels, amplitudes, positions, widths, x_values, num_peaks, region_of_interest)
+    DataSet(signals, amplitudes, positions, widths, labels, x_values, num_peaks, region_of_interest)
 
-    <Figure size 800x1800 with 6 Axes>
+    <Figure size 800x900 with 3 Axes>
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 35-36
+.. GENERATED FROM PYTHON SOURCE LINES 37-38
 
 Configure and run the detector
 
-.. GENERATED FROM PYTHON SOURCE LINES 36-49
+.. GENERATED FROM PYTHON SOURCE LINES 38-50
 
 .. code-block:: Python
 
     peak_locator = NonMaximumSuppression(
-        gaussian_sigma=0.005,
+        gaussian_sigma=kernel.width,
         threshold="auto",
         maximum_number_of_pulses=5,
-        kernel_truncation_radius_in_sigmas=3,
+        kernel_truncation_radius_in_sigmas=5,
     )
 
 
     result = peak_locator.run(time_samples=dataset.x_values, signal=dataset.signals[0])
-    result.plot()
 
     batch = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
 
 
 
 
+
+
+
+
+.. GENERATED FROM PYTHON SOURCE LINES 51-52
+
+Plot the results
+
+.. GENERATED FROM PYTHON SOURCE LINES 52-54
+
+.. code-block:: Python
+
+    batch.plot_histogram_counts()
+
+
+
+
 .. image-sg:: /gallery/images/sphx_glr_non_maximum_suppression_002.png
-   :alt: Detected peaks: 3
+   :alt: Detected peaks per sample
    :srcset: /gallery/images/sphx_glr_non_maximum_suppression_002.png
    :class: sphx-glr-single-img
 
 
+.. rst-class:: sphx-glr-script-out
+
+ .. code-block:: none
 
 
+    <Figure size 500x340 with 1 Axes>
 
-.. GENERATED FROM PYTHON SOURCE LINES 50-52
 
-Plot the results
-batch.plot_histogram_counts()
-
-.. GENERATED FROM PYTHON SOURCE LINES 54-55
-
-Plot the results
 
 .. GENERATED FROM PYTHON SOURCE LINES 55-56
 
+Plot the results
+
+.. GENERATED FROM PYTHON SOURCE LINES 56-57
+
 .. code-block:: Python
 
-    batch.plot(ncols=3, max_plots=6, ground_truth=dataset.positions)
+    batch.plot(ncols=3, max_plots=6, true_position=dataset.positions, show_kernel=True)
 
 
 
 .. image-sg:: /gallery/images/sphx_glr_non_maximum_suppression_003.png
-   :alt: Sample #0 (K=5, detected=3), Sample #1 (K=5, detected=3), Sample #2 (K=5, detected=3), Sample #3 (K=5, detected=3), Sample #4 (K=5, detected=2), Sample #5 (K=5, detected=3)
+   :alt: Sample #0 (K=5, detected=3), Sample #1 (K=5, detected=2), Sample #2 (K=5, detected=3), Sample #3 (K=5, detected=2), Sample #4 (K=5, detected=2), Sample #5 (K=5, detected=2)
    :srcset: /gallery/images/sphx_glr_non_maximum_suppression_003.png
    :class: sphx-glr-single-img
 
@@ -141,7 +160,7 @@ Plot the results
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.734 seconds)
+   **Total running time of the script:** (0 minutes 1.277 seconds)
 
 
 .. _sphx_glr_download_gallery_non_maximum_suppression.py:
