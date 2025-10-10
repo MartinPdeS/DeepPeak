@@ -10,19 +10,19 @@
 | DeepPeak/algorithms/non\_maximum\_suppression copy.py |      336 |      336 |       66 |        0 |      0% |     1-835 |
 | DeepPeak/algorithms/non\_maximum\_suppression.py      |      336 |      256 |       66 |        0 |     20% |55, 59, 63, 74, 100-147, 195, 199, 203, 208, 212-213, 229, 253-277, 281-282, 286-288, 292-311, 315-317, 321-322, 339-364, 376-383, 423-436, 454-512, 530, 560-564, 584, 612-627, 645-647, 675-686, 706-784, 795-805, 816-824, 833-835 |
 | DeepPeak/algorithms/zero\_crossing.py                 |      225 |      169 |       54 |        0 |     20% |51, 54, 68-108, 146, 150, 154, 159, 162-163, 189-226, 271-276, 287-335, 360-442, 458-461, 472-476, 487-497 |
-| DeepPeak/dataset.py                                   |       34 |       22 |       14 |        0 |     29% |27-29, 33-82 |
-| DeepPeak/helper.py                                    |       18 |       11 |        4 |        0 |     32% |     33-48 |
+| DeepPeak/dataset.py                                   |       41 |       28 |       14 |        0 |     27% |28-30, 52-107 |
+| DeepPeak/helper.py                                    |       18 |       18 |        4 |        0 |      0% |      2-50 |
 | DeepPeak/kernel.py                                    |      160 |       12 |       24 |        7 |     89% |33, 35, 151, 213, 250, 321, 353, 408-410, 415, 431 |
 | DeepPeak/machine\_learning/classifier/autoencoder.py  |       43 |        1 |        4 |        2 |     94% |84->exit, 93 |
-| DeepPeak/machine\_learning/classifier/base.py         |       80 |       28 |       18 |        5 |     60% |27-45, 49-50, 54-55, 59, 63-69, 107, 124-126, 135-136, 205, 211->215, 216-217 |
+| DeepPeak/machine\_learning/classifier/base.py         |      107 |       45 |       30 |        9 |     53% |18-19, 23-24, 28, 32-38, 76, 93-95, 104-105, 149, 152->156, 159->171, 174->178, 201, 207->211, 212-213, 260-314 |
 | DeepPeak/machine\_learning/classifier/dense.py        |       32 |        1 |        6 |        2 |     92% |62->exit, 71 |
 | DeepPeak/machine\_learning/classifier/metrics.py      |       48 |       12 |        6 |        0 |     67% |18-34, 104 |
 | DeepPeak/machine\_learning/classifier/utils.py        |       38 |       38 |        2 |        0 |      0% |     1-245 |
-| DeepPeak/machine\_learning/classifier/wavenet.py      |       40 |        1 |        6 |        2 |     93% |66->exit, 77 |
+| DeepPeak/machine\_learning/classifier/wavenet.py      |      109 |       64 |       32 |        2 |     35% |71->exit, 82, 132-189, 210-276 |
 | DeepPeak/signals.py                                   |       57 |        3 |       14 |        5 |     89% |83, 97->101, 127, 175, 183->190 |
 | DeepPeak/utils.py                                     |       71 |       71 |       14 |        0 |      0% |     1-185 |
 | DeepPeak/visualization.py                             |      202 |      202 |       70 |        0 |      0% |     1-800 |
-|                                             **TOTAL** | **2020** | **1418** |  **424** |   **23** | **26%** |           |
+|                                             **TOTAL** | **2123** | **1511** |  **462** |   **27** | **25%** |           |
 
 
 ## Setup coverage badge
