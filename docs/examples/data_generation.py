@@ -24,7 +24,7 @@ from DeepPeak import kernel
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
-sample_count = 3
+sample_count = 12
 
 generator = SignalDatasetGenerator(n_samples=sample_count, sequence_length=SEQUENCE_LENGTH)
 
@@ -41,4 +41,4 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-dataset.plot()
+dataset.plot(number_of_columns=3, number_of_samples=9)

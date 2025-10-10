@@ -77,7 +77,7 @@ history = dense_net.fit(
     dataset.signals,
     dataset.region_of_interest,
     validation_split=0.2,
-    epochs=4,
+    epochs=20,
     batch_size=64,
 )
 
@@ -89,4 +89,4 @@ dense_net.plot_model_history(filter_pattern="BinaryIoU")
 # %%
 # Predict and visualize on a test signal
 # --------------------------------------
-dense_net.plot_prediction(signal=dataset.signals[0:1, :], threshold=0.4)
+_ = dense_net.plot_prediction(dataset=dataset, number_of_samples=12, number_of_columns=3, threshold=0.1, randomize_signal=True)

@@ -38,7 +38,7 @@ kernel = kernel.Lorentzian(
     width=(0.03, 0.05),
 )
 
-generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
+generator = SignalDatasetGenerator(n_samples=300, sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     kernel=kernel,
@@ -87,4 +87,4 @@ dense_net.plot_model_history()
 # %%
 # Predict and visualize on a test signal
 # --------------------------------------
-dense_net.plot_prediction(signal=dataset.signals[0:1, :], threshold=0.4)
+_ = dense_net.plot_prediction(dataset=dataset, number_of_samples=12, number_of_columns=3, threshold=0.1, randomize_signal=True)

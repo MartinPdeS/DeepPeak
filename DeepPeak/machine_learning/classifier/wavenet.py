@@ -1,7 +1,12 @@
-from typing import Optional, Tuple, Union, Iterable
+from typing import Optional, Tuple, Union
 from dataclasses import dataclass, field
+import tempfile
+import os
+
+
 import tensorflow as tf
 from tensorflow.keras import layers, models  # type: ignore
+from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
 
 from DeepPeak.machine_learning.classifier.base import BaseClassifier
 from DeepPeak.machine_learning.classifier.metrics import BinaryIoU
@@ -114,3 +119,158 @@ class WaveNet(BaseClassifier):
         self.model = models.Model(inputs=inputs, outputs=outputs, name="WaveNetDetector")
         self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=list(self.metrics))
         return self.model
+
+    def save(self, path: str):
+        """
+        Save the WaveNet model, its weights, and training history to a directory.
+
+        Parameters
+        ----------
+        path : str
+            Directory where to save model components.
+        """
+        import os, json
+
+        os.makedirs(path, exist_ok=True)
+
+        # --- JSON-safe serialization helpers ---
+        def serialize_metric(metric):
+            if isinstance(metric, str):
+                return metric
+            if hasattr(metric, "name"):
+                return metric.name
+            if hasattr(metric, "__class__"):
+                return metric.__class__.__name__
+            return str(metric)
+
+        def serialize_loss(loss):
+            if isinstance(loss, str):
+                return loss
+            if hasattr(loss, "__name__"):
+                return loss.__name__
+            if hasattr(loss, "__class__"):
+                return loss.__class__.__name__
+            return str(loss)
+
+        def serialize_optimizer(opt):
+            if isinstance(opt, str):
+                return opt
+            if hasattr(opt, "_name"):
+                return opt._name
+            if hasattr(opt, "__class__"):
+                return opt.__class__.__name__
+            return str(opt)
+
+        # --- Build config dict ---
+        config = {
+            "sequence_length": self.sequence_length,
+            "num_filters": self.num_filters,
+            "num_dilation_layers": self.num_dilation_layers,
+            "kernel_size": self.kernel_size,
+            "optimizer": serialize_optimizer(self.optimizer),
+            "loss": serialize_loss(self.loss),
+            "metrics": [serialize_metric(m) for m in self.metrics],
+            "seed": self.seed,
+        }
+
+        # --- Write config.json ---
+        with open(os.path.join(path, "config.json"), "w") as f:
+            json.dump(config, f, indent=2)
+
+        # --- Save weights ---
+        self.model.save_weights(os.path.join(path, ".weights.h5"))
+
+        # --- Save training history ---
+        history_data = self.history if hasattr(self, "history") else None
+
+        with open(os.path.join(path, "history.json"), "w") as f:
+            json.dump(history_data, f, indent=2)
+
+        print(f"Model saved to {path}")
+
+    @classmethod
+    def load(cls, path: str) -> "WaveNet":
+        """
+        Load a complete WaveNet instance (architecture, weights, and metadata)
+        from a directory or a single .h5/.keras file.
+
+        Parameters
+        ----------
+        path : str
+            Directory or file path where the model was previously saved.
+            - If `.keras` or `.h5`, loads a full Keras model directly.
+            - Otherwise, expects a directory with:
+                config.json, weights.h5, and (optionally) history.json.
+
+        Returns
+        -------
+        WaveNet
+            Fully reconstructed WaveNet instance.
+        """
+        import os
+        import json
+        from tensorflow import keras
+
+        # Case 1 — direct .h5 or .keras model file
+        if os.path.isfile(path) and (path.endswith(".h5") or path.endswith(".keras")):
+            model = keras.models.load_model(path, custom_objects={"BinaryIoU": BinaryIoU})
+            instance = cls(
+                sequence_length=model.input_shape[1],
+                num_filters=model.get_layer("input_projection").filters,
+                num_dilation_layers=len([l for l in model.layers if l.name.startswith("dilated_conv_")]),
+                kernel_size=model.get_layer("dilated_conv_0").kernel_size[0],
+                optimizer=model.optimizer,
+                loss=model.loss,
+                metrics=model.metrics,
+            )
+            instance.model = model
+            print(f"Loaded full model from file: {path}")
+            return instance
+
+        # Case 2 — directory-based save
+        config_path = os.path.join(path, "config.json")
+        weights_path = os.path.join(path, "weights.h5")
+        history_path = os.path.join(path, "history.json")
+
+        if not os.path.exists(config_path):
+            raise FileNotFoundError(f"Missing config.json in {path}")
+
+        # Load config.json
+        with open(config_path, "r") as f:
+            config = json.load(f)
+
+        # Map metric names back to instances
+        metric_map = {
+            "accuracy": "accuracy",
+            "BinaryIoU": BinaryIoU(),
+        }
+        metrics = [metric_map.get(m, m) for m in config["metrics"]]
+
+        # Instantiate model class
+        instance = cls(
+            sequence_length=config["sequence_length"],
+            num_filters=config["num_filters"],
+            num_dilation_layers=config["num_dilation_layers"],
+            kernel_size=config["kernel_size"],
+            optimizer=config["optimizer"],
+            loss=config["loss"],
+            metrics=tuple(metrics),
+            seed=config.get("seed"),
+        )
+
+        # Build Keras model architecture
+        instance.build()
+
+        # Load weights if available
+        if os.path.exists(weights_path):
+            instance.model.load_weights(weights_path)
+            print(f"Weights loaded from {weights_path}")
+
+        # Load history if available
+        if os.path.exists(history_path):
+            with open(history_path, "r") as f:
+                instance.history = json.load(f)
+            print(f"Training history loaded from {history_path}")
+
+        print(f"WaveNet instance fully reconstructed from {path}")
+        return instance
