@@ -196,86 +196,86 @@ Train the classifier
  .. code-block:: none
 
     Epoch 1/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.1511 - loss: 0.7219    3/4 ━━━━━━━━━━━━━━━━━━━━ 0s 25ms/step - accuracy: 0.4614 - loss: 0.6944
-    Epoch 1: val_loss improved from None to 0.60602, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 1s 98ms/step - accuracy: 0.7364 - loss: 0.6592 - val_accuracy: 0.9503 - val_loss: 0.6060
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 2s 896ms/step - accuracy: 0.3691 - loss: 0.7073    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step - accuracy: 0.6455 - loss: 0.6764 
+    Epoch 1: val_loss improved from None to 0.62679, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 1s 87ms/step - accuracy: 0.7956 - loss: 0.6597 - val_accuracy: 0.9503 - val_loss: 0.6268
     Epoch 2/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9520 - loss: 0.6147    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9508 - loss: 0.6096
-    Epoch 2: val_loss improved from 0.60602 to 0.57643, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9502 - loss: 0.6042 - val_accuracy: 0.9503 - val_loss: 0.5764
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9552 - loss: 0.6175    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9523 - loss: 0.6183
+    Epoch 2: val_loss improved from 0.62679 to 0.57569, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9502 - loss: 0.6149 - val_accuracy: 0.9503 - val_loss: 0.5757
     Epoch 3/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9506 - loss: 0.5960    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9501 - loss: 0.5803
-    Epoch 3: val_loss improved from 0.57643 to 0.52512, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9502 - loss: 0.5669 - val_accuracy: 0.9503 - val_loss: 0.5251
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9500 - loss: 0.5817    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step - accuracy: 0.9502 - loss: 0.5747
+    Epoch 3: val_loss improved from 0.57569 to 0.53118, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9502 - loss: 0.5681 - val_accuracy: 0.9503 - val_loss: 0.5312
     Epoch 4/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9549 - loss: 0.5374    3/4 ━━━━━━━━━━━━━━━━━━━━ 0s 27ms/step - accuracy: 0.9524 - loss: 0.5285
-    Epoch 4: val_loss improved from 0.52512 to 0.46661, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 46ms/step - accuracy: 0.9502 - loss: 0.5133 - val_accuracy: 0.9503 - val_loss: 0.4666
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 34ms/step - accuracy: 0.9502 - loss: 0.5396    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step - accuracy: 0.9502 - loss: 0.5287
+    Epoch 4: val_loss improved from 0.53118 to 0.47503, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - accuracy: 0.9502 - loss: 0.5193 - val_accuracy: 0.9503 - val_loss: 0.4750
     Epoch 5/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9474 - loss: 0.4779    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9496 - loss: 0.4620
-    Epoch 5: val_loss improved from 0.46661 to 0.39238, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9505 - loss: 0.4504 - val_accuracy: 0.9513 - val_loss: 0.3924
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 32ms/step - accuracy: 0.9509 - loss: 0.4875    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9515 - loss: 0.4735
+    Epoch 5: val_loss improved from 0.47503 to 0.40408, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9502 - loss: 0.4598 - val_accuracy: 0.9523 - val_loss: 0.4041
     Epoch 6/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9511 - loss: 0.3983    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9525 - loss: 0.3850
-    Epoch 6: val_loss improved from 0.39238 to 0.30514, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9551 - loss: 0.3724 - val_accuracy: 0.9709 - val_loss: 0.3051
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9526 - loss: 0.4141    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9520 - loss: 0.3988
+    Epoch 6: val_loss improved from 0.40408 to 0.32188, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9532 - loss: 0.3845 - val_accuracy: 0.9578 - val_loss: 0.3219
     Epoch 7/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9670 - loss: 0.3068    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9667 - loss: 0.2932
-    Epoch 7: val_loss improved from 0.30514 to 0.20867, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9667 - loss: 0.2800 - val_accuracy: 0.9803 - val_loss: 0.2087
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9555 - loss: 0.3281    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9603 - loss: 0.3143
+    Epoch 7: val_loss improved from 0.32188 to 0.23581, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - accuracy: 0.9655 - loss: 0.3004 - val_accuracy: 0.9741 - val_loss: 0.2358
     Epoch 8/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9765 - loss: 0.2202    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9770 - loss: 0.2038
-    Epoch 8: val_loss improved from 0.20867 to 0.13636, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9766 - loss: 0.1904 - val_accuracy: 0.9808 - val_loss: 0.1364
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9715 - loss: 0.2401    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9714 - loss: 0.2272
+    Epoch 8: val_loss improved from 0.23581 to 0.15631, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9733 - loss: 0.2148 - val_accuracy: 0.9789 - val_loss: 0.1563
     Epoch 9/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9798 - loss: 0.1420    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9777 - loss: 0.1347
-    Epoch 9: val_loss improved from 0.13636 to 0.09080, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9772 - loss: 0.1264 - val_accuracy: 0.9802 - val_loss: 0.0908
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9730 - loss: 0.1671    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9748 - loss: 0.1538
+    Epoch 9: val_loss improved from 0.15631 to 0.10293, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9758 - loss: 0.1426 - val_accuracy: 0.9790 - val_loss: 0.1029
     Epoch 10/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9761 - loss: 0.0989    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9766 - loss: 0.0943
-    Epoch 10: val_loss improved from 0.09080 to 0.06963, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9769 - loss: 0.0894 - val_accuracy: 0.9799 - val_loss: 0.0696
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9767 - loss: 0.1079    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9770 - loss: 0.1018
+    Epoch 10: val_loss improved from 0.10293 to 0.07600, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - accuracy: 0.9766 - loss: 0.0980 - val_accuracy: 0.9793 - val_loss: 0.0760
     Epoch 11/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9752 - loss: 0.0830    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9758 - loss: 0.0780
-    Epoch 11: val_loss improved from 0.06963 to 0.06062, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9762 - loss: 0.0738 - val_accuracy: 0.9798 - val_loss: 0.0606
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 34ms/step - accuracy: 0.9795 - loss: 0.0771    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9780 - loss: 0.0774
+    Epoch 11: val_loss improved from 0.07600 to 0.06351, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9769 - loss: 0.0767 - val_accuracy: 0.9800 - val_loss: 0.0635
     Epoch 12/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9752 - loss: 0.0731    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9763 - loss: 0.0688
-    Epoch 12: val_loss improved from 0.06062 to 0.05846, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9770 - loss: 0.0654 - val_accuracy: 0.9793 - val_loss: 0.0585
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9760 - loss: 0.0735    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step - accuracy: 0.9768 - loss: 0.0693
+    Epoch 12: val_loss improved from 0.06351 to 0.05988, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - accuracy: 0.9771 - loss: 0.0669 - val_accuracy: 0.9791 - val_loss: 0.0599
     Epoch 13/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9742 - loss: 0.0733    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9764 - loss: 0.0657
-    Epoch 13: val_loss improved from 0.05846 to 0.05489, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9773 - loss: 0.0618 - val_accuracy: 0.9804 - val_loss: 0.0549
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9793 - loss: 0.0569    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9787 - loss: 0.0601
+    Epoch 13: val_loss improved from 0.05988 to 0.05379, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9783 - loss: 0.0613 - val_accuracy: 0.9812 - val_loss: 0.0538
     Epoch 14/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9798 - loss: 0.0545    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9781 - loss: 0.0592
-    Epoch 14: val_loss improved from 0.05489 to 0.05439, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9776 - loss: 0.0599 - val_accuracy: 0.9797 - val_loss: 0.0544
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9773 - loss: 0.0579    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9786 - loss: 0.0564
+    Epoch 14: val_loss did not improve from 0.05379
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9787 - loss: 0.0582 - val_accuracy: 0.9803 - val_loss: 0.0539
     Epoch 15/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9771 - loss: 0.0606    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9781 - loss: 0.0585
-    Epoch 15: val_loss improved from 0.05439 to 0.05414, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9782 - loss: 0.0583 - val_accuracy: 0.9793 - val_loss: 0.0541
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9802 - loss: 0.0530    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 21ms/step - accuracy: 0.9789 - loss: 0.0564
+    Epoch 15: val_loss improved from 0.05379 to 0.05074, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9784 - loss: 0.0579 - val_accuracy: 0.9811 - val_loss: 0.0507
     Epoch 16/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9785 - loss: 0.0579    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9783 - loss: 0.0577
-    Epoch 16: val_loss improved from 0.05414 to 0.05123, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9777 - loss: 0.0576 - val_accuracy: 0.9812 - val_loss: 0.0512
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9798 - loss: 0.0557    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9787 - loss: 0.0567
+    Epoch 16: val_loss improved from 0.05074 to 0.04934, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9781 - loss: 0.0582 - val_accuracy: 0.9823 - val_loss: 0.0493
     Epoch 17/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9802 - loss: 0.0540    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9791 - loss: 0.0549
-    Epoch 17: val_loss improved from 0.05123 to 0.05037, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - accuracy: 0.9784 - loss: 0.0562 - val_accuracy: 0.9814 - val_loss: 0.0504
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9820 - loss: 0.0490    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9801 - loss: 0.0552
+    Epoch 17: val_loss did not improve from 0.04934
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 34ms/step - accuracy: 0.9790 - loss: 0.0573 - val_accuracy: 0.9792 - val_loss: 0.0551
     Epoch 18/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9784 - loss: 0.0546    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9790 - loss: 0.0545
-    Epoch 18: val_loss improved from 0.05037 to 0.04901, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9790 - loss: 0.0551 - val_accuracy: 0.9822 - val_loss: 0.0490
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9768 - loss: 0.0584    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9781 - loss: 0.0575
+    Epoch 18: val_loss did not improve from 0.04934
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 34ms/step - accuracy: 0.9791 - loss: 0.0559 - val_accuracy: 0.9800 - val_loss: 0.0529
     Epoch 19/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9755 - loss: 0.0612    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9780 - loss: 0.0567
-    Epoch 19: val_loss improved from 0.04901 to 0.04783, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9794 - loss: 0.0542 - val_accuracy: 0.9825 - val_loss: 0.0478
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9785 - loss: 0.0598    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9792 - loss: 0.0563
+    Epoch 19: val_loss improved from 0.04934 to 0.04735, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - accuracy: 0.9797 - loss: 0.0552 - val_accuracy: 0.9829 - val_loss: 0.0473
     Epoch 20/20
-    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9789 - loss: 0.0606    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9790 - loss: 0.0565
-    Epoch 20: val_loss improved from 0.04783 to 0.04727, saving model to /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
-        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - accuracy: 0.9799 - loss: 0.0533 - val_accuracy: 0.9823 - val_loss: 0.0473
-    Restored best model weights from /tmp/wavenet_ckpt_3_x3qng7/best.weights.h5
+    1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 33ms/step - accuracy: 0.9803 - loss: 0.0495    4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 20ms/step - accuracy: 0.9801 - loss: 0.0526
+    Epoch 20: val_loss improved from 0.04735 to 0.04655, saving model to /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
+        4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9803 - loss: 0.0528 - val_accuracy: 0.9833 - val_loss: 0.0465
+    Restored best model weights from /tmp/wavenet_ckpt_ryynbcb7/best.weights.h5
 
 
 
@@ -334,7 +334,7 @@ Predict and visualize on a test signal
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 9.123 seconds)
+   **Total running time of the script:** (0 minutes 8.108 seconds)
 
 
 .. _sphx_glr_download_gallery_classifier_dense.py:

@@ -100,7 +100,7 @@ Configure and run the detector
 
 
 .. image-sg:: /gallery/images/sphx_glr_amplitude_retrieval_002.png
-   :alt: Sample #0 (K=4, detected=0), Sample #1 (K=4, detected=3), Sample #2 (K=4, detected=3), Sample #3 (K=4, detected=3)
+   :alt: Sample #0 (K=4, detected=1), Sample #1 (K=4, detected=4), Sample #2 (K=4, detected=2), Sample #3 (K=4, detected=4)
    :srcset: /gallery/images/sphx_glr_amplitude_retrieval_002.png
    :class: sphx-glr-single-img
 
@@ -148,7 +148,7 @@ Solve for amplitudes
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.436 seconds)
+   **Total running time of the script:** (0 minutes 1.300 seconds)
 
 
 .. _sphx_glr_download_gallery_amplitude_retrieval.py:
