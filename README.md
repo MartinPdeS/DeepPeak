@@ -2,27 +2,27 @@
 
 [Full report](https://htmlpreview.github.io/?https://github.com/MartinPdeS/DeepPeak/blob/python-coverage-comment-action-data/htmlcov/index.html)
 
-| Name                                                  |    Stmts |     Miss |   Branch |   BrPart |   Cover |   Missing |
-|------------------------------------------------------ | -------: | -------: | -------: | -------: | ------: | --------: |
-| DeepPeak/algorithms/base.py                           |       86 |       71 |       20 |        0 |     14% |28-32, 51-56, 74-134, 147-166, 190-195 |
-| DeepPeak/algorithms/cholesky\_solver.py               |       30 |       24 |        6 |        0 |     17% |22-28, 46-69 |
-| DeepPeak/algorithms/closed\_form\_solver.py           |      184 |      160 |       30 |        0 |     11% |48-60, 85-92, 103-128, 140, 153-157, 175-197, 220-233, 256-271, 286-308, 321-337, 360-457 |
-| DeepPeak/algorithms/non\_maximum\_suppression copy.py |      336 |      336 |       66 |        0 |      0% |     1-835 |
-| DeepPeak/algorithms/non\_maximum\_suppression.py      |      336 |      256 |       66 |        0 |     20% |55, 59, 63, 74, 100-147, 195, 199, 203, 208, 212-213, 229, 253-277, 281-282, 286-288, 292-311, 315-317, 321-322, 339-364, 376-383, 423-436, 454-512, 530, 560-564, 584, 612-627, 645-647, 675-686, 706-784, 795-805, 816-824, 833-835 |
-| DeepPeak/algorithms/zero\_crossing.py                 |      225 |      169 |       54 |        0 |     20% |51, 54, 68-108, 146, 150, 154, 159, 162-163, 189-226, 271-276, 287-335, 360-442, 458-461, 472-476, 487-497 |
-| DeepPeak/dataset.py                                   |       41 |       28 |       14 |        0 |     27% |28-30, 52-107 |
-| DeepPeak/helper.py                                    |       18 |       18 |        4 |        0 |      0% |      2-50 |
-| DeepPeak/kernel.py                                    |      160 |       12 |       24 |        7 |     89% |33, 35, 151, 213, 250, 321, 353, 408-410, 415, 431 |
-| DeepPeak/machine\_learning/classifier/autoencoder.py  |       43 |        1 |        4 |        2 |     94% |84->exit, 93 |
-| DeepPeak/machine\_learning/classifier/base.py         |      107 |       45 |       30 |        9 |     53% |18-19, 23-24, 28, 32-38, 76, 93-95, 104-105, 149, 152->156, 159->171, 174->178, 201, 207->211, 212-213, 260-314 |
-| DeepPeak/machine\_learning/classifier/dense.py        |       32 |        1 |        6 |        2 |     92% |62->exit, 71 |
-| DeepPeak/machine\_learning/classifier/metrics.py      |       48 |       12 |        6 |        0 |     67% |18-34, 104 |
-| DeepPeak/machine\_learning/classifier/utils.py        |       38 |       38 |        2 |        0 |      0% |     1-245 |
-| DeepPeak/machine\_learning/classifier/wavenet.py      |      109 |       64 |       32 |        2 |     35% |71->exit, 82, 132-189, 210-276 |
-| DeepPeak/signals.py                                   |       57 |        3 |       14 |        5 |     89% |83, 97->101, 127, 175, 183->190 |
-| DeepPeak/utils.py                                     |       71 |       71 |       14 |        0 |      0% |     1-185 |
-| DeepPeak/visualization.py                             |      202 |      202 |       70 |        0 |      0% |     1-800 |
-|                                             **TOTAL** | **2123** | **1511** |  **462** |   **27** | **25%** |           |
+| Name                                                  |    Stmts |     Miss |   Branch |   BrPart |      Cover |   Missing |
+|------------------------------------------------------ | -------: | -------: | -------: | -------: | ---------: | --------: |
+| DeepPeak/algorithms/base.py                           |       86 |       71 |       20 |        0 |     14.15% |28-32, 51-56, 74-134, 147-166, 190-195 |
+| DeepPeak/algorithms/cholesky\_solver.py               |       30 |       24 |        6 |        0 |     16.67% |22-28, 46-69 |
+| DeepPeak/algorithms/closed\_form\_solver.py           |      181 |      160 |       30 |        0 |      9.95% |48-60, 85-92, 103-128, 140, 153-157, 175-197, 220-233, 256-271, 286-308, 321-337, 360-457 |
+| DeepPeak/algorithms/non\_maximum\_suppression copy.py |      315 |      315 |       66 |        0 |      0.00% |     1-835 |
+| DeepPeak/algorithms/non\_maximum\_suppression.py      |      315 |      256 |       66 |        0 |     15.49% |55, 59, 63, 74, 100-147, 195, 199, 203, 208, 212-213, 229, 253-277, 281-282, 286-288, 292-311, 315-317, 321-322, 339-364, 376-383, 423-436, 454-512, 530, 560-564, 584, 612-627, 645-647, 675-686, 706-784, 795-805, 816-824, 833-835 |
+| DeepPeak/algorithms/zero\_crossing.py                 |      205 |      169 |       54 |        0 |     13.90% |51, 54, 68-108, 146, 150, 154, 159, 162-163, 189-226, 271-276, 287-335, 360-442, 458-461, 472-476, 487-497 |
+| DeepPeak/dataset.py                                   |       53 |       39 |       20 |        0 |     21.92% |28-30, 36-47, 69-127 |
+| DeepPeak/helper.py                                    |       18 |       18 |        4 |        0 |      0.00% |      2-50 |
+| DeepPeak/kernel.py                                    |      162 |       16 |       24 |        7 |     86.56% |33, 35, 191, 254, 321, 396, 463, 522-526, 531, 549, 579-583 |
+| DeepPeak/machine\_learning/classifier/autoencoder.py  |       42 |        1 |        4 |        2 |     93.48% |84->exit, 93 |
+| DeepPeak/machine\_learning/classifier/base.py         |       82 |       22 |       26 |        9 |     65.74% |18-19, 23-24, 28, 32-38, 76, 95-99, 108-111, 155, 160->164, 167->179, 182->186, 209, 217->221, 222-225 |
+| DeepPeak/machine\_learning/classifier/dense.py        |       31 |        1 |        6 |        2 |     91.89% |62->exit, 71 |
+| DeepPeak/machine\_learning/classifier/metrics.py      |       48 |       12 |        6 |        0 |     66.67% |18-34, 104 |
+| DeepPeak/machine\_learning/classifier/utils.py        |       65 |       54 |        6 |        0 |     15.49% |31-51, 112-135, 185-190, 243-259, 298-362 |
+| DeepPeak/machine\_learning/classifier/wavenet.py      |      108 |       64 |       32 |        2 |     34.29% |71->exit, 82, 132-189, 210-276 |
+| DeepPeak/signals.py                                   |       60 |        3 |       14 |        5 |     89.19% |83, 101->105, 136, 186, 194->201 |
+| DeepPeak/utils.py                                     |       71 |       71 |       14 |        0 |      0.00% |     1-185 |
+| DeepPeak/visualization.py                             |      202 |      202 |       70 |        0 |      0.00% |     1-800 |
+|                                             **TOTAL** | **2074** | **1498** |  **468** |   **27** | **24.51%** |           |
 
 
 ## Setup coverage badge
