@@ -70,7 +70,13 @@ class Gaussian(BaseKernel):
             "widths": self.widths,
         }
 
-    def evaluate(self, x_values: NDArray, n_samples: int, n_peaks: tuple, categorical_peak_count: bool = False) -> np.ndarray:
+    def evaluate(
+        self,
+        x_values: NDArray,
+        n_samples: int,
+        n_peaks: tuple,
+        categorical_peak_count: bool = False,
+    ) -> np.ndarray:
         """
         Evaluate a batch of Gaussian pulses.
         Parameters
@@ -91,8 +97,12 @@ class Gaussian(BaseKernel):
         """
         min_peaks, max_peaks = int(n_peaks[0]), int(n_peaks[1])
 
-        self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
-        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.num_peaks = np.random.randint(
+            low=min_peaks, high=max_peaks + 1, size=n_samples
+        )
+        self.amplitudes = np.random.uniform(
+            *self._amplitude, size=(n_samples, max_peaks)
+        )
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
         self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
@@ -112,9 +122,39 @@ class Gaussian(BaseKernel):
         amp_ = self.amplitudes[..., np.newaxis]
 
         if categorical_peak_count:
-            self.num_peaks = self._one_hot_numpy(self.num_peaks, max_peaks + 1, dtype=np.float32)
+            self.num_peaks = self._one_hot_numpy(
+                self.num_peaks, max_peaks + 1, dtype=np.float32
+            )
 
-        return amp_ * np.exp(-0.5 * ((x_ - pos_) / wid_) ** 2)
+        return self._kernel(x_values=x_, amplitudes=amp_, centers=pos_, widths=wid_)
+
+    def _kernel(
+        self, x_values: NDArray, amplitudes: NDArray, centers: NDArray, widths: NDArray
+    ) -> NDArray:
+        """
+        Compute Gaussian kernel values.
+
+        The Gaussian profile is given by the formula:
+        ... math::
+            G(x; A, x0, \sigma) = A * exp(-0.5 * ((x - x0) / \sigma)^2)
+
+        Parameters
+        ----------
+        x_values : NDArray
+            Input x-values, shape (1, 1, M).
+        amplitudes : NDArray
+            Amplitudes, shape (n_samples, max_peaks, 1).
+        centers : NDArray
+            Centers, shape (n_samples, max_peaks, 1).
+        widths : NDArray
+            Widths (standard deviations), shape (n_samples, max_peaks, 1).
+
+        Returns
+        -------
+        NDArray
+            Evaluated Gaussian values, shape (n_samples, max_peaks, M).
+        """
+        return amplitudes * np.exp(-0.5 * ((x_values - centers) / widths) ** 2)
 
 
 @dataclass
@@ -183,10 +223,14 @@ class Lorentzian(BaseKernel):
         min_peaks, max_peaks = int(n_peaks[0]), int(n_peaks[1])
 
         # Draw per-sample number of peaks
-        self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
+        self.num_peaks = np.random.randint(
+            low=min_peaks, high=max_peaks + 1, size=n_samples
+        )
 
         # Draw parameters (uniform in provided ranges)
-        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.amplitudes = np.random.uniform(
+            *self._amplitude, size=(n_samples, max_peaks)
+        )
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
         self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
@@ -206,13 +250,40 @@ class Lorentzian(BaseKernel):
         gam_ = self.widths[..., np.newaxis]  # $\gamma$ (HWHM)
         amp_ = self.amplitudes[..., np.newaxis]
 
-        # L(x) = A * $\gamma$^2 / ((x - x0)^2 + $\gamma$^2)
-        y = amp_ * (gam_**2 / ((x_ - pos_) ** 2 + gam_**2))
-
         if categorical_peak_count:
-            self.num_peaks = self._one_hot_numpy(self.num_peaks, max_peaks + 1, dtype=np.float32)
+            self.num_peaks = self._one_hot_numpy(
+                self.num_peaks, max_peaks + 1, dtype=np.float32
+            )
 
-        return y
+        return self._kernel(x_values=x_, amplitudes=amp_, centers=pos_, widths=gam_)
+
+    def _kernel(
+        self, x_values: NDArray, amplitudes: NDArray, centers: NDArray, widths: NDArray
+    ) -> NDArray:
+        """
+        Compute Lorentzian kernel values.
+
+        The Lorentzian profile is given by the formula:
+        ... math::
+            L(x; A, x0, \gamma) = A \cdot \frac{\gamma^2}{(x - x0)^2 + \gamma^2}
+
+        Parameters
+        ----------
+        x_values : NDArray
+            Input x-values, shape (1, 1, M).
+        amplitudes : NDArray
+            Amplitudes, shape (n_samples, max_peaks, 1).
+        centers : NDArray
+            Centers, shape (n_samples, max_peaks, 1).
+        widths : NDArray
+            Widths (HWHM), shape (n_samples, max_peaks, 1).
+
+        Returns
+        -------
+        NDArray
+            Evaluated Lorentzian values, shape (n_samples, max_peaks, M).
+        """
+        return amplitudes * (widths**2 / ((x_values - centers) ** 2 + widths**2))
 
 
 @dataclass
@@ -282,10 +353,14 @@ class Square(BaseKernel):
         min_peaks, max_peaks = int(n_peaks[0]), int(n_peaks[1])
 
         # Draw per-sample number of peaks
-        self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
+        self.num_peaks = np.random.randint(
+            low=min_peaks, high=max_peaks + 1, size=n_samples
+        )
 
         # Draw parameters (uniform in provided ranges)
-        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.amplitudes = np.random.uniform(
+            *self._amplitude, size=(n_samples, max_peaks)
+        )
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
         self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
@@ -318,9 +393,44 @@ class Square(BaseKernel):
             y[inactive.repeat(y.shape[-1], axis=-1)] = np.nan
 
         if categorical_peak_count:
-            self.num_peaks = self._one_hot_numpy(self.num_peaks, max_peaks + 1, dtype=np.float32)
+            self.num_peaks = self._one_hot_numpy(
+                self.num_peaks, max_peaks + 1, dtype=np.float32
+            )
 
-        return y
+        return self._kernel(x_values=x_, amplitudes=amp_, centers=pos_, widths=wid_)
+
+    def _kernel(
+        self, x_values: NDArray, amplitudes: NDArray, centers: NDArray, widths: NDArray
+    ) -> NDArray:
+        """
+        Compute square pulse kernel values.
+
+        The square pulse is:
+            S(x; A, x0, w) = A · 1_{x ∈ [x0 - w/2, x0 + w/2]}
+
+        Parameters
+        ----------
+        x_values : NDArray
+            Input x-values, shape (1, 1, M).
+        amplitudes : NDArray
+            Amplitudes, shape (n_samples, max_peaks, 1).
+        centers : NDArray
+            Centers, shape (n_samples, max_peaks, 1).
+        widths : NDArray
+            Widths, shape (n_samples, max_peaks, 1).
+
+        Returns
+        -------
+        NDArray
+            Computed square pulse values, shape (n_samples, max_peaks, M).
+
+        """
+        # Indicator for inclusive interval [x0 - w/2, x0 + w/2]
+        left = centers - 0.5 * widths
+        right = centers + 0.5 * widths
+        rect = ((x_values >= left) & (x_values <= right)).astype(float)
+
+        return amplitudes * rect
 
 
 @dataclass
@@ -385,10 +495,14 @@ class Dirac(BaseKernel):
         min_peaks, max_peaks = int(n_peaks[0]), int(n_peaks[1])
 
         # Draw per-sample number of peaks
-        self.num_peaks = np.random.randint(low=min_peaks, high=max_peaks + 1, size=n_samples)
+        self.num_peaks = np.random.randint(
+            low=min_peaks, high=max_peaks + 1, size=n_samples
+        )
 
         # Draw parameters
-        self.amplitudes = np.random.uniform(*self._amplitude, size=(n_samples, max_peaks))
+        self.amplitudes = np.random.uniform(
+            *self._amplitude, size=(n_samples, max_peaks)
+        )
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
 
         # Keep copy for labels before masking
@@ -406,13 +520,17 @@ class Dirac(BaseKernel):
 
         if M == 0:
             if categorical_peak_count:
-                self.num_peaks = self._one_hot_numpy(self.num_peaks, max_peaks + 1, dtype=np.float32)
+                self.num_peaks = self._one_hot_numpy(
+                    self.num_peaks, max_peaks + 1, dtype=np.float32
+                )
             return y
 
         # Assume uniform, ascending grid
         dx = np.diff(x_values)
         if not (np.all(dx > 0) and np.allclose(dx, dx[0], rtol=1e-6, atol=1e-12)):
-            raise ValueError("Dirac.evaluate expects a uniform, strictly ascending x_values grid.")
+            raise ValueError(
+                "Dirac.evaluate expects a uniform, strictly ascending x_values grid."
+            )
         dt = float(dx[0])
         x0 = float(x_values[0])
 
@@ -428,6 +546,38 @@ class Dirac(BaseKernel):
             y[s, p, :] = row
 
         if categorical_peak_count:
-            self.num_peaks = self._one_hot_numpy(self.num_peaks, max_peaks + 1, dtype=np.float32)
+            self.num_peaks = self._one_hot_numpy(
+                self.num_peaks, max_peaks + 1, dtype=np.float32
+            )
 
         return y
+
+    def _kernel(
+        self, x_values: NDArray, amplitudes: NDArray, centers: NDArray, widths: NDArray
+    ) -> NDArray:
+        """
+        Compute Dirac pulse kernel values.
+
+        Parameters
+        ----------
+        x_values : NDArray
+            Input x-values, shape (1, 1, M).
+        amplitudes : NDArray
+            Amplitudes, shape (n_samples, max_peaks, 1).
+        centers : NDArray
+            Centers, shape (n_samples, max_peaks, 1).
+        widths : NDArray
+            Widths, shape (n_samples, max_peaks, 1). (Unused for Dirac.)
+
+        Returns
+        -------
+        NDArray
+            Computed Dirac pulse values, shape (n_samples, max_peaks, M).
+
+        """
+        # Indicator for inclusive interval [x0 - w/2, x0 + w/2]
+        left = centers - 0.5 * widths
+        right = centers + 0.5 * widths
+        rect = ((x_values >= left) & (x_values <= right)).astype(float)
+
+        return amplitudes * rect

@@ -84,12 +84,16 @@ class SignalDatasetGenerator:
 
         x_values = np.linspace(0.0, 1.0, self.sequence_length)
 
-        signals = kernel.evaluate(x_values, self.n_samples, n_peaks, categorical_peak_count)
+        signals = kernel.evaluate(
+            x_values, self.n_samples, n_peaks, categorical_peak_count
+        )
         signals = np.nansum(signals, axis=1)
 
         # Labels: 1 at discrete peak centers using *original* positions
         labels = np.zeros((self.n_samples, self.sequence_length))
-        peak_positions = (kernel.positions_for_labels * (self.sequence_length - 1)).astype(int)
+        peak_positions = (
+            kernel.positions_for_labels * (self.sequence_length - 1)
+        ).astype(int)
         for i in range(self.n_samples):
             labels[i, peak_positions[i, : kernel.num_peaks[i]]] = 1
 
@@ -107,7 +111,7 @@ class SignalDatasetGenerator:
                 width_in_pixels=roi_width_in_pixels,
             )
 
-        return DataSet(
+        dataset = DataSet(
             signals=signals,
             **kernel.get_kwargs(),
             labels=labels,
@@ -115,6 +119,11 @@ class SignalDatasetGenerator:
             num_peaks=kernel.num_peaks,
             region_of_interest=self.last_rois_,
         )
+
+        dataset.n_samples = self.n_samples
+        dataset.sequence_length = self.sequence_length
+
+        return dataset
 
     # -------------------------- helpers --------------------------
 
@@ -160,7 +169,9 @@ class SignalDatasetGenerator:
 
         # Convert normalized positions -> pixel centers (int), keep shape
         tmp = positions * (sequence_length - 1)  # float, may have NaN/inf
-        centers = np.full_like(tmp, fill_value=-1, dtype=np.int64)  # sentinel for invalid
+        centers = np.full_like(
+            tmp, fill_value=-1, dtype=np.int64
+        )  # sentinel for invalid
         valid_pos = np.isfinite(tmp)
         centers[valid_pos] = np.rint(tmp[valid_pos]).astype(np.int64)
         np.clip(centers, 0, sequence_length - 1, out=centers)

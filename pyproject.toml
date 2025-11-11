@@ -67,36 +67,3 @@ documentation = [
 dev = [
     "flake8 ==7.3.0",
 ]
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-xfail_strict = true
-log_cli_level = "INFO"
-testpaths = [
-    "tests/*",
-]
-addopts = [
-    '-v',
-    '-rA',
-    '-rw',
-    '--cov=DeepPeak',
-    '--cov-report=html',
-    '--cov-report=term'
-]
-
-[tool.coverage.run]
-source = ['DeepPeak']
-omit = [
-    '*/__init__.py',
-    '*/_version.py',
-    '*/directories.py',
-]
-branch = true
-relative_files = true
-
-
-[tool.doc8]
-ignore = ["D001"]
-
-[tool.black]
-line-length = 300

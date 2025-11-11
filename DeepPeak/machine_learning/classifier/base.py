@@ -75,7 +75,9 @@ class BaseClassifier:
             return (p >= float(threshold)).astype(np.float32)
         return p
 
-    def evaluate(self, x: np.ndarray, y: np.ndarray, *, batch_size: int = 32, verbose: int = 0) -> dict:
+    def evaluate(
+        self, x: np.ndarray, y: np.ndarray, *, batch_size: int = 32, verbose: int = 0
+    ) -> dict:
         """
         Evaluate the model; returns a dict of metric -> value.
 
@@ -91,7 +93,9 @@ class BaseClassifier:
             Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch).
         """
         self._ensure_built()
-        results = self.model.evaluate(x, y, batch_size=batch_size, verbose=verbose, return_dict=True)
+        results = self.model.evaluate(
+            x, y, batch_size=batch_size, verbose=verbose, return_dict=True
+        )
         return results
 
     def receptive_field(self) -> int:
@@ -101,7 +105,9 @@ class BaseClassifier:
         For dilation rates d_i = 2^i and kernel size K:
             RF = 1 + sum_i (K - 1) * d_i
         """
-        rf = 1 + sum((self.kernel_size - 1) * (2**i) for i in range(self.num_dilation_layers))
+        rf = 1 + sum(
+            (self.kernel_size - 1) * (2**i) for i in range(self.num_dilation_layers)
+        )
         return rf
 
     def fit(
@@ -146,7 +152,9 @@ class BaseClassifier:
         """
 
         if self.model is None:
-            raise RuntimeError("The model must be built before fitting. Call `build()` first.")
+            raise RuntimeError(
+                "The model must be built before fitting. Call `build()` first."
+            )
 
         # If user didn’t provide a path, use a temporary checkpoint
         if checkpoint_path is None:
@@ -198,7 +206,9 @@ class BaseClassifier:
         hist = self.history
 
         if hist is None:
-            raise ValueError("No history available. Train the model or pass a History/dict to plot.")
+            raise ValueError(
+                "No history available. Train the model or pass a History/dict to plot."
+            )
 
         parameters = list(hist.keys())
 
@@ -209,10 +219,17 @@ class BaseClassifier:
             parameters = [s for s in parameters if pattern.match(s)]
 
         if len(parameters) == 0:
-            print(f"No matching parameters found. List of parameters: {list(hist.keys())}")
+            print(
+                f"No matching parameters found. List of parameters: {list(hist.keys())}"
+            )
             return
 
-        figure, axes = plt.subplots(nrows=len(parameters), ncols=1, figsize=(8, 3 * len(parameters)), squeeze=False)
+        figure, axes = plt.subplots(
+            nrows=len(parameters),
+            ncols=1,
+            figsize=(8, 3 * len(parameters)),
+            squeeze=False,
+        )
 
         for ax, parameter in zip(axes.flatten(), parameters):
             ax.plot(hist[parameter], label=parameter)
@@ -222,93 +239,3 @@ class BaseClassifier:
             ax.set_ylabel(parameter)
 
         return figure
-
-    @helper.post_mpl_plot
-    def plot_prediction(
-        self,
-        dataset,
-        threshold: float,
-        number_of_columns=1,
-        number_of_samples: int = 3,
-        randomize_signal: bool = False,
-        show_prediction_curve: bool = True,
-    ) -> plt.Figure:
-        """
-        Plot the predicted Regions of Interest (ROIs) for several sample signals.
-
-        Parameters
-        ----------
-        dataset : Dataset
-            Dataset object providing `signals` and corresponding `x_values`.
-        threshold : float
-            Probability threshold above which a region is classified as ROI.
-        number_of_samples : int, default=3
-            Number of signals to visualize.
-        randomize_signal : bool, default=False
-            If True, randomly select signals from the dataset instead of taking
-            the first N samples.
-        number_of_columns : int, default=1
-            Number of columns in the subplot grid.
-        show_prediction_curve : bool, default=True
-            If True, overlay the predicted probability curve on the signal plot.
-
-        Returns
-        -------
-        matplotlib.figure.Figure
-            The generated matplotlib Figure instance.
-        """
-        import numpy as np
-        import matplotlib.pyplot as plt
-
-        num_signals = dataset.signals.shape[0]
-        sample_indices = np.random.choice(num_signals, size=number_of_samples, replace=False) if randomize_signal else np.arange(min(number_of_samples, num_signals))
-
-        nrows = int(np.ceil(len(sample_indices) / number_of_columns))
-
-        fig, axes = plt.subplots(
-            nrows=nrows,
-            ncols=number_of_columns,
-            figsize=(8 * number_of_columns, 3 * nrows),
-            squeeze=False,
-        )
-
-        for idx, ax in zip(sample_indices, axes.flatten()):
-            signal = dataset.signals[idx, :]
-            prediction = self.predict(signal[None, :]).squeeze()
-
-            ax.plot(dataset.x_values, signal, color="black", linewidth=1)
-            ax.fill_between(
-                dataset.x_values,
-                0,
-                1,
-                where=prediction > threshold,
-                transform=ax.get_xaxis_transform(),
-                color="lightblue",
-                alpha=0.6,
-                label="Predicted ROI",
-            )
-
-            ax.vlines(
-                x=dataset.positions[idx],
-                ymin=0,
-                ymax=1,
-                color="black",
-                linewidth=1,
-                linestyle="--",
-                label="True Peak",
-                transform=ax.get_xaxis_transform(),
-            )
-
-            if show_prediction_curve:
-                twin_ax = ax.twinx()
-                twin_ax.plot(dataset.x_values, prediction, color="red", linestyle="--", label="Predicted Probability")
-                twin_ax.legend(loc="upper left")
-                twin_ax.set_ylim([0, 1])
-                twin_ax.grid(False, which="both")
-
-            ax.set_title(f"Predicted ROI (Sample {idx})")
-            ax.set_xlabel("Time step")
-            ax.set_ylabel("Amplitude")
-            ax.legend(loc="upper right")
-
-        return fig

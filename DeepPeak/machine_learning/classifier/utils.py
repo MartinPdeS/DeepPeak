@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn.metrics import precision_recall_fscore_support
 from tensorflow.keras import models  # type: ignore
+import matplotlib.pyplot as plt
+from MPSPlots import helper
 
 
 def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -> dict:
@@ -30,7 +32,9 @@ def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -
     true_flat = true_mask.flatten()
 
     # Compute precision, recall, and F1 score.
-    precision, recall, f1, _ = precision_recall_fscore_support(true_flat, pred_flat, average="binary")
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        true_flat, pred_flat, average="binary"
+    )
 
     # Compute Intersection over Union (IoU)
     intersection = np.logical_and(true_flat, pred_flat).sum()
@@ -38,7 +42,11 @@ def compute_segmentation_metrics(pred_mask: np.ndarray, true_mask: np.ndarray) -
     iou = intersection / union if union > 0 else 0.0
 
     # Compute Dice coefficient: (2 * Intersection) / (Total area of both masks)
-    dice = (2 * intersection) / (true_flat.sum() + pred_flat.sum()) if (true_flat.sum() + pred_flat.sum()) > 0 else 0.0
+    dice = (
+        (2 * intersection) / (true_flat.sum() + pred_flat.sum())
+        if (true_flat.sum() + pred_flat.sum()) > 0
+        else 0.0
+    )
 
     return {
         "precision": precision,
@@ -132,7 +140,9 @@ def roi_containment_metric(roi_pred: np.ndarray, roi_gt: np.ndarray) -> dict:
     }
 
 
-def mc_dropout_prediction(model: models.Model, signals: np.ndarray, num_samples: int = 30) -> tuple[np.ndarray, np.ndarray]:
+def mc_dropout_prediction(
+    model: models.Model, signals: np.ndarray, num_samples: int = 30
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Perform Monte Carlo (MC) dropout to estimate the mean and uncertainty of ROI predictions.
 
@@ -172,7 +182,9 @@ def mc_dropout_prediction(model: models.Model, signals: np.ndarray, num_samples:
     >>> print(mean_pred.shape, std_pred.shape)
     (10, 128, 1) (10, 128, 1)
     """
-    predictions = np.array([model(signals, training=True)["ROI"].numpy() for _ in range(num_samples)])
+    predictions = np.array(
+        [model(signals, training=True)["ROI"].numpy() for _ in range(num_samples)]
+    )
     mean_prediction = predictions.mean(axis=0)
     uncertainty = predictions.std(axis=0)
     return mean_prediction, uncertainty
@@ -228,7 +240,9 @@ def filter_predictions(
     >>> print(filtered_mask.shape)
     (5, 128, 1)
     """
-    predictions = np.array([model(signals, training=True)["ROI"].numpy() for _ in range(n_samples)])
+    predictions = np.array(
+        [model(signals, training=True)["ROI"].numpy() for _ in range(n_samples)]
+    )
 
     mean_prediction = predictions.mean(axis=0)
 
@@ -243,3 +257,106 @@ def filter_predictions(
     mean_prediction *= std_mask
 
     return mean_prediction.squeeze(), uncertainty.squeeze()
+
+
+@helper.post_mpl_plot
+def plot_predictions(
+    classifier,
+    signals,
+    positions,
+    x_values,
+    threshold: float,
+    number_of_columns=1,
+    number_of_samples: int = 3,
+    randomize_signal: bool = False,
+    show_prediction_curve: bool = True,
+) -> plt.Figure:
+    """
+    Plot the predicted Regions of Interest (ROIs) for several sample signals.
+
+    Parameters
+    ----------
+    dataset : Dataset
+        Dataset object providing `signals` and corresponding `x_values`.
+    threshold : float
+        Probability threshold above which a region is classified as ROI.
+    number_of_samples : int, default=3
+        Number of signals to visualize.
+    randomize_signal : bool, default=False
+        If True, randomly select signals from the dataset instead of taking
+        the first N samples.
+    number_of_columns : int, default=1
+        Number of columns in the subplot grid.
+    show_prediction_curve : bool, default=True
+        If True, overlay the predicted probability curve on the signal plot.
+
+    Returns
+    -------
+    matplotlib.figure.Figure
+        The generated matplotlib Figure instance.
+    """
+    num_signals = signals.shape[0]
+    sample_indices = (
+        np.random.choice(num_signals, size=number_of_samples, replace=False)
+        if randomize_signal
+        else np.arange(min(number_of_samples, num_signals))
+    )
+
+    nrows = int(np.ceil(len(sample_indices) / number_of_columns))
+
+    fig, axes = plt.subplots(
+        nrows=nrows,
+        ncols=number_of_columns,
+        figsize=(8 * number_of_columns, 3 * nrows),
+        squeeze=False,
+    )
+
+    for idx, ax in zip(sample_indices, axes.flatten()):
+        signal = signals[idx, :]
+        prediction = classifier.predict(signal[None, :]).squeeze()
+
+        ax.plot(x_values, signal, color="black", linewidth=1)
+        ax.fill_between(
+            x_values,
+            0,
+            1,
+            where=prediction > threshold,
+            transform=ax.get_xaxis_transform(),
+            color="lightblue",
+            alpha=0.6,
+            label="Predicted ROI",
+        )
+
+        ax.vlines(
+            x=positions[idx],
+            ymin=0,
+            ymax=1,
+            color="black",
+            linewidth=1,
+            linestyle="--",
+            label="True Peak",
+            transform=ax.get_xaxis_transform(),
+        )
+
+        if show_prediction_curve:
+            twin_ax = ax.twinx()
+            twin_ax.plot(
+                x_values,
+                prediction,
+                color="red",
+                linestyle="--",
+                label="Predicted Probability",
+            )
+            twin_ax.legend(loc="upper left")
+            twin_ax.set_ylim([0, 1])
+            twin_ax.grid(False, which="both")
+
+        ax.set_title(f"Sample {idx}")
+        ax.legend(loc="upper left")
+        twin_ax.legend(loc="upper right")
+
+    fig.suptitle(f"Predicted ROI")
+    fig.supxlabel("Time step [AU]", y=0)
+    fig.supylabel("Signal [AU]", x=0)
+
+    return fig

@@ -29,6 +29,23 @@ class DataSet:
         attributes = ", ".join(f"{key}" for key in self.list_of_attributes)
         return f"{class_name}({attributes})"
 
+    def get_normalized_signal(self, normalization: str = "l1"):
+        """
+        Normalize the signals in the dataset to have values between 0 and 1.
+        """
+        if normalization.lower() == "l1":
+            sum_vals = np.sum(self.signals, axis=1, keepdims=True)
+            return self.signals / (sum_vals + 1e-8)
+        elif normalization.lower() == "l2":
+            norm_vals = np.linalg.norm(self.signals, axis=1, keepdims=True)
+            return self.signals / (norm_vals + 1e-8)
+        elif normalization.lower() == "min-max":
+            min_vals = np.min(self.signals, axis=1, keepdims=True)
+            max_vals = np.max(self.signals, axis=1, keepdims=True)
+            return (self.signals - min_vals) / (max_vals - min_vals + 1e-8)
+        else:
+            raise ValueError(f"Unknown normalization method: {normalization}")
+
     @helper.post_mpl_plot
     def plot(
         self,
@@ -56,7 +73,9 @@ class DataSet:
 
         # Select which samples to display
         if randomize_signal:
-            indices = np.random.choice(sample_count, size=number_of_samples, replace=False)
+            indices = np.random.choice(
+                sample_count, size=number_of_samples, replace=False
+            )
         else:
             indices = np.arange(min(number_of_samples, sample_count))
 
@@ -100,8 +119,9 @@ class DataSet:
                     by_label[l] = h
 
             ax.legend(by_label.values(), by_label.keys())
-            ax.set_xlabel("Time step")
-            ax.set_ylabel("Amplitude")
-            ax.set_title(f"Predicted ROI (Sample {plot_index})")
+            ax.set_title(f"Sample {plot_index}")
+
+        figure.supxlabel("Time step [AU]", y=0)
+        figure.supylabel("Signal [AU]", x=0)
 
         return figure
