@@ -24,7 +24,7 @@ keywords = ["refracive index", "optics", "microbeads", "Mie scattering"]
 
 dependencies = [
     "numpy",
-    'tensorflow=1.0.0',
+    'tensorflow',
     'scikit-learn',
     'MPSPlots',
     # 'PyWavelets',
