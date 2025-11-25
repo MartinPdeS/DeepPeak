@@ -103,7 +103,11 @@ class Gaussian(BaseKernel):
         self.amplitudes = np.random.uniform(
             *self._amplitude, size=(n_samples, max_peaks)
         )
+
+        # interpret user-supplied position range in normalized space [0,1]
+        # map to real x-values
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
+
         self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
         # Keep a copy for label computation prior to NaN-masking
@@ -131,12 +135,12 @@ class Gaussian(BaseKernel):
     def _kernel(
         self, x_values: NDArray, amplitudes: NDArray, centers: NDArray, widths: NDArray
     ) -> NDArray:
-        """
+        r"""
         Compute Gaussian kernel values.
 
         The Gaussian profile is given by the formula:
         ... math::
-            G(x; A, x0, \sigma) = A * exp(-0.5 * ((x - x0) / \sigma)^2)
+            G(x; A, x0, $\sigma$) = A * exp(-0.5 * ((x - x0) / $\sigma$)^2)
 
         Parameters
         ----------
@@ -159,7 +163,7 @@ class Gaussian(BaseKernel):
 
 @dataclass
 class Lorentzian(BaseKernel):
-    """
+    r"""
     Simple Lorentzian pulse model.
 
     Attributes
@@ -175,7 +179,7 @@ class Lorentzian(BaseKernel):
     Notes
     -----
     The Lorentzian profile used is:
-        L(x; A, x0, $\gamma$) = A * $\gamma$^2 / ((x - x0)^2 + $\gamma$^2) = A / (1 + ((x - x0)/$\gamma$)^2)
+        L(x; A, x0, $\gamma$) = A * \gamma^2 / ((x - x0)^2 + $\gamma$^2) = A / (1 + ((x - x0)/$\gamma$)^2)
     """
 
     amplitude: float
@@ -231,7 +235,10 @@ class Lorentzian(BaseKernel):
         self.amplitudes = np.random.uniform(
             *self._amplitude, size=(n_samples, max_peaks)
         )
+        # interpret user-supplied position range in normalized space [0,1]
+        # map to real x-values
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
+
         self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
         # Keep copy for labels before masking
@@ -260,7 +267,7 @@ class Lorentzian(BaseKernel):
     def _kernel(
         self, x_values: NDArray, amplitudes: NDArray, centers: NDArray, widths: NDArray
     ) -> NDArray:
-        """
+        r"""
         Compute Lorentzian kernel values.
 
         The Lorentzian profile is given by the formula:
@@ -361,7 +368,10 @@ class Square(BaseKernel):
         self.amplitudes = np.random.uniform(
             *self._amplitude, size=(n_samples, max_peaks)
         )
+        # interpret user-supplied position range in normalized space [0,1]
+        # map to real x-values
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
+
         self.widths = np.random.uniform(*self._width, size=(n_samples, max_peaks))
 
         # Keep copy for label computation before masking
@@ -503,6 +513,9 @@ class Dirac(BaseKernel):
         self.amplitudes = np.random.uniform(
             *self._amplitude, size=(n_samples, max_peaks)
         )
+
+        # interpret user-supplied position range in normalized space [0,1]
+        # map to real x-values
         self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
 
         # Keep copy for labels before masking
@@ -581,3 +594,150 @@ class Dirac(BaseKernel):
         rect = ((x_values >= left) & (x_values <= right)).astype(float)
 
         return amplitudes * rect
+
+
+@dataclass
+class CustomKernel(BaseKernel):
+    """
+    A pulse model that uses a user supplied kernel shape.
+
+    The kernel is a one dimensional array that defines the pulse shape.
+    The user can place scaled copies of this kernel at random positions,
+    exactly like Gaussian or Lorentzian pulses.
+
+    Attributes
+    ----------
+    kernel : ndarray
+        One dimensional array representing the pulse shape. The array does not
+        need to match the resolution of x_values. Linear interpolation is used.
+    amplitude : float or (low, high)
+        Amplitude range for random sampling.
+    position : float or (low, high)
+        Center position range for the kernel.
+    """
+
+    kernel: NDArray
+    amplitude: float
+    position: float
+
+    def __post_init__(self):
+        if self.kernel.ndim != 1:
+            raise ValueError("kernel must be a one dimensional array")
+
+        self._amplitude = self._ensure_tuple(self.amplitude)
+        self._position = self._ensure_tuple(self.position)
+
+        # Normalize kernel length for later interpolation
+        self.kernel = np.asarray(self.kernel, dtype=float)
+        self.kernel_x = np.linspace(0, 1, self.kernel.size)
+
+    def get_kwargs(self) -> dict:
+        return {
+            "kernel": self.kernel,
+            "amplitudes": self.amplitudes,
+            "positions": self.positions,
+        }
+
+    def evaluate(
+        self,
+        x_values: NDArray,
+        n_samples: int,
+        n_peaks: tuple,
+        categorical_peak_count: bool = False,
+    ) -> NDArray:
+        """
+        Evaluate the custom kernel at random positions and amplitudes.
+
+        The output has shape (n_samples, max_peaks, M)
+        where M = len(x_values).
+        """
+        min_peaks, max_peaks = int(n_peaks[0]), int(n_peaks[1])
+        M = x_values.size
+
+        # Draw number of peaks per sample
+        self.num_peaks = np.random.randint(
+            low=min_peaks, high=max_peaks + 1, size=n_samples
+        )
+
+        # Draw random amplitudes and positions
+        self.amplitudes = np.random.uniform(
+            *self._amplitude, size=(n_samples, max_peaks)
+        )
+        self.positions = np.random.uniform(*self._position, size=(n_samples, max_peaks))
+
+        # Keep original unmasked positions for labels
+        self.positions_for_labels = self.positions.copy()
+
+        # Mask inactive peaks
+        peak_indices = np.arange(max_peaks)
+        active_mask = peak_indices < self.num_peaks[:, None]
+        self.amplitudes[~active_mask] = np.nan
+        self.positions[~active_mask] = np.nan
+
+        # Broadcast arrays
+        x_ = x_values.reshape(1, 1, M)
+        pos_ = self.positions[..., np.newaxis]  # (n_samples, max_peaks, 1)
+        amp_ = self.amplitudes[..., np.newaxis]  # (n_samples, max_peaks, 1)
+
+        # Evaluate the kernel
+        y = self._kernel(x_values=x_, amplitudes=amp_, centers=pos_)
+
+        if categorical_peak_count:
+            self.num_peaks = self._one_hot_numpy(
+                self.num_peaks, max_peaks + 1, dtype=np.float32
+            )
+
+        return y
+
+    def _kernel(
+        self,
+        x_values: NDArray,
+        amplitudes: NDArray,
+        centers: NDArray,
+    ) -> NDArray:
+        """
+        Evaluate the user kernel at each center without truncation.
+
+        The kernel is defined on self.kernel_x which spans [0, 1].
+        We stretch this interval to match the actual kernel width in x_values.
+        """
+        n_samples, max_peaks = amplitudes.shape[0], amplitudes.shape[1]
+        M = x_values.shape[-1]
+
+        # True kernel support in x coordinates
+        # Kernel width equals the median dx times kernel length
+        # This preserves your recovered kernel exactly
+        x_grid = x_values[0, 0, :]
+        dx = float(np.median(np.diff(x_grid)))
+        kernel_width = dx * self.kernel.size
+
+        # Kernel coordinate in real x-space
+        kernel_support_x = np.linspace(
+            -0.5 * kernel_width, 0.5 * kernel_width, self.kernel.size
+        )
+
+        # Output
+        y = np.zeros((n_samples, max_peaks, M), dtype=float)
+
+        for i in range(n_samples):
+            for j in range(max_peaks):
+
+                A = amplitudes[i, j, 0]
+                x0 = centers[i, j, 0]
+
+                # Inactive peaks
+                if np.isnan(A) or np.isnan(x0):
+                    y[i, j, :] = np.nan
+                    continue
+
+                # Shift kernel to center x0
+                shifted_support = kernel_support_x + x0
+
+                # Interpolate without truncation
+                vals = np.interp(
+                    x_grid, shifted_support, self.kernel, left=0.0, right=0.0
+                )
+
+                y[i, j, :] = A * vals
+
+        return y

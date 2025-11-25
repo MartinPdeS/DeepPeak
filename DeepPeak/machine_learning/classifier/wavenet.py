@@ -65,7 +65,9 @@ class WaveNet(BaseClassifier):
 
     # filled after build()
     model: tf.keras.Model = field(init=False, repr=False, default=None)
-    history_: Optional[tf.keras.callbacks.History] = field(init=False, repr=False, default=None)
+    history_: Optional[tf.keras.callbacks.History] = field(
+        init=False, repr=False, default=None
+    )
 
     def __post_init__(self):
         if not isinstance(self.metrics, (tuple, list)):
@@ -81,10 +83,12 @@ class WaveNet(BaseClassifier):
         if self.seed is not None:
             tf.keras.utils.set_random_seed(self.seed)
 
-        inputs = layers.Input(shape=(self.sequence_length, 1), name="input")
+        inputs = layers.Input(shape=(None, 1), name="input")
 
         # Project input to the working channel dimension for residual additions
-        x = layers.Conv1D(self.num_filters, 1, padding="same", name="input_projection")(inputs)
+        x = layers.Conv1D(self.num_filters, 1, padding="same", name="input_projection")(
+            inputs
+        )
 
         skip_paths = []
 
@@ -106,7 +110,9 @@ class WaveNet(BaseClassifier):
             x = layers.Add(name=f"residual_add_{i}")([x, res])
 
             # Skip path (1x1) from the block output
-            skip = layers.Conv1D(self.num_filters, 1, padding="same", name=f"skip_{i}")(x)
+            skip = layers.Conv1D(self.num_filters, 1, padding="same", name=f"skip_{i}")(
+                x
+            )
             skip_paths.append(skip)
 
         # Aggregate all skip connections
@@ -116,8 +122,12 @@ class WaveNet(BaseClassifier):
         # Final per-timestep probability (peak / no-peak)
         outputs = layers.Conv1D(1, 1, activation="sigmoid", name="output")(s)
 
-        self.model = models.Model(inputs=inputs, outputs=outputs, name="WaveNetDetector")
-        self.model.compile(optimizer=self.optimizer, loss=self.loss, metrics=list(self.metrics))
+        self.model = models.Model(
+            inputs=inputs, outputs=outputs, name="WaveNetDetector"
+        )
+        self.model.compile(
+            optimizer=self.optimizer, loss=self.loss, metrics=list(self.metrics)
+        )
         return self.model
 
     def save(self, path: str):
@@ -213,11 +223,15 @@ class WaveNet(BaseClassifier):
 
         # Case 1 — direct .h5 or .keras model file
         if os.path.isfile(path) and (path.endswith(".h5") or path.endswith(".keras")):
-            model = keras.models.load_model(path, custom_objects={"BinaryIoU": BinaryIoU})
+            model = keras.models.load_model(
+                path, custom_objects={"BinaryIoU": BinaryIoU}
+            )
             instance = cls(
                 sequence_length=model.input_shape[1],
                 num_filters=model.get_layer("input_projection").filters,
-                num_dilation_layers=len([l for l in model.layers if l.name.startswith("dilated_conv_")]),
+                num_dilation_layers=len(
+                    [l for l in model.layers if l.name.startswith("dilated_conv_")]
+                ),
                 kernel_size=model.get_layer("dilated_conv_0").kernel_size[0],
                 optimizer=model.optimizer,
                 loss=model.loss,
@@ -229,7 +243,7 @@ class WaveNet(BaseClassifier):
 
         # Case 2 — directory-based save
         config_path = os.path.join(path, "config.json")
-        weights_path = os.path.join(path, "weights.h5")
+        weights_path = os.path.join(path, ".weights.h5")
         history_path = os.path.join(path, "history.json")
 
         if not os.path.exists(config_path):

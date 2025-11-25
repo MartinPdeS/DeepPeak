@@ -125,3 +125,135 @@ class DataSet:
         figure.supylabel("Signal [AU]", x=0)
 
         return figure
+
+    def low_pass(
+        self,
+        cutoff_fraction: float = 0.2,
+        method: str = "fft",  # "fft" or "moving_average"
+        window_size: int | None = None,  # used when method == "moving_average"
+        inplace: bool = False,
+    ):
+        """
+        Low pass filter the dataset signals.
+
+        Parameters
+        ----------
+        cutoff_fraction : float
+            Fraction of the Nyquist frequency to keep (0 < cutoff_fraction < 0.5).
+            Used when method == "fft".
+        method : {"fft", "moving_average"}
+            "fft": zero out high frequency bins in rFFT.
+            "moving_average": simple boxcar smoothing over window_size samples.
+        window_size : int or None
+            Length of the moving average window when method == "moving_average".
+            If None, defaults to max(3, L//100).
+        inplace : bool
+            If True, overwrite self.signals with the filtered version.
+            If False, return a new filtered array.
+
+        Returns
+        -------
+        np.ndarray
+            The filtered signals (also written to self.signals if inplace=True).
+        """
+        import numpy as np
+
+        signals = np.asarray(self.signals, dtype=float)
+        if signals.ndim != 2:
+            raise ValueError("signals must be a 2D array of shape (N, L)")
+
+        N, L = signals.shape
+
+        # check that x_values is evenly spaced if using FFT
+        if method == "fft":
+            dx = np.diff(self.x_values)
+            if not np.allclose(dx, dx[0], rtol=1e-3, atol=1e-9):
+                raise ValueError("x_values must be evenly spaced for FFT low pass")
+
+            if not (0.0 < cutoff_fraction < 0.5):
+                raise ValueError("cutoff_fraction must be in (0, 0.5)")
+
+            # rFFT bins: indices 0..K where K=L//2
+            K = L // 2
+            k_cut = int(np.floor(cutoff_fraction * K))
+            if k_cut < 1:
+                k_cut = 1
+
+            filtered = np.empty_like(signals)
+            for i in range(N):
+                spec = np.fft.rfft(signals[i])
+                spec[k_cut + 1 :] = 0.0
+                filtered[i] = np.fft.irfft(spec, n=L)
+
+        elif method == "moving_average":
+            if window_size is None:
+                window_size = max(3, L // 100)
+            window_size = int(window_size)
+            if window_size < 1:
+                window_size = 1
+            # simple symmetric boxcar with reflection at edges
+            kernel = np.ones(window_size, dtype=float) / float(window_size)
+            pad = window_size // 2
+            filtered = np.empty_like(signals)
+            for i in range(N):
+                x = signals[i]
+                xpad = np.pad(x, pad_width=pad, mode="reflect")
+                filtered[i] = np.convolve(xpad, kernel, mode="valid")
+                # ensure length L (valid yields L when pad == window//2)
+                if filtered[i].shape[0] != L:
+                    filtered[i] = filtered[i][:L]
+        else:
+            raise ValueError("method must be 'fft' or 'moving_average'")
+
+        if inplace:
+            self.signals = filtered
+        return filtered
+
+    def compute_region_of_interest(
+        self,
+        width_in_pixels: int = 4,
+    ) -> np.ndarray:
+        """
+        ROI builder robust to any x sampling grid.
+        Positions are already in real x coordinates.
+
+        Parameters
+        ----------
+        dataset : DataSet
+            Dataset to which to add the region_of_interest attribute.
+        width_in_pixels : int
+            Full width (in samples) of ROI around each peak center.
+        """
+        n_samples, sequence_length = self.signals.shape
+
+        # Map true x positions -> nearest index
+        diff = np.abs(self.positions[..., None] - self.x_values[None, None, :])
+        centers = diff.argmin(axis=-1).astype(np.int64)
+
+        np.clip(centers, 0, sequence_length - 1, out=centers)
+
+        # Valid peaks = finite position and finite amplitude
+        valid_pos = np.isfinite(self.positions)
+        valid_amp = np.isfinite(self.amplitudes) & (self.amplitudes != 0)
+        valid = valid_pos & valid_amp
+
+        w = int(width_in_pixels)
+        if w < 0:
+            raise ValueError("width_in_pixels must be non-negative")
+        half = w // 2
+
+        starts = np.clip(centers - half, 0, sequence_length)
+        ends = np.clip(centers + half + 1, 0, sequence_length)
+
+        diff = np.zeros((n_samples, sequence_length + 1), dtype=np.int32)
+
+        ii, jj = np.nonzero(valid)
+        if ii.size > 0:
+            np.add.at(diff, (ii, starts[ii, jj]), 1)
+            np.add.at(diff, (ii, ends[ii, jj]), -1)
+
+        rois = (np.cumsum(diff[:, :sequence_length], axis=1) > 0).astype(np.int32)
+
+        self.region_of_interest = rois
+
+        return self

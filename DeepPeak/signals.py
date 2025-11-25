@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 import numpy as np
 
 from DeepPeak.dataset import DataSet  # type: ignore
@@ -22,111 +22,150 @@ class SignalDatasetGenerator:
     # --- public attributes updated on each generate() call ---
     last_rois_: Optional[np.ndarray] = None
 
-    def __init__(self, n_samples: int, sequence_length: int) -> None:
+    def __init__(
+        self, sequence_length: int, x_values: Optional[np.ndarray] = None
+    ) -> None:
         """
         Initialize the signal dataset generator.
 
         Parameters
         ----------
-        n_samples : int
-            Number of signals (rows) to generate.
         sequence_length : int
             Length of each signal (columns).
+        x_values : array-like, optional
+            Grid on which signals are evaluated. Defaults to [0, 1].
         """
-        self.n_samples = n_samples
         self.sequence_length = sequence_length
+
+        # Default x-grid
+        self.x_values = (
+            x_values if x_values is not None else np.arange(self.sequence_length)
+        )
+
+        assert (
+            self.x_values.ndim == 1 and len(self.x_values) == self.sequence_length
+        ), f"x_values must be a 1D array of length sequence_length [{self.sequence_length}] got shape {self.x_values.shape}"
 
     # -------------------------- public API --------------------------
 
     def generate(
         self,
         *,
+        n_samples: int,
         n_peaks: Tuple[int, int] | int,
         kernel: BaseKernel,
         seed: Optional[int] = None,
-        noise_std: Optional[float] = None,
+        noise_std: Optional[Union[float, Tuple[float, float]]] = None,
+        drift: Optional[Union[float, Tuple[float, float]]] = None,
         categorical_peak_count: bool = False,
-        compute_region_of_interest: bool = False,
         roi_width_in_pixels: int = 4,
     ) -> DataSet:
         """
-        Generate a dataset of 1D signals with varying number of peaks.
+        Generate a dataset of parametric peak signals.
 
         Parameters
         ----------
-        n_peaks : (int,int) or int
-            (min_peaks, max_peaks) inclusive; if int, uses (v, v).
-        kernel : Kernel
-            Peak shape type (Kernel).
+        n_samples : int
+            Number of signals (rows) to generate.
+        n_peaks : int or (int, int)
+            Either a fixed number of peaks or a range (min, max).
+        kernel : BaseKernel
+            A kernel instance describing peak shape and parameter sampling.
         seed : int, optional
-            RNG seed.
-        noise_std : Optional[float]
-            Additive Gaussian noise std.
+            RNG seed for reproducibility.
+        noise_std : float or (float, float), optional
+            Gaussian noise standard deviation.
+            - scalar: fixed noise level for all samples
+            - tuple: random level drawn uniformly per sample
+        drift : float or (float, float), optional
+            Linear baseline drift slope added per sample.
+            - scalar: fixed slope
+            - tuple: random slope drawn uniformly per sample
         categorical_peak_count : bool
-            If True, return one-hot encoding of peak counts (NumPy-based).
-        convolution_kernel : np.ndarray, optional
-            Convolution kernel used only for DIRAC.
-        compute_region_of_interest : bool
-            If True, compute an ROI mask around each discrete peak (stored in `last_rois_`).
-        roi_width_in_pixels : int
-            ROI full width in samples (integer), used when `compute_region_of_interest=True`.
+            If True, return one hot encoded peak-counts from kernel.
 
         Returns
         -------
         DataSet
-            Object with fields: signals, labels, amplitudes, positions, widths, x_values, num_peaks.
+            Structured dataset containing:
+            - signals
+            - labels (peak locations)
+            - amplitudes, positions, widths from the kernel
+            - x_values
+            - num_peaks
+            - region_of_interest (if computed)
         """
-        # coerce scalars to (v, v)
+        self.n_samples = n_samples
+
+        # Resolve peak count boundaries
         n_peaks = self._ensure_tuple(n_peaks)
+        noise_std = self._ensure_tuple(noise_std) if noise_std is not None else None
+        drift = self._ensure_tuple(drift) if drift is not None else None
+        print(drift)
 
         if seed is not None:
             np.random.seed(seed)
 
-        x_values = np.linspace(0.0, 1.0, self.sequence_length)
-
-        signals = kernel.evaluate(
-            x_values, self.n_samples, n_peaks, categorical_peak_count
+        # --------------------------------------------------------------
+        # 1. Generate raw peak components
+        # --------------------------------------------------------------
+        peak_components = kernel.evaluate(
+            self.x_values, self.n_samples, n_peaks, categorical_peak_count
         )
-        signals = np.nansum(signals, axis=1)
+        signals = np.nansum(peak_components, axis=1)  # shape: (n_samples, seq_len)
 
-        # Labels: 1 at discrete peak centers using *original* positions
+        # --------------------------------------------------------------
+        # 2. Generate labels using original (unmasked) peak positions
+        # --------------------------------------------------------------
         labels = np.zeros((self.n_samples, self.sequence_length))
-        peak_positions = (
-            kernel.positions_for_labels * (self.sequence_length - 1)
-        ).astype(int)
+
+        true_positions = kernel.positions_for_labels  # real x-values
+
+        diff = np.abs(true_positions[..., None] - self.x_values[None, None, :])
+        peak_indices = diff.argmin(axis=-1)
+        peak_indices = np.clip(peak_indices, 0, self.sequence_length - 1)
+
         for i in range(self.n_samples):
-            labels[i, peak_positions[i, : kernel.num_peaks[i]]] = 1
+            labels[i, peak_indices[i, : kernel.num_peaks[i]]] = 1
 
-        # Add noise
+        # --------------------------------------------------------------
+        # 3. Add Gaussian noise (optional)
+        # --------------------------------------------------------------
         if noise_std is not None:
-            signals = signals + np.random.normal(0.0, noise_std, signals.shape)
-
-        # Optional ROI
-        self.last_rois_ = None
-        if compute_region_of_interest:
-            self.last_rois_ = self._compute_rois_from_signals(
-                signals=signals,
-                positions=kernel.positions,
-                amplitudes=kernel.amplitudes,
-                width_in_pixels=roi_width_in_pixels,
+            noise_levels = np.random.uniform(
+                noise_std[0], noise_std[1], size=(self.n_samples, 1)
             )
 
+            noise = np.random.normal(0.0, 1.0, size=signals.shape) * noise_levels
+            signals = signals + noise
+
+        # --------------------------------------------------------------
+        # 4. Add drift (optional)
+        # --------------------------------------------------------------
+        if drift is not None:
+            drift_levels = np.random.uniform(
+                drift[0], drift[1], size=(self.n_samples, 1)
+            )
+
+            baseline = drift_levels * np.linspace(0, 1, self.sequence_length)
+            signals = signals + baseline
+
+        # --------------------------------------------------------------
+        # 5. Wrap into DataSet structure
+        # --------------------------------------------------------------
         dataset = DataSet(
             signals=signals,
             **kernel.get_kwargs(),
             labels=labels,
-            x_values=x_values,
+            x_values=self.x_values,
             num_peaks=kernel.num_peaks,
-            region_of_interest=self.last_rois_,
         )
 
         dataset.n_samples = self.n_samples
         dataset.sequence_length = self.sequence_length
-
         return dataset
 
     # -------------------------- helpers --------------------------
-
     @staticmethod
     def _ensure_tuple(
         value: Tuple[float, float] | float | Tuple[int, int] | int,
@@ -135,68 +174,3 @@ class SignalDatasetGenerator:
         if isinstance(value, (int, float)):
             return (value, value)  # type: ignore[return-value]
         return value  # type: ignore[return-value]
-
-    @staticmethod
-    def _compute_rois_from_signals(
-        signals: np.ndarray,
-        positions: np.ndarray,
-        amplitudes: np.ndarray,
-        width_in_pixels: int,
-    ) -> np.ndarray:
-        """
-        Vectorized ROI builder: marks ±(width_in_pixels//2) around each valid peak center.
-        - No Python loops over samples/peaks.
-        - Handles NaNs in positions/amplitudes.
-
-        Parameters
-        ----------
-        signals: np.ndarray
-            The input signals.
-        positions: np.ndarray
-            The positions of the peaks.
-        amplitudes: np.ndarray
-            The amplitudes of the peaks.
-        width_in_pixels: int
-            The width of the ROI in pixels.
-
-        Returns
-        -------
-        np.ndarray
-            The computed ROIs.
-        """
-        n_samples, sequence_length = signals.shape
-        assert positions.shape[0] == n_samples and amplitudes.shape == positions.shape
-
-        # Convert normalized positions -> pixel centers (int), keep shape
-        tmp = positions * (sequence_length - 1)  # float, may have NaN/inf
-        centers = np.full_like(
-            tmp, fill_value=-1, dtype=np.int64
-        )  # sentinel for invalid
-        valid_pos = np.isfinite(tmp)
-        centers[valid_pos] = np.rint(tmp[valid_pos]).astype(np.int64)
-        np.clip(centers, 0, sequence_length - 1, out=centers)
-
-        # Valid peaks must also have finite, non-zero amplitude
-        valid_amp = np.isfinite(amplitudes) & (amplitudes != 0)
-        valid = valid_pos & valid_amp
-
-        # Interval [start, end) per peak, clipped to bounds
-        w = int(width_in_pixels)
-        if w < 0:
-            raise ValueError("width_in_pixels must be non-negative")
-        half = w // 2
-        starts = np.clip(centers - half, 0, sequence_length)
-        ends = np.clip(centers + half + 1, 0, sequence_length)  # +1 for inclusive end
-
-        # Difference array per sample: add +1 at start, -1 at end
-        diff = np.zeros((n_samples, sequence_length + 1), dtype=np.int32)
-        ii, jj = np.nonzero(valid)  # indices of valid (sample, peak) pairs
-        if ii.size:
-            s = starts[ii, jj]
-            e = ends[ii, jj]
-            np.add.at(diff, (ii, s), 1)
-            np.add.at(diff, (ii, e), -1)
-
-        # Cumulative sum -> coverage counts; binarize
-        rois = (np.cumsum(diff[:, :sequence_length], axis=1) > 0).astype(np.int32)
-        return rois

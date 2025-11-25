@@ -136,7 +136,9 @@ def test_kernel_categorical_peak_count_one_hot():
     n_peaks = (0, 3)
 
     ker = Gaussian(amplitude=(1, 2), position=(0.1, 0.9), width=(0.02, 0.03))
-    _ = ker.evaluate(x_values=x, n_samples=n_samples, n_peaks=n_peaks, categorical_peak_count=True)
+    _ = ker.evaluate(
+        x_values=x, n_samples=n_samples, n_peaks=n_peaks, categorical_peak_count=True
+    )
 
     assert hasattr(ker, "num_peaks")
     num_peaks = ker.num_peaks
@@ -160,8 +162,12 @@ def test_gaussian_center_value_matches_amplitude():
     amp = 123.0
     sigma = 0.03
 
-    ker = Gaussian(amplitude=(amp, amp), position=(pos_exact, pos_exact), width=(sigma, sigma))
-    Y = ker.evaluate(x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False)
+    ker = Gaussian(
+        amplitude=(amp, amp), position=(pos_exact, pos_exact), width=(sigma, sigma)
+    )
+    Y = ker.evaluate(
+        x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False
+    )
     y = Y[0, 0]  # (N,)
     assert np.isfinite(y[idx])
     assert y[idx] == pytest.approx(amp, rel=1e-12, abs=1e-12)
@@ -177,8 +183,12 @@ def test_lorentzian_center_value_matches_amplitude():
     amp = 77.0
     gamma = 0.02
 
-    ker = Lorentzian(amplitude=(amp, amp), position=(pos_exact, pos_exact), width=(gamma, gamma))
-    Y = ker.evaluate(x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False)
+    ker = Lorentzian(
+        amplitude=(amp, amp), position=(pos_exact, pos_exact), width=(gamma, gamma)
+    )
+    Y = ker.evaluate(
+        x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False
+    )
     y = Y[0, 0]
     assert y[idx] == pytest.approx(amp, rel=1e-12, abs=1e-12)
 
@@ -194,8 +204,12 @@ def test_square_area_and_edges_inclusive():
     amp = 5.0
     width = 0.1  # should cover about width/DT samples
 
-    ker = Square(amplitude=(amp, amp), position=(pos_exact, pos_exact), width=(width, width))
-    Y = ker.evaluate(x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False)
+    ker = Square(
+        amplitude=(amp, amp), position=(pos_exact, pos_exact), width=(width, width)
+    )
+    Y = ker.evaluate(
+        x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False
+    )
     y = Y[0, 0]
 
     left = pos_exact - 0.5 * width
@@ -219,12 +233,16 @@ def test_dirac_impulse_placed_at_nearest_sample_on_uniform_grid():
     amp = 42.0
 
     ker = Dirac(amplitude=(amp, amp), position=(mid_pos, mid_pos))
-    Y = ker.evaluate(x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False)
+    Y = ker.evaluate(
+        x_values=x, n_samples=1, n_peaks=(1, 1), categorical_peak_count=False
+    )
     y = Y[0, 0]
 
     # Nearest index calculation should match the implementation
     nearest = int(round((mid_pos - x[0]) / dt))
-    assert np.count_nonzero(np.isfinite(y)) == y.size  # Dirac returns zeros elsewhere (not NaNs for active)
+    assert (
+        np.count_nonzero(np.isfinite(y)) == y.size
+    )  # Dirac returns zeros elsewhere (not NaNs for active)
     assert np.isclose(y[nearest], amp)
     # Other samples should be 0
     assert np.allclose(np.delete(y, nearest), 0.0)
@@ -233,65 +251,56 @@ def test_dirac_impulse_placed_at_nearest_sample_on_uniform_grid():
 # ==========================================================
 #          GENERATOR — BASIC INTEGRATION & NOISE EFFECT
 # ==========================================================
-def _extract_signals(dataset):
-    """
-    Try to extract a (n_samples, max_peaks, N) or (n_samples, N) array from dataset.
-    This is kept flexible to avoid over-specifying dataset internals.
-    """
-    candidates = ("signals", "signal_matrix", "X", "data", "matrix", "components")
-    for name in candidates:
-        if hasattr(dataset, name):
-            arr = getattr(dataset, name)
-            if isinstance(arr, np.ndarray):
-                return arr
-    # Some datasets may expose a getter
-    if hasattr(dataset, "get_signals"):
-        arr = dataset.get_signals()
-        if isinstance(arr, np.ndarray):
-            return arr
-    return None
-
-
-def _extract_time(dataset):
-    candidates = ("time_samples", "time", "t", "x")
-    for name in candidates:
-        if hasattr(dataset, name):
-            arr = getattr(dataset, name)
-            if isinstance(arr, np.ndarray) and arr.ndim == 1:
-                return arr
-    return None
-
-
 def test_signal_dataset_generator_shapes_and_counts():
     np.random.seed(SEED)
-    gen = SignalDatasetGenerator(n_samples=6, sequence_length=N)
+    gen = SignalDatasetGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(10, 300), position=(0.3, 0.7), width=0.02)
 
-    ds = gen.generate(kernel=kernel, n_peaks=(3, 3), noise_std=0.0, categorical_peak_count=False)
+    ds = gen.generate(
+        n_samples=10,
+        kernel=kernel,
+        n_peaks=(3, 3),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
     assert ds is not None
 
-    sig = _extract_signals(ds)
-    assert sig is not None, "Dataset should expose signals-like ndarray via a common attribute"
+    sig = ds.signals
+    assert (
+        sig is not None
+    ), "Dataset should expose signals-like ndarray via a common attribute"
 
     # Accept either (B, P, N) or (B, N)
     assert sig.ndim in (2, 3)
-    assert sig.shape[0] == 6
+    assert sig.shape[0] == 10
     if sig.ndim == 3:
         assert sig.shape[-1] == N
 
 
 def test_generator_noise_increases_variance():
     np.random.seed(SEED)
-    gen = SignalDatasetGenerator(n_samples=8, sequence_length=N)
+    gen = SignalDatasetGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(10, 300), position=(0.3, 0.7), width=0.02)
 
-    ds_clean = gen.generate(kernel=kernel, n_peaks=(1, 3), noise_std=0.0, categorical_peak_count=False)
+    ds_clean = gen.generate(
+        n_samples=8,
+        kernel=kernel,
+        n_peaks=(1, 3),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
     np.random.seed(SEED)  # reset for fair comparison of underlying pulses
-    ds_noisy = gen.generate(kernel=kernel, n_peaks=(1, 3), noise_std=0.1, categorical_peak_count=False)
+    ds_noisy = gen.generate(
+        n_samples=8,
+        kernel=kernel,
+        n_peaks=(1, 3),
+        noise_std=0.1,
+        categorical_peak_count=False,
+    )
 
     # Pull signals and collapse to (B, N) if needed
-    s_clean = _extract_signals(ds_clean)
-    s_noisy = _extract_signals(ds_noisy)
+    s_clean = ds_clean.signals
+    s_noisy = ds_noisy.signals
     assert s_clean is not None and s_noisy is not None
 
     if s_clean.ndim == 3:
@@ -311,16 +320,28 @@ def test_generator_reproducibility_with_seed():
     Setting numpy's global seed should make successive generate(...) calls reproducible.
     (This assumes generator/kernels use NumPy RNG; if not, adjust your generator to accept a seed.)
     """
-    gen = SignalDatasetGenerator(n_samples=5, sequence_length=N)
+    gen = SignalDatasetGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
 
     np.random.seed(SEED)
-    ds1 = gen.generate(kernel=kernel, n_peaks=(2, 3), noise_std=0.0, categorical_peak_count=False)
-    s1 = _extract_signals(ds1)
+    ds1 = gen.generate(
+        n_samples=5,
+        kernel=kernel,
+        n_peaks=(2, 3),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
+    s1 = ds1.signals
 
     np.random.seed(SEED)
-    ds2 = gen.generate(kernel=kernel, n_peaks=(2, 3), noise_std=0.0, categorical_peak_count=False)
-    s2 = _extract_signals(ds2)
+    ds2 = gen.generate(
+        n_samples=5,
+        kernel=kernel,
+        n_peaks=(2, 3),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
+    s2 = ds2.signals
 
     assert s1 is not None and s2 is not None
     assert s1.shape == s2.shape
@@ -333,13 +354,18 @@ def test_generator_time_axis_if_present():
     with the configured sequence length.
     """
     np.random.seed(SEED)
-    gen = SignalDatasetGenerator(n_samples=3, sequence_length=N)
+    gen = SignalDatasetGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(10, 20), position=(0.35, 0.65), width=0.02)
 
-    ds = gen.generate(kernel=kernel, n_peaks=(1, 1), noise_std=0.0, categorical_peak_count=False)
-    t = _extract_time(ds)
-    if t is None:
-        pytest.skip("Dataset does not expose a time axis attribute")
+    ds = gen.generate(
+        n_samples=30,
+        kernel=kernel,
+        n_peaks=(1, 1),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
+
+    t = ds.x_values
     assert t.ndim == 1 and t.size == N
     dt = np.diff(t)
     assert np.all(dt > 0)
