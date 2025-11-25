@@ -58,7 +58,6 @@ class SignalDatasetGenerator:
         noise_std: Optional[Union[float, Tuple[float, float]]] = None,
         drift: Optional[Union[float, Tuple[float, float]]] = None,
         categorical_peak_count: bool = False,
-        roi_width_in_pixels: int = 4,
     ) -> DataSet:
         """
         Generate a dataset of parametric peak signals.
@@ -101,7 +100,6 @@ class SignalDatasetGenerator:
         n_peaks = self._ensure_tuple(n_peaks)
         noise_std = self._ensure_tuple(noise_std) if noise_std is not None else None
         drift = self._ensure_tuple(drift) if drift is not None else None
-        print(drift)
 
         if seed is not None:
             np.random.seed(seed)

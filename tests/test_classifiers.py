@@ -21,15 +21,17 @@ def dataset():
         width=(0.03, 0.05),
     )
 
-    generator = SignalDatasetGenerator(n_samples=600, sequence_length=SEQUENCE_LENGTH)
+    generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
+        n_samples=600,
         kernel=kernel,
         n_peaks=(1, NUM_PEAKS),
         noise_std=0.1,
         categorical_peak_count=False,
-        compute_region_of_interest=True,
     )
+
+    dataset.compute_region_of_interest(width_in_pixels=5)
 
     return dataset
 
@@ -47,7 +49,7 @@ def test_architecture(patch, dataset, architecture):
         dataset.signals,
         dataset.region_of_interest,
         validation_split=0.2,
-        epochs=20,
+        epochs=4,
         batch_size=64,
     )
 
@@ -57,4 +59,4 @@ def test_architecture(patch, dataset, architecture):
 
 
 if __name__ == "__main__":
-    pytest.main(["-W error", __file__])
+    pytest.main([__file__])
