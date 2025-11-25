@@ -240,6 +240,7 @@ class DataSet:
         w = int(width_in_pixels)
         if w < 0:
             raise ValueError("width_in_pixels must be non-negative")
+
         half = w // 2
 
         starts = np.clip(centers - half, 0, sequence_length)
