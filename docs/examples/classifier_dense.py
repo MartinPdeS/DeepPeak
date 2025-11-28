@@ -85,14 +85,3 @@ history = dense_net.fit(
 # Plot training history
 # ---------------------
 dense_net.plot_model_history()
-
-# %%
-# Predict and visualize on a test signal
-# --------------------------------------
-_ = dense_net.plot_prediction(
-    dataset=dataset,
-    number_of_samples=12,
-    number_of_columns=3,
-    threshold=0.1,
-    randomize_signal=True,
-)

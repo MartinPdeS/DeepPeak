@@ -86,14 +86,3 @@ history = wavenet.fit(
 # Plot training history
 # ---------------------
 _ = wavenet.plot_model_history()
-
-# %%
-# Predict and visualize on a test signal
-# --------------------------------------
-_ = wavenet.plot_prediction(
-    dataset=dataset,
-    number_of_samples=12,
-    number_of_columns=3,
-    threshold=0.1,
-    randomize_signal=True,
-)
