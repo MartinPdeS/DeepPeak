@@ -86,4 +86,4 @@ history = dense_net.fit(
 # %%
 # Plot training history
 # ---------------------
-dense_net.plot_model_history(filter_pattern="BinaryIoU")
+dense_net.plot_model_history()
