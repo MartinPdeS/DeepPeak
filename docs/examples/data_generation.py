@@ -31,7 +31,7 @@ generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
 kernel = kernel.Lorentzian(
     amplitude=(10, 300),  # Amplitude range
     position=(10, 190),  # Peak position range
-    width=0.02,
+    width=10,
 )
 
 dataset = generator.generate(

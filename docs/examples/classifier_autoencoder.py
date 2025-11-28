@@ -38,15 +38,17 @@ kernel = kernel.Lorentzian(
     width=(0.03, 0.05),
 )
 
-generator = SignalDatasetGenerator(n_samples=100, sequence_length=SEQUENCE_LENGTH)
+generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
+    n_samples=100,
     kernel=kernel,
     n_peaks=(1, NUM_PEAKS),
     noise_std=0.1,
     categorical_peak_count=False,
-    compute_region_of_interest=True,
 )
+
+dataset.compute_region_of_interest(width_in_pixels=5)
 
 # %%
 # Visualize a few example signals and their regions of interest
@@ -89,4 +91,10 @@ dense_net.plot_model_history(filter_pattern="BinaryIoU")
 # %%
 # Predict and visualize on a test signal
 # --------------------------------------
-_ = dense_net.plot_prediction(dataset=dataset, number_of_samples=12, number_of_columns=3, threshold=0.1, randomize_signal=True)
+_ = dense_net.plot_prediction(
+    dataset=dataset,
+    number_of_samples=12,
+    number_of_columns=3,
+    threshold=0.1,
+    randomize_signal=True,
+)
