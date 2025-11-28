@@ -26,7 +26,7 @@ Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset
 of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-38
+.. GENERATED FROM PYTHON SOURCE LINES 10-41
 
 .. code-block:: Python
 
@@ -47,14 +47,17 @@ the results.
         width=gaussian_width,  # Width range
     )
 
-    generator = SignalDatasetGenerator(n_samples=NSAMPLES, sequence_length=SEQUENCE_LENGTH)
+    generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
+        n_samples=NSAMPLES,
         kernel=kernel,
         n_peaks=NUM_PEAKS,
         noise_std=0.3,  # Add some noise
         categorical_peak_count=False,
     )
+
+    dataset.compute_region_of_interest(width_in_pixels=5)
 
     dataset.plot()
 
@@ -62,7 +65,7 @@ the results.
 
 
 .. image-sg:: /gallery/images/sphx_glr_amplitude_retrieval_001.png
-   :alt: Predicted ROI (Sample 0), Predicted ROI (Sample 1), Predicted ROI (Sample 2)
+   :alt: Sample 0, Sample 1, Sample 2
    :srcset: /gallery/images/sphx_glr_amplitude_retrieval_001.png
    :class: sphx-glr-single-img
 
@@ -76,11 +79,11 @@ the results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-40
+.. GENERATED FROM PYTHON SOURCE LINES 42-43
 
 Configure and run the detector
 
-.. GENERATED FROM PYTHON SOURCE LINES 40-52
+.. GENERATED FROM PYTHON SOURCE LINES 43-57
 
 .. code-block:: Python
 
@@ -91,7 +94,9 @@ Configure and run the detector
         kernel_truncation_radius_in_sigmas=3,
     )
 
-    batched_peak_detector = peak_locator.run_batch(time_samples=dataset.x_values, signal=dataset.signals)
+    batched_peak_detector = peak_locator.run_batch(
+        time_samples=dataset.x_values, signal=dataset.signals
+    )
 
     batched_peak_detector.plot()
 
@@ -100,7 +105,7 @@ Configure and run the detector
 
 
 .. image-sg:: /gallery/images/sphx_glr_amplitude_retrieval_002.png
-   :alt: Sample #0 (K=4, detected=1), Sample #1 (K=4, detected=4), Sample #2 (K=4, detected=2), Sample #3 (K=4, detected=4)
+   :alt: Sample #0 (K=4, detected=1), Sample #1 (K=4, detected=1), Sample #2 (K=4, detected=1), Sample #3 (K=4, detected=1)
    :srcset: /gallery/images/sphx_glr_amplitude_retrieval_002.png
    :class: sphx-glr-single-img
 
@@ -114,17 +119,20 @@ Configure and run the detector
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 53-54
+.. GENERATED FROM PYTHON SOURCE LINES 58-59
 
 Solve for amplitudes
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-59
+.. GENERATED FROM PYTHON SOURCE LINES 59-67
 
 .. code-block:: Python
 
     solver = ClosedFormSolver(sigma=dataset.widths.mean().squeeze())
 
-    result = solver.run_batch(centers=batched_peak_detector.peak_times, center_samples=batched_peak_detector.peak_amplitude_raw)
+    result = solver.run_batch(
+        centers=batched_peak_detector.peak_times,
+        center_samples=batched_peak_detector.peak_amplitude_raw,
+    )
 
     result.compare_plot(true_amplitudes=dataset.amplitudes)
 
@@ -148,7 +156,7 @@ Solve for amplitudes
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.300 seconds)
+   **Total running time of the script:** (0 minutes 1.697 seconds)
 
 
 .. _sphx_glr_download_gallery_amplitude_retrieval.py:

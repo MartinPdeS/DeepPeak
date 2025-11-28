@@ -36,19 +36,20 @@ SEQUENCE_LENGTH = 200
 kernel = DeepPeak.kernel.Gaussian(
     amplitude=(10, 20),
     position=(0.1, 0.9),
-    width=(0.04 * 1, 0.05 * 1),
+    width=(5, 10),
 )
 
-generator = SignalDatasetGenerator(n_samples=1000, sequence_length=SEQUENCE_LENGTH)
+generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
+    n_samples=1000,
     kernel=kernel,
     n_peaks=(1, NUM_PEAKS),
     noise_std=0.03,
     categorical_peak_count=False,
-    compute_region_of_interest=True,
 )
 
+dataset.compute_region_of_interest(width_in_pixels=5)
 
 # %%
 # Visualize a few example signals and their regions of interest
@@ -85,8 +86,3 @@ history = wavenet.fit(
 # Plot training history
 # ---------------------
 _ = wavenet.plot_model_history()
-
-# %%
-# Predict and visualize on a test signal
-# --------------------------------------
-_ = wavenet.plot_prediction(dataset=dataset, number_of_samples=12, number_of_columns=3, threshold=0.1, randomize_signal=True)

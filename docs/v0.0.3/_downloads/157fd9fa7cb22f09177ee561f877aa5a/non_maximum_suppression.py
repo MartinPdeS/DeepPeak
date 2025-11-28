@@ -15,21 +15,23 @@ from DeepPeak.kernel import Gaussian
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 400
 
-generator = SignalDatasetGenerator(n_samples=6, sequence_length=SEQUENCE_LENGTH)
+generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
 
 kernel = Gaussian(
     amplitude=(10, 300),  # Amplitude range
-    position=(0.3, 0.7),  # Peak position range
+    position=(0, SEQUENCE_LENGTH),  # Peak position range
     width=0.02,
 )
 
 dataset = generator.generate(
+    n_samples=6,
     kernel=kernel,
     n_peaks=(3, 3),
     noise_std=0,  # Add some noise
     categorical_peak_count=False,
 )
-print(dataset)
+
+dataset.compute_region_of_interest(width_in_pixels=5)
 
 dataset.plot()
 

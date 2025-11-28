@@ -410,6 +410,7 @@
 <li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_generation_custom_kernel.html">Generating data With a Custom Kernel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
 </ul>
 </div>
@@ -498,19 +499,22 @@ the results.</p>
     <span class="n">width</span><span class="o">=</span><span class="n">gaussian_width</span><span class="p">,</span>  <span class="c1"># Width range</span>
 <span class="p">)</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="n">NSAMPLES</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
+    <span class="n">n_samples</span><span class="o">=</span><span class="n">NSAMPLES</span><span class="p">,</span>
     <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
     <span class="n">n_peaks</span><span class="o">=</span><span class="n">NUM_PEAKS</span><span class="p">,</span>
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>  <span class="c1"># Add some noise</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 
+<span class="n">dataset</span><span class="o">.</span><span class="n">compute_region_of_interest</span><span class="p">(</span><span class="n">width_in_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
 <span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_amplitude_retrieval_001.png" srcset="../_images/sphx_glr_amplitude_retrieval_001.png" alt="Predicted ROI (Sample 0), Predicted ROI (Sample 1), Predicted ROI (Sample 2)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
+<img src="../_images/sphx_glr_amplitude_retrieval_001.png" srcset="../_images/sphx_glr_amplitude_retrieval_001.png" alt="Sample 0, Sample 1, Sample 2" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>Configure and run the detector</p>
@@ -521,18 +525,23 @@ the results.</p>
     <span class="n">kernel_truncation_radius_in_sigmas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">batched_peak_detector</span> <span class="o">=</span> <span class="n">peak_locator</span><span class="o">.</span><span class="n">run_batch</span><span class="p">(</span><span class="n">time_samples</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">)</span>
+<span class="n">batched_peak_detector</span> <span class="o">=</span> <span class="n">peak_locator</span><span class="o">.</span><span class="n">run_batch</span><span class="p">(</span>
+    <span class="n">time_samples</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">signals</span>
+<span class="p">)</span>
 
 <span class="n">batched_peak_detector</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_amplitude_retrieval_002.png" srcset="../_images/sphx_glr_amplitude_retrieval_002.png" alt="Sample #0 (K=4, detected=1), Sample #1 (K=4, detected=4), Sample #2 (K=4, detected=2), Sample #3 (K=4, detected=4)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 650x1120 with 4 Axes&gt;
+<img src="../_images/sphx_glr_amplitude_retrieval_002.png" srcset="../_images/sphx_glr_amplitude_retrieval_002.png" alt="Sample #0 (K=4, detected=1), Sample #1 (K=4, detected=1), Sample #2 (K=4, detected=1), Sample #3 (K=4, detected=1)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 650x1120 with 4 Axes&gt;
 </pre></div>
 </div>
 <p>Solve for amplitudes</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">solver</span> <span class="o">=</span> <span class="n">ClosedFormSolver</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">widths</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">squeeze</span><span class="p">())</span>
 
-<span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">run_batch</span><span class="p">(</span><span class="n">centers</span><span class="o">=</span><span class="n">batched_peak_detector</span><span class="o">.</span><span class="n">peak_times</span><span class="p">,</span> <span class="n">center_samples</span><span class="o">=</span><span class="n">batched_peak_detector</span><span class="o">.</span><span class="n">peak_amplitude_raw</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">run_batch</span><span class="p">(</span>
+    <span class="n">centers</span><span class="o">=</span><span class="n">batched_peak_detector</span><span class="o">.</span><span class="n">peak_times</span><span class="p">,</span>
+    <span class="n">center_samples</span><span class="o">=</span><span class="n">batched_peak_detector</span><span class="o">.</span><span class="n">peak_amplitude_raw</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="n">result</span><span class="o">.</span><span class="n">compare_plot</span><span class="p">(</span><span class="n">true_amplitudes</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">amplitudes</span><span class="p">)</span>
 </pre></div>
@@ -540,7 +549,7 @@ the results.</p>
 <img src="../_images/sphx_glr_amplitude_retrieval_003.png" srcset="../_images/sphx_glr_amplitude_retrieval_003.png" alt="amplitude retrieval" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x500 with 4 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.300 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.697 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-amplitude-retrieval-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/18c5d7407121c594154c1cc173fa8eaa/amplitude_retrieval.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">amplitude_retrieval.ipynb</span></code></a></p>
