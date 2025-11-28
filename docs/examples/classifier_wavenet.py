@@ -39,9 +39,10 @@ kernel = DeepPeak.kernel.Gaussian(
     width=(5, 10),
 )
 
-generator = SignalDatasetGenerator(n_samples=1000, sequence_length=SEQUENCE_LENGTH)
+generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
+    n_samples=1000,
     kernel=kernel,
     n_peaks=(1, NUM_PEAKS),
     noise_std=0.03,
