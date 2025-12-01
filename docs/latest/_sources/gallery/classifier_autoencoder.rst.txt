@@ -224,86 +224,86 @@ Train the classifier
  .. code-block:: none
 
     Epoch 1/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0122 - loss: 0.6898
-    Epoch 1: val_loss improved from None to 0.65400, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 356ms/step - BinaryIoU: 0.0120 - loss: 0.6855 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6540
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0182 - loss: 0.6993
+    Epoch 1: val_loss improved from None to 0.68514, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 360ms/step - BinaryIoU: 0.0189 - loss: 0.6975 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6851
     Epoch 2/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6441
-    Epoch 2: val_loss improved from 0.65400 to 0.59862, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6382 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5986
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0083 - loss: 0.6835
+    Epoch 2: val_loss improved from 0.68514 to 0.66817, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - BinaryIoU: 0.0067 - loss: 0.6817 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6682
     Epoch 3/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5765
-    Epoch 3: val_loss improved from 0.59862 to 0.50824, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5670 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5082
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6624
+    Epoch 3: val_loss improved from 0.66817 to 0.63910, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6594 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6391
     Epoch 4/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4670
-    Epoch 4: val_loss improved from 0.50824 to 0.37736, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4542 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.3774
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6273
+    Epoch 4: val_loss improved from 0.63910 to 0.59314, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6224 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5931
     Epoch 5/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3223
-    Epoch 5: val_loss improved from 0.37736 to 0.22069, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3054 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.2207
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5715
+    Epoch 5: val_loss improved from 0.59314 to 0.52119, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5630 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5212
     Epoch 6/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1711
-    Epoch 6: val_loss improved from 0.22069 to 0.10534, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1600 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.1053
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4847
+    Epoch 6: val_loss improved from 0.52119 to 0.41436, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4739 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.4144
     Epoch 7/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0880
-    Epoch 7: val_loss improved from 0.10534 to 0.07125, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0886 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0713
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3643
+    Epoch 7: val_loss improved from 0.41436 to 0.27759, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3501 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.2776
     Epoch 8/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0887
-    Epoch 8: val_loss did not improve from 0.07125
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0910 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0771
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.2223
+    Epoch 8: val_loss improved from 0.27759 to 0.14941, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.0000e+00 - loss: 0.2095 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.1494
     Epoch 9/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1089
-    Epoch 9: val_loss did not improve from 0.07125
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1122 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0862
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1159
+    Epoch 9: val_loss improved from 0.14941 to 0.08292, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1112 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0829
     Epoch 10/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1280
-    Epoch 10: val_loss did not improve from 0.07125
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1279 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0893
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0820
+    Epoch 10: val_loss improved from 0.08292 to 0.07345, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 91ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0863 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0734
     Epoch 11/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1302
-    Epoch 11: val_loss did not improve from 0.07125
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 64ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1289 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0866
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1031
+    Epoch 11: val_loss did not improve from 0.07345
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1005 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0816
     Epoch 12/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1219
-    Epoch 12: val_loss did not improve from 0.07125
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1236 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0798
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1189
+    Epoch 12: val_loss did not improve from 0.07345
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1198 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0883
     Epoch 13/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1107
-    Epoch 13: val_loss improved from 0.07125 to 0.07116, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 94ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1134 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0712
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1304
+    Epoch 13: val_loss did not improve from 0.07345
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1311 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0891
     Epoch 14/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0961
-    Epoch 14: val_loss improved from 0.07116 to 0.06332, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0968 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0633
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1314
+    Epoch 14: val_loss did not improve from 0.07345
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1334 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0843
     Epoch 15/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0859
-    Epoch 15: val_loss improved from 0.06332 to 0.05847, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0845 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0585
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1244
+    Epoch 15: val_loss did not improve from 0.07345
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1220 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0762
     Epoch 16/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0683
-    Epoch 16: val_loss improved from 0.05847 to 0.05830, saving model to /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 93ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0714 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0583
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1109
+    Epoch 16: val_loss improved from 0.07345 to 0.06773, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1075 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0677
     Epoch 17/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0628
-    Epoch 17: val_loss did not improve from 0.05830
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0625 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0636
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0945
+    Epoch 17: val_loss improved from 0.06773 to 0.06132, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0936 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0613
     Epoch 18/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0615
-    Epoch 18: val_loss did not improve from 0.05830
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0602 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0729
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0800
+    Epoch 18: val_loss improved from 0.06132 to 0.05950, saving model to /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 92ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0805 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0595
     Epoch 19/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0595
-    Epoch 19: val_loss did not improve from 0.05830
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0598 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0799
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0656
+    Epoch 19: val_loss did not improve from 0.05950
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0680 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0645
     Epoch 20/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0608
-    Epoch 20: val_loss did not improve from 0.05830
-        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0605 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0793
-    Restored best model weights from /tmp/wavenet_ckpt_v6op1kbd/best.weights.h5
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0615
+    Epoch 20: val_loss did not improve from 0.05950
+        2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0618 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0746
+    Restored best model weights from /tmp/wavenet_ckpt_wq3ekwyw/best.weights.h5
 
 
 
@@ -339,7 +339,7 @@ Plot training history
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 8.277 seconds)
+   **Total running time of the script:** (0 minutes 8.350 seconds)
 
 
 .. _sphx_glr_download_gallery_classifier_autoencoder.py:
