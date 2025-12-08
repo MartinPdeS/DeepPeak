@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "A package for deep-learning peak detection."
 license = { file = "LICENSE" }
 readme = "README.rst"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 authors = [{ name = "Martin Poinsinet de Sivry-Houle", email = "martin.poinsinet.de.sivry@gmail.com" }]
 classifiers = [
     "Programming Language :: Python",
@@ -27,9 +27,6 @@ dependencies = [
     'tensorflow',
     'scikit-learn',
     'MPSPlots',
-    # 'PyWavelets',
-    # 'opencv-python',
-    # 'tf_explain'
 ]
 
 [project.urls]
