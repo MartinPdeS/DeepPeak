@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:55.540** total execution time for 7 files **from gallery**:
+**00:58.149** total execution time for 7 files **from gallery**:
 
 .. container::
 
@@ -33,23 +33,23 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_classifier_wavenet.py` (``classifier_wavenet.py``)
-     - 00:36.154
+     - 00:38.077
      - 0.0
    * - :ref:`sphx_glr_gallery_classifier_autoencoder.py` (``classifier_autoencoder.py``)
-     - 00:08.042
+     - 00:08.441
      - 0.0
    * - :ref:`sphx_glr_gallery_classifier_dense.py` (``classifier_dense.py``)
-     - 00:05.254
-     - 0.0
-   * - :ref:`sphx_glr_gallery_amplitude_retrieval.py` (``amplitude_retrieval.py``)
-     - 00:01.640
+     - 00:05.462
      - 0.0
    * - :ref:`sphx_glr_gallery_non_maximum_suppression.py` (``non_maximum_suppression.py``)
-     - 00:01.639
+     - 00:01.679
      - 0.0
-   * - :ref:`sphx_glr_gallery_data_generation.py` (``data_generation.py``)
-     - 00:01.415
+   * - :ref:`sphx_glr_gallery_amplitude_retrieval.py` (``amplitude_retrieval.py``)
+     - 00:01.642
      - 0.0
    * - :ref:`sphx_glr_gallery_data_generation_custom_kernel.py` (``data_generation_custom_kernel.py``)
-     - 00:01.397
+     - 00:01.427
+     - 0.0
+   * - :ref:`sphx_glr_gallery_data_generation.py` (``data_generation.py``)
+     - 00:01.421
      - 0.0
