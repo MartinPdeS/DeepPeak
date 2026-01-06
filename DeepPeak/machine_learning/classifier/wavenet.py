@@ -73,6 +73,8 @@ class WaveNet(BaseClassifier):
         if not isinstance(self.metrics, (tuple, list)):
             self.metrics = (self.metrics,)
 
+        self.histories = []
+
     # --------------------------------------------------------------------- #
     # Construction / compilation
     # --------------------------------------------------------------------- #
@@ -99,7 +101,7 @@ class WaveNet(BaseClassifier):
             h = layers.Conv1D(
                 self.num_filters,
                 kernel_size=self.kernel_size,
-                padding="causal",
+                padding="same",
                 dilation_rate=dilation,
                 activation="relu",
                 name=f"dilated_conv_{i}",
@@ -111,7 +113,7 @@ class WaveNet(BaseClassifier):
 
             # Skip path (1x1) from the block output
             skip = layers.Conv1D(self.num_filters, 1, padding="same", name=f"skip_{i}")(
-                x
+                h
             )
             skip_paths.append(skip)
 
@@ -121,6 +123,7 @@ class WaveNet(BaseClassifier):
 
         # Final per-timestep probability (peak / no-peak)
         outputs = layers.Conv1D(1, 1, activation="sigmoid", name="output")(s)
+        # outputs = layers.Conv1D(1, 1, activation=None, name="output")(s)
 
         self.model = models.Model(
             inputs=inputs, outputs=outputs, name="WaveNetDetector"

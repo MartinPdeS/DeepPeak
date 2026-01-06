@@ -1,6 +1,15 @@
+from __future__ import annotations
+
+from typing import Literal
 import matplotlib.pyplot as plt
 from MPSPlots import helper
 import numpy as np
+from DeepPeak import processing
+
+
+Profile = Literal["gaussian", "lorentzian"]
+WidthDefinition = Literal["fwhm", "sigma", "gamma"]
+NormalizationMode = Literal["analytic", "sampled"]
 
 
 class DataSet:
@@ -29,22 +38,35 @@ class DataSet:
         attributes = ", ".join(f"{key}" for key in self.list_of_attributes)
         return f"{class_name}({attributes})"
 
-    def get_normalized_signal(self, normalization: str = "l1"):
+    def get_normalized_signal(self, normalization: str = "zscore"):
         """
-        Normalize the signals in the dataset to have values between 0 and 1.
+        Normalize dataset signals.
+
+        Supported normalization modes
+        -----------------------------
+        "none"
+            Return a float copy of the signals.
+        "l1"
+            Divide each signal by its L1 norm (sum of absolute values).
+        "l2"
+            Divide each signal by its L2 norm.
+        "minmax"
+            Map each signal to [0, 1] using per signal min and max.
+        "zscore"
+            Per signal standardization: (x - mean) / std.
+        "robust_zscore"
+            Per signal robust standardization: (x - median) / (1.4826 * MAD).
+        "maxabs"
+            Divide each signal by its max absolute value.
+
+        Notes
+        -----
+        - "minmax" guarantees an output in [0, 1] (per signal).
+        - "zscore" and "robust_zscore" are usually better for neural network training.
         """
-        if normalization.lower() == "l1":
-            sum_vals = np.sum(self.signals, axis=1, keepdims=True)
-            return self.signals / (sum_vals + 1e-8)
-        elif normalization.lower() == "l2":
-            norm_vals = np.linalg.norm(self.signals, axis=1, keepdims=True)
-            return self.signals / (norm_vals + 1e-8)
-        elif normalization.lower() == "min-max":
-            min_vals = np.min(self.signals, axis=1, keepdims=True)
-            max_vals = np.max(self.signals, axis=1, keepdims=True)
-            return (self.signals - min_vals) / (max_vals - min_vals + 1e-8)
-        else:
-            raise ValueError(f"Unknown normalization method: {normalization}")
+        return processing.normalize_signal(
+            self.signals, normalization=normalization, axis=1
+        )
 
     @helper.post_mpl_plot
     def plot(
@@ -52,9 +74,12 @@ class DataSet:
         number_of_samples: int | None = 3,
         number_of_columns: int = 1,
         randomize_signal: bool = False,
+        region_of_interest: np.ndarray | None = None,
+        reference_pulse_trace: np.ndarray | None = None,
+        reference_pulse_scale: str = "auto",  # "auto", "signal_max", "none"
     ):
         """
-        Plot the predicted Regions of Interest (ROIs) for several sample signals.
+        Plot signals and optional labels for several sample signals.
 
         Parameters
         ----------
@@ -65,13 +90,23 @@ class DataSet:
             the first N samples.
         number_of_columns : int, default=1
             Number of columns in the subplot grid.
+        region_of_interest : np.ndarray or None
+            Optional ROI mask of shape (n_samples, sequence_length).
+            Nonzero values are highlighted as a band.
+        reference_pulse_trace : np.ndarray or None
+            Optional reference pulse trace of shape (n_samples, sequence_length).
+            Plotted as an overlay line.
+        reference_pulse_scale : {"auto", "signal_max", "none"}
+            How to scale the reference pulse trace for display:
+            "auto"      : scale each reference trace to the local signal max.
+            "signal_max": same as "auto" (kept for explicitness).
+            "none"      : plot reference as is.
         """
         sample_count = self.signals.shape[0]
 
         if number_of_samples is None:
             number_of_samples = sample_count
 
-        # Select which samples to display
         if randomize_signal:
             indices = np.random.choice(
                 sample_count, size=number_of_samples, replace=False
@@ -91,28 +126,40 @@ class DataSet:
         for plot_index, ax in zip(indices, axes.flatten()):
             signal = self.signals[plot_index]
 
-            # Plot signal
             ax.plot(self.x_values, signal, label="signal", color="black")
-
-            # Highlight predicted region of interest
 
             handles, labels = ax.get_legend_handles_labels()
 
-            if self.region_of_interest is not None:
+            if region_of_interest is not None:
                 roi_patch = ax.fill_between(
                     self.x_values,
                     y1=0,
                     y2=1,
-                    where=(self.region_of_interest[plot_index] != 0),
+                    where=(region_of_interest[plot_index] != 0),
                     color="lightblue",
                     alpha=1.0,
                     transform=ax.get_xaxis_transform(),
                 )
-
                 handles.append(roi_patch)
                 labels.append("Predicted ROI")
 
-            # Build legend (consistent with your existing plotting logic)
+            if reference_pulse_trace is not None:
+                reference = np.asarray(reference_pulse_trace[plot_index], dtype=float)
+
+                if reference_pulse_scale.lower() in ["auto", "signal_max"]:
+                    reference_max = float(np.max(reference))
+                    signal_max = float(np.max(signal))
+                    if reference_max > 0.0:
+                        reference = reference / reference_max * signal_max
+
+                reference_handle = ax.plot(
+                    self.x_values,
+                    reference,
+                    label="Reference pulse",
+                )[0]
+                handles.append(reference_handle)
+                labels.append("Reference pulse")
+
             by_label = {}
             for h, l in zip(handles, labels):
                 if l and not l.startswith("_") and l not in by_label:
@@ -209,7 +256,7 @@ class DataSet:
             self.signals = filtered
         return filtered
 
-    def compute_region_of_interest(
+    def get_region_of_interest(
         self,
         width_in_pixels: int = 4,
     ) -> np.ndarray:
@@ -255,6 +302,254 @@ class DataSet:
 
         rois = (np.cumsum(diff[:, :sequence_length], axis=1) > 0).astype(np.int32)
 
-        self.region_of_interest = rois
+        return rois
 
-        return self
+    def _validate_reference_pulse_inputs(
+        self,
+        signals: np.ndarray,
+        x_values: np.ndarray,
+        positions: np.ndarray,
+        amplitudes: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Validate and standardize arrays needed to build a reference pulse trace.
+
+        Expected shapes
+        ---------------
+        signals:
+            (n_samples, sequence_length)
+        x_values:
+            (sequence_length,)
+        positions:
+            (n_samples, n_peaks)
+        amplitudes:
+            (n_samples, n_peaks)
+
+        Returns
+        -------
+        signals, x_values, positions, amplitudes
+            The same arrays converted to float ndarrays (no copies unless needed).
+
+        Raises
+        ------
+        ValueError
+            If shapes are inconsistent.
+        """
+        signals = np.asarray(signals, dtype=float)
+        if signals.ndim != 2:
+            raise ValueError(
+                "signals must be 2D with shape (n_samples, sequence_length)"
+            )
+
+        x_values = np.asarray(x_values, dtype=float)
+        if x_values.ndim != 1:
+            raise ValueError("x_values must be 1D with shape (sequence_length,)")
+
+        positions = np.asarray(positions, dtype=float)
+        amplitudes = np.asarray(amplitudes, dtype=float)
+
+        if positions.ndim != 2 or amplitudes.ndim != 2:
+            raise ValueError(
+                "positions and amplitudes must both be 2D with shape (n_samples, n_peaks)"
+            )
+
+        if positions.shape != amplitudes.shape:
+            raise ValueError("positions and amplitudes must have the same shape")
+
+        n_samples, sequence_length = signals.shape
+        if x_values.shape[0] != sequence_length:
+            raise ValueError(
+                "x_values length must match signals second dimension (sequence_length)"
+            )
+
+        if positions.shape[0] != n_samples:
+            raise ValueError(
+                "positions and amplitudes must have n_samples rows, matching signals"
+            )
+
+        return signals, x_values, positions, amplitudes
+
+    def _gaussian_pulse(
+        self,
+        delta: np.ndarray,
+        width: float,
+        width_definition: Literal["fwhm", "sigma"],
+    ) -> np.ndarray:
+        """
+        Evaluate a Gaussian pulse on a delta grid.
+
+        Parameters
+        ----------
+        delta
+            x minus center, with shape (..., sequence_length) or any broadcastable shape.
+        width
+            Width parameter. Interpreted by width_definition.
+        width_definition
+            "fwhm" interprets `width` as full width at half maximum.
+            "sigma" interprets `width` as standard deviation.
+
+        Returns
+        -------
+        np.ndarray
+            Gaussian values with the same shape as `delta`.
+
+        Raises
+        ------
+        ValueError
+            If width is non positive or width_definition is invalid.
+        """
+        width = float(width)
+
+        if width_definition.lower() == "fwhm":
+            if width <= 0.0:
+                raise ValueError("Gaussian FWHM must be positive")
+            # Direct FWHM form avoids conversion drift: exp(-4 ln(2) (delta / fwhm)^2)
+            return np.exp(-4.0 * np.log(2.0) * (delta / width) ** 2)
+
+        if width_definition.lower() == "sigma":
+            sigma = width
+            if sigma <= 0.0:
+                raise ValueError("Gaussian sigma must be positive")
+            return np.exp(-0.5 * (delta / sigma) ** 2)
+
+        raise ValueError("For gaussian, width_definition must be 'fwhm' or 'sigma'")
+
+    def _lorentzian_pulse(
+        self,
+        delta: np.ndarray,
+        width: float,
+        width_definition: Literal["fwhm", "gamma"],
+    ) -> np.ndarray:
+        """
+        Evaluate a Lorentzian pulse on a delta grid.
+
+        Parameters
+        ----------
+        delta
+            x minus center, with shape (..., sequence_length) or any broadcastable shape.
+        width
+            Width parameter. Interpreted by width_definition.
+        width_definition
+            "fwhm" interprets `width` as full width at half maximum (FWHM = 2 * gamma).
+            "gamma" interprets `width` as the half width at half maximum.
+
+        Returns
+        -------
+        np.ndarray
+            Lorentzian values with the same shape as `delta`.
+
+        Raises
+        ------
+        ValueError
+            If width is non positive or width_definition is invalid.
+        """
+        width = float(width)
+
+        if width_definition.lower() == "fwhm":
+            if width <= 0.0:
+                raise ValueError("Lorentzian FWHM must be positive")
+            gamma = width / 2.0
+            return 1.0 / (1.0 + (delta / gamma) ** 2)
+
+        if width_definition.lower() == "gamma":
+            gamma = width
+            if gamma <= 0.0:
+                raise ValueError("Lorentzian gamma must be positive")
+            return 1.0 / (1.0 + (delta / gamma) ** 2)
+
+        raise ValueError("For lorentzian, width_definition must be 'fwhm' or 'gamma'")
+
+    def get_reference_pulse_trace(
+        self,
+        width: float,
+        amplitude: float | None = None,
+        profile: Profile = "gaussian",
+        width_definition: WidthDefinition = "fwhm",
+        normalize_peak_to_one: bool = False,
+        *,
+        normalization_mode: NormalizationMode = "analytic",
+        sampled_normalization_epsilon: float = 1e-12,
+    ) -> np.ndarray:
+        """
+        Build an idealized reference trace by summing analytic pulses at known peak positions.
+
+        For each valid peak (finite position and finite nonzero amplitude), an analytic pulse
+        is evaluated on `self.x_values` and summed into a clean reference trace for each sample.
+
+        Parameters
+        ----------
+        width
+            Pulse width parameter in the same units as `self.x_values`.
+        amplitude
+            If None, use `self.amplitudes` per peak. If provided, overrides all valid peak amplitudes.
+        profile
+            "gaussian" or "lorentzian".
+        width_definition
+            For gaussian: "fwhm" or "sigma".
+            For lorentzian: "fwhm" or "gamma".
+        normalize_peak_to_one
+            If True, normalize the pulse so each peak has maximum 1 before amplitude scaling.
+        normalization_mode
+            "analytic" assumes the analytic maximum is 1 at delta=0.
+            "sampled" normalizes by the sampled maximum along x, robust to sub sample peak centers.
+        sampled_normalization_epsilon
+            Floor to avoid division by zero in sampled normalization.
+
+        Returns
+        -------
+        np.ndarray
+            Reference pulse trace of shape (n_samples, sequence_length).
+        """
+        _, x_values, positions, amplitudes = self._validate_reference_pulse_inputs(
+            signals=self.signals,
+            x_values=self.x_values,
+            positions=self.positions,
+            amplitudes=self.amplitudes,
+        )
+
+        valid_pos = np.isfinite(positions)
+        valid_amp = np.isfinite(amplitudes) & (amplitudes != 0.0)
+        valid = valid_pos & valid_amp  # (n_samples, n_peaks)
+
+        if amplitude is None:
+            amplitude_per_peak = amplitudes
+        else:
+            amplitude_per_peak = np.full_like(amplitudes, float(amplitude))
+
+        amplitude_per_peak = np.where(valid, amplitude_per_peak, 0.0)
+
+        # NaN safe positions to keep delta finite everywhere
+        positions_safe = np.where(valid, positions, 0.0)
+
+        # delta shape: (n_samples, n_peaks, sequence_length)
+        delta = x_values[None, None, :] - positions_safe[:, :, None]
+
+        if profile.lower() == "gaussian":
+            pulse = self._gaussian_pulse(
+                delta=delta, width=width, width_definition=width_definition
+            )  # type: ignore[arg-type]
+        elif profile.lower() == "lorentzian":
+            pulse = self._lorentzian_pulse(
+                delta=delta, width=width, width_definition=width_definition
+            )  # type: ignore[arg-type]
+        else:
+            raise ValueError("profile must be 'gaussian' or 'lorentzian'")
+
+        if normalize_peak_to_one:
+            mode = normalization_mode.lower()
+            if mode not in ("analytic", "sampled"):
+                raise ValueError("normalization_mode must be 'analytic' or 'sampled'")
+
+            if mode == "sampled":
+                sampled_max = np.max(pulse, axis=2)  # (n_samples, n_peaks)
+                sampled_max = np.where(valid, sampled_max, 1.0)
+                sampled_max = np.maximum(
+                    sampled_max, float(sampled_normalization_epsilon)
+                )
+                pulse = pulse / sampled_max[:, :, None]
+
+        # Ensure invalid peaks contribute exactly 0.
+        pulse = np.where(valid[:, :, None], pulse, 0.0)
+
+        reference_pulse_trace = np.sum(amplitude_per_peak[:, :, None] * pulse, axis=1)
+        return reference_pulse_trace

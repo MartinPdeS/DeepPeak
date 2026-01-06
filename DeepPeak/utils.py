@@ -2,7 +2,8 @@ from itertools import islice
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pywt
+
+# import pywt
 import sklearn.model_selection as sk
 from matplotlib import style as mps
 from tensorflow.keras.utils import to_categorical  # type: ignore
@@ -20,7 +21,9 @@ def batched(iterable, n: int):  # Function is present in itertools for python 3.
 def dataset_split(test_size: float, random_state: float, **kwargs) -> dict:
     values = list(kwargs.values())
 
-    splitted = sk.train_test_split(*values, test_size=test_size, random_state=random_state)
+    splitted = sk.train_test_split(
+        *values, test_size=test_size, random_state=random_state
+    )
 
     output = {"train": dict(), "test": dict()}
 
@@ -31,7 +34,9 @@ def dataset_split(test_size: float, random_state: float, **kwargs) -> dict:
     return output
 
 
-def filter_with_wavelet_transform(signals: np.ndarray, low_boundary: int, high_boundary: int, kernel: str = "mexh") -> tuple[np.ndarray, np.ndarray]:
+def filter_with_wavelet_transform(
+    signals: np.ndarray, low_boundary: int, high_boundary: int, kernel: str = "mexh"
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Efficient filtering of multiple signals using CWT, with minimal looping.
 
@@ -62,12 +67,18 @@ def filter_with_wavelet_transform(signals: np.ndarray, low_boundary: int, high_b
     n_selected_scales = np.sum(scale_mask)
 
     # Perform CWT individually (CWT must be done per-signal due to PyWavelets)
-    coeffs_list = [pywt.cwt(signals[i], all_scales, kernel)[0] for i in range(n_signals)]
+    coeffs_list = [
+        pywt.cwt(signals[i], all_scales, kernel)[0] for i in range(n_signals)
+    ]
     coeffs = np.stack(coeffs_list, axis=0)  # Shape: (n_signals, n_scales, n_samples)
 
     # Apply mask and reconstruct using broadcasting
     filtered_coeffs = coeffs * scale_mask[:, np.newaxis]  # scale_mask: (n_scales, 1)
-    filtered_signals = np.sum(filtered_coeffs, axis=1) / np.sqrt(n_selected_scales) / abs(high_boundary - low_boundary)
+    filtered_signals = (
+        np.sum(filtered_coeffs, axis=1)
+        / np.sqrt(n_selected_scales)
+        / abs(high_boundary - low_boundary)
+    )
 
     return filtered_signals, coeffs
 
@@ -94,7 +105,9 @@ class PulseDeconvolver:
         """
         Build Gaussian design matrix for a given set of centers.
         """
-        return np.exp(-0.5 * ((self.x_values[:, None] - centers[None, :]) / self.width) ** 2)
+        return np.exp(
+            -0.5 * ((self.x_values[:, None] - centers[None, :]) / self.width) ** 2
+        )
 
     def deconvolve(self, signals: np.ndarray, centers: np.ndarray) -> np.ndarray:
         """
@@ -128,12 +141,16 @@ class PulseDeconvolver:
         return amplitudes
 
     def plot(self, data_set: object) -> None:
-        estimated_amplitudes = self.deconvolve(signals=data_set.signals, centers=data_set.positions)
+        estimated_amplitudes = self.deconvolve(
+            signals=data_set.signals, centers=data_set.positions
+        )
 
         n_plot = data_set.signals.shape[0]
 
         with plt.style.context(mps):
-            _, axes = plt.subplots(ncols=1, nrows=n_plot, figsize=(8, 4 * n_plot), squeeze=False)
+            _, axes = plt.subplots(
+                ncols=1, nrows=n_plot, figsize=(8, 4 * n_plot), squeeze=False
+            )
 
         for index in range(n_plot):
             ax = axes[index, 0]
@@ -183,3 +200,59 @@ class PulseDeconvolver:
 
         plt.tight_layout()
         plt.show()
+
+
+def merge_and_plot_histories(*histories, plot_keys=("loss", "val_loss")):
+    """
+    Merge any number of Keras History objects and plot selected keys.
+
+    Parameters
+    ----------
+    *histories
+        Any number of tf.keras.callbacks.History objects.
+    plot_keys : tuple[str, ...]
+        Keys to plot from the merged history (default: ("loss", "val_loss")).
+
+    Returns
+    -------
+    dict
+        Merged history dictionary {metric_name: list_of_values}.
+    """
+    merged = {}
+
+    keys = set()
+    for history in histories:
+        keys |= set(history.history.keys())
+
+    for key in keys:
+        merged[key] = []
+        for history in histories:
+            merged[key].extend(list(history.history.get(key, [])))
+
+    figure = plt.figure()
+    for key in plot_keys:
+        values = merged.get(key, [])
+        if len(values) == 0:
+            continue
+        epochs = np.arange(1, len(values) + 1)
+        plt.plot(epochs, values, label=key)
+
+    plt.xlabel("Epoch")
+    plt.legend()
+    return merged, figure
+
+
+def low_pass_filter(
+    adata: np.ndarray, bandlimit: int = 1000, sampling_rate: int = 44100
+) -> np.ndarray:
+    # translate bandlimit from Hz to dataindex according to sampling rate and data size
+    bandlimit_index = int(bandlimit * adata.size / sampling_rate)
+
+    fsig = np.fft.fft(adata)
+
+    for i in range(bandlimit_index + 1, len(fsig) - bandlimit_index):
+        fsig[i] = 0
+
+    adata_filtered = np.fft.ifft(fsig)
+
+    return np.real(adata_filtered)
