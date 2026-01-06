@@ -31,8 +31,6 @@ def dataset():
         categorical_peak_count=False,
     )
 
-    dataset.compute_region_of_interest(width_in_pixels=5)
-
     return dataset
 
 
@@ -45,9 +43,11 @@ def test_architecture(patch, dataset, architecture):
     model.build()
     model.summary()
 
+    roi = dataset.get_region_of_interest(width_in_pixels=5)
+
     history = model.fit(
         dataset.signals,
-        dataset.region_of_interest,
+        roi,
         validation_split=0.2,
         epochs=4,
         batch_size=64,

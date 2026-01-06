@@ -52,6 +52,6 @@ dataset = generator.generate(
     drift=(0, 10),
 )
 
-dataset.compute_region_of_interest(width_in_pixels=5)
+roi = dataset.get_region_of_interest(width_in_pixels=5)
 
-dataset.plot(number_of_columns=3, number_of_samples=9)
+dataset.plot(number_of_columns=3, number_of_samples=9, region_of_interest=roi)

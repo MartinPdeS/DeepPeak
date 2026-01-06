@@ -54,14 +54,12 @@ dataset.region_of_interest = dataset.get_region_of_interest(
 # This places one pulse per ground truth peak using dataset.positions and dataset.amplitudes.
 # The output is a dense target that can be used for regression training or thresholded later.
 reference_width = 2  # same scale as the kernel width used to generate
-reference = dataset.build_reference_pulse_trace(
+reference = dataset.get_reference_pulse_trace(
     width=reference_width,
     amplitude=None,  # use dataset.amplitudes
     profile="gaussian",  # match the generator
     width_definition="fwhm",
     normalize_peak_to_one=True,
-    store_as="reference_pulse_trace",
-    inplace=True,
 )
 
 # %%

@@ -48,12 +48,12 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-dataset.compute_region_of_interest(width_in_pixels=5)
+roi = dataset.get_region_of_interest(width_in_pixels=5)
 
 # %%
 # Visualize a few example signals and their regions of interest
 # ------------------------------------------------------------
-dataset.plot(number_of_samples=3)
+dataset.plot(number_of_samples=3, region_of_interest=roi)
 
 # %%
 # Build and summarize the DenseNet classifier
@@ -75,7 +75,7 @@ dense_net.summary()
 # --------------------
 history = dense_net.fit(
     dataset.signals,
-    dataset.region_of_interest,
+    roi,
     validation_split=0.2,
     epochs=20,
     batch_size=64,
