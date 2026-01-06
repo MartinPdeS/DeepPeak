@@ -410,6 +410,7 @@
 <li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_generation_1.html">Reference pulse trace labels</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation_custom_kernel.html">Generating data With a Custom Kernel</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
 </ul>
@@ -506,9 +507,9 @@ the results.</p>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">dataset</span><span class="o">.</span><span class="n">compute_region_of_interest</span><span class="p">(</span><span class="n">width_in_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">roi</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_region_of_interest</span><span class="p">(</span><span class="n">width_in_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
-<span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">region_of_interest</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_non_maximum_suppression_001.png" srcset="../_images/sphx_glr_non_maximum_suppression_001.png" alt="Sample 0, Sample 1, Sample 2" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
@@ -542,7 +543,7 @@ the results.</p>
 <img src="../_images/sphx_glr_non_maximum_suppression_003.png" srcset="../_images/sphx_glr_non_maximum_suppression_003.png" alt="Sample #0 (K=5, detected=5), Sample #1 (K=5, detected=5), Sample #2 (K=5, detected=5), Sample #3 (K=5, detected=5), Sample #4 (K=5, detected=5), Sample #5 (K=5, detected=5)" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 1950x560 with 6 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.655 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.634 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-non-maximum-suppression-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/25e1135ef1ffbe32122a83c577db9e9d/non_maximum_suppression.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">non_maximum_suppression.ipynb</span></code></a></p>

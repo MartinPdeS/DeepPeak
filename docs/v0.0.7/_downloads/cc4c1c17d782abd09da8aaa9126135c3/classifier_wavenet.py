@@ -49,12 +49,12 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-dataset.compute_region_of_interest(width_in_pixels=5)
+roi = dataset.get_region_of_interest(width_in_pixels=5)
 
 # %%
 # Visualize a few example signals and their regions of interest
 # ------------------------------------------------------------
-_ = dataset.plot(number_of_samples=6, number_of_columns=3)
+_ = dataset.plot(number_of_samples=6, number_of_columns=3, region_of_interest=roi)
 
 # %%
 # Build and summarize the WaveNet classifier
@@ -76,7 +76,7 @@ wavenet.build()
 # --------------------
 history = wavenet.fit(
     dataset.signals,
-    dataset.region_of_interest,
+    roi,
     validation_split=0.2,
     epochs=40,
     batch_size=64,

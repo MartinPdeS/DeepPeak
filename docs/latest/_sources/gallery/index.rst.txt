@@ -109,6 +109,23 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to generate a smooth label trace aligned with the true pulse positions and amplitudes. This can be used as a training target to reduce class imbalance compared to a binary ROI mask.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_data_generation_1_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_data_generation_1.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Reference pulse trace labels</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Compute a Region of Interest (ROI) mask based on pulse positions.   3. Visualize signals with peak positions, amplitudes, and the ROI mask.">
 
 .. only:: html
@@ -156,6 +173,7 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
    /gallery/classifier_dense
    /gallery/classifier_wavenet
    /gallery/data_generation
+   /gallery/data_generation_1
    /gallery/data_generation_custom_kernel
    /gallery/non_maximum_suppression
 

@@ -57,9 +57,9 @@ the results.
         categorical_peak_count=False,
     )
 
-    dataset.compute_region_of_interest(width_in_pixels=5)
+    roi = dataset.get_region_of_interest(width_in_pixels=5)
 
-    dataset.plot()
+    dataset.plot(region_of_interest=roi)
 
 
 
@@ -156,7 +156,7 @@ Solve for amplitudes
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.625 seconds)
+   **Total running time of the script:** (0 minutes 1.718 seconds)
 
 
 .. _sphx_glr_download_gallery_amplitude_retrieval.py:

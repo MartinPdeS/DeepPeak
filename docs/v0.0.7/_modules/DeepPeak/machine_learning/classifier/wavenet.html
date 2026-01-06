@@ -527,6 +527,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">)):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,)</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">histories</span> <span class="o">=</span> <span class="p">[]</span>
+
     <span class="c1"># --------------------------------------------------------------------- #</span>
     <span class="c1"># Construction / compilation</span>
     <span class="c1"># --------------------------------------------------------------------- #</span>
@@ -553,7 +555,7 @@
             <span class="n">h</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Conv1D</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">num_filters</span><span class="p">,</span>
                 <span class="n">kernel_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kernel_size</span><span class="p">,</span>
-                <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;causal&quot;</span><span class="p">,</span>
+                <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span>
                 <span class="n">dilation_rate</span><span class="o">=</span><span class="n">dilation</span><span class="p">,</span>
                 <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span>
                 <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dilated_conv_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
@@ -565,7 +567,7 @@
 
             <span class="c1"># Skip path (1x1) from the block output</span>
             <span class="n">skip</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Conv1D</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_filters</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;skip_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)(</span>
-                <span class="n">x</span>
+                <span class="n">h</span>
             <span class="p">)</span>
             <span class="n">skip_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">skip</span><span class="p">)</span>
 
@@ -575,6 +577,7 @@
 
         <span class="c1"># Final per-timestep probability (peak / no-peak)</span>
         <span class="n">outputs</span> <span class="o">=</span> <span class="n">layers</span><span class="o">.</span><span class="n">Conv1D</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s2">&quot;sigmoid&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;output&quot;</span><span class="p">)(</span><span class="n">s</span><span class="p">)</span>
+        <span class="c1"># outputs = layers.Conv1D(1, 1, activation=None, name=&quot;output&quot;)(s)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span>
             <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;WaveNetDetector&quot;</span>

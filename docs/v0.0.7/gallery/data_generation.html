@@ -58,7 +58,7 @@
     <link rel="icon" href="../_static/thumbnail.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Generating data With a Custom Kernel" href="data_generation_custom_kernel.html" />
+    <link rel="next" title="Reference pulse trace labels" href="data_generation_1.html" />
     <link rel="prev" title="DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals" href="classifier_wavenet.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -410,6 +410,7 @@
 <li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Generating and Visualizing Signal Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_generation_1.html">Reference pulse trace labels</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation_custom_kernel.html">Generating data With a Custom Kernel</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
 </ul>
@@ -505,7 +506,7 @@ specified ranges.</p>
 
 <span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
 
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">Lorentzian</span><span class="p">(</span>
+<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span>
     <span class="n">amplitude</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">300</span><span class="p">),</span>  <span class="c1"># Amplitude range</span>
     <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">190</span><span class="p">),</span>  <span class="c1"># Peak position range</span>
     <span class="n">width</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
@@ -519,15 +520,15 @@ specified ranges.</p>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">dataset</span><span class="o">.</span><span class="n">compute_region_of_interest</span><span class="p">(</span><span class="n">width_in_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">roi</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_region_of_interest</span><span class="p">(</span><span class="n">width_in_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
-<span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_columns</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_columns</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">number_of_samples</span><span class="o">=</span><span class="mi">9</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_data_generation_001.png" srcset="../_images/sphx_glr_data_generation_001.png" alt="Sample 0, Sample 1, Sample 2, Sample 3, Sample 4, Sample 5, Sample 6, Sample 7, Sample 8" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 2400x900 with 9 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.420 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.434 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-data-generation-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/a1b41407492e5620f3d9e47717976bbf/data_generation.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">data_generation.ipynb</span></code></a></p>

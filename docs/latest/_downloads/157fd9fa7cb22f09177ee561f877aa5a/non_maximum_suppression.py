@@ -31,9 +31,9 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-dataset.compute_region_of_interest(width_in_pixels=5)
+roi = dataset.get_region_of_interest(width_in_pixels=5)
 
-dataset.plot()
+dataset.plot(region_of_interest=roi)
 
 # %%
 # Configure and run the detector
