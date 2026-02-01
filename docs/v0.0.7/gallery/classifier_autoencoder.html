@@ -501,10 +501,6 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/keras/src/export/tf2onnx_lib.py:8: FutureWarning: In the future `np.object` will be defined as the corresponding NumPy scalar.
-  if not hasattr(np, &quot;object&quot;):
-</pre></div>
-</div>
 </section>
 <section id="generate-synthetic-dataset">
 <h2>Generate synthetic dataset<a class="headerlink" href="#generate-synthetic-dataset" title="Link to this heading">#</a></h2>
@@ -608,84 +604,84 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0217 - loss: 0.6937
-2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 336ms/step - BinaryIoU: 0.0217 - loss: 0.6891 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6564
+1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0188 - loss: 0.6883
+2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 320ms/step - BinaryIoU: 0.0181 - loss: 0.6844 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6548
 Epoch 2/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6459
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6401 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6022
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6449
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6389 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6007
 Epoch 3/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5784
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5686 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5086
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5767
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5672 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5147
 Epoch 4/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4676
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4526 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.3668
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4721
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4589 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.3855
 Epoch 5/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3129
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.2964 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.2031
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3277
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3133 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.2290
 Epoch 6/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1578
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1477 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0938
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1781
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1671 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.1092
 Epoch 7/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0818
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0837 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0694
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0937
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0904 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0720
 Epoch 8/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0902
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0944 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0780
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0906
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0909 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0767
 Epoch 9/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1042
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1140 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0870
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1104
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1100 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0857
 Epoch 10/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1230
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 64ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1254 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0891
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1273
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1248 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0890
 Epoch 11/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1262
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1305 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0847
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1304
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1292 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0860
 Epoch 12/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1252
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1223 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0764
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1217
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1223 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0785
 Epoch 13/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1079
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1090 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0669
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1119
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1105 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0694
 Epoch 14/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0931
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0915 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0590
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0983
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0947 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0614
 Epoch 15/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0781
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 64ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0774 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0548
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0822
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0813 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0565
 Epoch 16/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0673
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0664 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0569
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0689
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0685 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0571
 Epoch 17/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0591
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0585 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0658
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0594
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0588 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0631
 Epoch 18/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0571
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0570 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0750
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0552
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0562 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0719
 Epoch 19/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0592
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0593 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0774
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0578
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0575 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0778
 Epoch 20/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0593
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0585 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0715
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0592
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0584 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0764
 </pre></div>
 </div>
 </section>
@@ -697,7 +693,7 @@ Epoch 20/20
 <img src="../_images/sphx_glr_classifier_autoencoder_002.png" srcset="../_images/sphx_glr_classifier_autoencoder_002.png" alt="Losses, Metrics" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 900x720 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.458 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 8.096 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-autoencoder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/027ad6dec8c2fb9e539fbd7af3497d66/classifier_autoencoder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_autoencoder.ipynb</span></code></a></p>
