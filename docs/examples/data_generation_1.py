@@ -10,7 +10,7 @@ class imbalance compared to a binary ROI mask.
 import numpy as np
 import matplotlib.pyplot as plt
 
-from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.signal_generator import SignalGenerator
 from DeepPeak import kernel
 
 # If DataSet is part of your package, import it from there instead
@@ -24,7 +24,7 @@ SEQUENCE_LENGTH = 200
 sample_count = 12
 number_of_peaks = 3
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 pulse_kernel = kernel.Lorentzian(
     amplitude=(10, 300),

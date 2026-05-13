@@ -8,11 +8,11 @@ import pytest
 
 # Import your project pieces (skip the suite if not installed in the env)
 DP_alg = pytest.importorskip("DeepPeak.algorithms")
-DP_sig = pytest.importorskip("DeepPeak.signals")
+DP_sig = pytest.importorskip("DeepPeak.signal_generator")
 DP_ker = pytest.importorskip("DeepPeak.kernel")
 
 # Aliases
-SignalDatasetGenerator = DP_sig.SignalDatasetGenerator
+SignalGenerator = DP_sig.SignalGenerator
 
 # Kernels that should exist in DeepPeak.kernel
 Gaussian = getattr(DP_ker, "Gaussian")
@@ -253,7 +253,7 @@ def test_dirac_impulse_placed_at_nearest_sample_on_uniform_grid():
 # ==========================================================
 def test_signal_dataset_generator_shapes_and_counts():
     np.random.seed(SEED)
-    gen = SignalDatasetGenerator(sequence_length=N)
+    gen = SignalGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(10, 300), position=(0.3, 0.7), width=0.02)
 
     ds = gen.generate(
@@ -279,7 +279,7 @@ def test_signal_dataset_generator_shapes_and_counts():
 
 def test_generator_noise_increases_variance():
     np.random.seed(SEED)
-    gen = SignalDatasetGenerator(sequence_length=N)
+    gen = SignalGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(10, 300), position=(0.3, 0.7), width=0.02)
 
     ds_clean = gen.generate(
@@ -320,7 +320,7 @@ def test_generator_reproducibility_with_seed():
     Setting numpy's global seed should make successive generate(...) calls reproducible.
     (This assumes generator/kernels use NumPy RNG; if not, adjust your generator to accept a seed.)
     """
-    gen = SignalDatasetGenerator(sequence_length=N)
+    gen = SignalGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
 
     np.random.seed(SEED)
@@ -354,7 +354,7 @@ def test_generator_time_axis_if_present():
     with the configured sequence length.
     """
     np.random.seed(SEED)
-    gen = SignalDatasetGenerator(sequence_length=N)
+    gen = SignalGenerator(sequence_length=N)
     kernel = Gaussian(amplitude=(10, 20), position=(0.35, 0.65), width=0.02)
 
     ds = gen.generate(

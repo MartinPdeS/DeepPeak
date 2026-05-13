@@ -21,7 +21,7 @@ We will:
 import numpy as np
 
 from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
-from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.signal_generator import SignalGenerator
 from DeepPeak import kernel
 
 np.random.seed(42)
@@ -38,7 +38,7 @@ kernel = kernel.Lorentzian(
     width=(0.03, 0.05),
 )
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     n_samples=100,

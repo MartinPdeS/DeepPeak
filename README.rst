@@ -32,6 +32,42 @@ Key Features
 - **Custom Signal Support**: Easily adaptable to various types of 1D signals.
 - **Easy-to-Use API**: Train and predict with minimal setup.
 
+Analysis Quickstart
+-------------------
+
+For dilution-series analysis, prefer the namespaced ``DilutionSeries`` API:
+
+.. code-block:: python
+
+   from DeepPeak.analysis import DilutionSeries, PeakTrigger
+
+   series = DilutionSeries(
+       folder="path/to/traces",
+       wavenet=wavenet,
+       initial_concentration=1.0,
+       nrows=100_000,
+       std_trigger=PeakTrigger(height=0.15, hysteresis=0.12),
+       cnn_trigger=PeakTrigger(height=0.05, hysteresis=0.03),
+   )
+
+   series.run()
+
+   series.trace.standard(index=0)
+   series.trace.wavenet(index=0)
+
+   series.poisson.plot_expected_inter_arrival_histogram(
+       index=0,
+       base_index=0,
+       detector="standard",
+       x_axis="time",
+   )
+
+   series.amplitude.plot_histogram(index=0, detector="standard")
+   series.width.plot_histogram(index=0, detector="standard", x_axis="time")
+
+The older ``PeakCountSeries`` name remains available as a backward-compatible
+alias, but new notebook code should prefer ``DilutionSeries``.
+
 Contact
 -------
 For questions or contributions, contact `martin.poinsinet.de.sivry@gmail.com <mailto:martin.poinsinet.de.sivry@gmail.com>`_.

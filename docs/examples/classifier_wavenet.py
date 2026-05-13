@@ -21,7 +21,7 @@ We will:
 import numpy as np
 
 from DeepPeak.machine_learning.classifier import WaveNet, BinaryIoU
-from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.signal_generator import SignalGenerator
 from DeepPeak import kernel
 import DeepPeak
 
@@ -39,7 +39,7 @@ kernel = DeepPeak.kernel.Gaussian(
     width=(5, 10),
 )
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     n_samples=1000,

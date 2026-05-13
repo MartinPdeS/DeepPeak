@@ -9,21 +9,26 @@ the results.
 """
 
 from DeepPeak.algorithms import NonMaximumSuppression
-from DeepPeak.signals import Kernel, SignalDatasetGenerator
+from DeepPeak.kernel import Gaussian
+from DeepPeak.signal_generator import SignalGenerator
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 400
 
 gaussian_width = 0.02
 
-generator = SignalDatasetGenerator(n_samples=6, sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
+
+kernel = Gaussian(
+    amplitude=(10, 300),
+    position=(0.3, 0.7),
+    width=gaussian_width,
+)
 
 dataset = generator.generate(
-    signal_type=Kernel.GAUSSIAN,
+    n_samples=6,
+    kernel=kernel,
     n_peaks=(3, 3),
-    amplitude=(10, 300),  # Amplitude range
-    position=(0.3, 0.7),  # Peak position range
-    width=gaussian_width,  # Width range
     noise_std=2,  # Add some noise
     categorical_peak_count=False,
 )

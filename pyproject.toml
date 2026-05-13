@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "DeepPeak"
 dynamic = ["version"]
-description = "A package for deep-learning peak detection."
+description = "Peak detection, trace analysis, and dilution-series tooling for 1D signals."
 license = { file = "LICENSE" }
 readme = "README.rst"
 requires-python = ">=3.10"
@@ -20,13 +20,14 @@ classifiers = [
     "Intended Audience :: Science/Research"
 ]
 
-keywords = ["refracive index", "optics", "microbeads", "Mie scattering"]
+keywords = ["peak detection", "signal processing", "dilution series", "deep learning"]
 
 dependencies = [
     "numpy",
-    'tensorflow',
-    'scikit-learn',
-    'MPSPlots',
+    "scipy",
+    "pandas",
+    "matplotlib",
+    "MPSPlots",
 ]
 
 [project.urls]
@@ -35,8 +36,8 @@ Documentation = "https://martinpdes.github.io/DeepPeak/"
 Repository = "https://github.com/MartinPdeS/DeepPeak.git"
 
 
-[tool.setuptools]
-packages = ["DeepPeak"]
+[tool.setuptools.packages.find]
+include = ["DeepPeak", "DeepPeak.*"]
 
 [tool.setuptools_scm]
 write_to = "DeepPeak/_version.py"
@@ -46,6 +47,16 @@ local_scheme = "no-local-version"
 
 
 [project.optional-dependencies]
+ml = [
+    "tensorflow",
+    "scikit-learn",
+    "tf-explain",
+]
+
+wavelets = [
+    "PyWavelets",
+]
+
 testing = [
     "pytest>=0.6",
     "pytest-cov>=2.0",

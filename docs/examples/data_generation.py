@@ -11,7 +11,7 @@ This example demonstrates how to:
 # %%
 # Imports
 # -------
-from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.signal_generator import SignalGenerator
 from DeepPeak import kernel
 
 # %%
@@ -26,7 +26,7 @@ NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 sample_count = 12
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 kernel = kernel.Gaussian(
     amplitude=(10, 300),  # Amplitude range

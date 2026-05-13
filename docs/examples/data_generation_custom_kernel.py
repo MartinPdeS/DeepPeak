@@ -11,7 +11,7 @@ This example demonstrates how to:
 # %%
 # Imports
 # -------
-from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.signal_generator import SignalGenerator
 from DeepPeak import kernel
 import numpy as np
 
@@ -37,7 +37,7 @@ sample_count = 12
 
 
 x_values = np.linspace(0, 4, SEQUENCE_LENGTH)
-generator = SignalDatasetGenerator(
+generator = SignalGenerator(
     sequence_length=SEQUENCE_LENGTH,
     x_values=x_values,
 )

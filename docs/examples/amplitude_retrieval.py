@@ -10,7 +10,7 @@ the results.
 
 from DeepPeak.algorithms import NonMaximumSuppression
 from DeepPeak.algorithms import ClosedFormSolver
-from DeepPeak.signals import SignalDatasetGenerator
+from DeepPeak.signal_generator import SignalGenerator
 from DeepPeak import kernel
 
 NUM_PEAKS = 4
@@ -24,7 +24,7 @@ kernel = kernel.Lorentzian(
     width=gaussian_width,  # Width range
 )
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     n_samples=NSAMPLES,
