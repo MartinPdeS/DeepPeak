@@ -10,7 +10,7 @@ the results.
 
 from DeepPeak.algorithms import NonMaximumSuppression
 from DeepPeak.signal_generator import SignalGenerator
-from DeepPeak.kernel import Gaussian
+from DeepPeak import Gaussian, UniformCount
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 400
@@ -26,7 +26,7 @@ kernel = Gaussian(
 dataset = generator.generate(
     n_samples=6,
     kernel=kernel,
-    n_peaks=(3, 3),
+    peak_count=UniformCount(bounds=(3, 3)),
     noise_std=0,  # Add some noise
     categorical_peak_count=False,
 )
