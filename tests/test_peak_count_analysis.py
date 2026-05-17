@@ -1370,7 +1370,7 @@ def test_trace_record_plot_methods_raise_clear_error_when_record_is_passed_again
     signal = np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0])
     record = analyzer.analyze_processed_signal(signal, dx=0.25, filename="trace.csv")
 
-    with pytest.raises(TypeError, match="do not pass the record again"):
+    with pytest.raises(ValueError, match="x_axis must be either"):
         record.plot_standard_detection(record)
 
     with pytest.raises(TypeError, match="do not pass the record again"):
