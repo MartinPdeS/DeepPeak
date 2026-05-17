@@ -21,9 +21,8 @@ We will:
 import numpy as np
 
 from DeepPeak.machine_learning.classifier import WaveNet, BinaryIoU
-from DeepPeak.signals import SignalDatasetGenerator
-from DeepPeak import kernel
-import DeepPeak
+from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak import Gaussian, UniformCount
 
 np.random.seed(42)
 
@@ -33,18 +32,18 @@ np.random.seed(42)
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-kernel = DeepPeak.kernel.Gaussian(
+pulse_kernel = Gaussian(
     amplitude=(10, 20),
     position=(0.1, 0.9),
     width=(5, 10),
 )
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     n_samples=1000,
-    kernel=kernel,
-    n_peaks=(1, NUM_PEAKS),
+    kernel=pulse_kernel,
+    peak_count=UniformCount(bounds=(1, NUM_PEAKS)),
     noise_std=0.03,
     categorical_peak_count=False,
 )

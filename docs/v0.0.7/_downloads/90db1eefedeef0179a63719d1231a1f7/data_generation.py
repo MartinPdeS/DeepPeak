@@ -11,8 +11,8 @@ This example demonstrates how to:
 # %%
 # Imports
 # -------
-from DeepPeak.signals import SignalDatasetGenerator
-from DeepPeak import kernel
+from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak import Gaussian, UniformCount
 
 # %%
 # Generate Synthetic Signal Dataset
@@ -26,9 +26,9 @@ NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 sample_count = 12
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
-kernel = kernel.Gaussian(
+pulse_kernel = Gaussian(
     amplitude=(10, 300),  # Amplitude range
     position=(10, 190),  # Peak position range
     width=10,
@@ -36,8 +36,8 @@ kernel = kernel.Gaussian(
 
 dataset = generator.generate(
     n_samples=sample_count,
-    kernel=kernel,
-    n_peaks=(3, 3),
+    kernel=pulse_kernel,
+    peak_count=UniformCount(bounds=(3, 3)),
     noise_std=0,  # Add some noise
     categorical_peak_count=False,
 )

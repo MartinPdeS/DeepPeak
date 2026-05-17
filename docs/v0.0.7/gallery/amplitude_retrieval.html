@@ -31,7 +31,7 @@
 <link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/docs/source/_static/default.css" />
+    <link rel="stylesheet" type="text/css" href="/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/docs/source/_static/default.css" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -486,26 +486,26 @@ of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">NonMaximumSuppression</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClosedFormSolver</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalDatasetGenerator</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">kernel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signal_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lorentzian</span><span class="p">,</span> <span class="n">UniformCount</span>
 
 <span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">400</span>
 <span class="n">NSAMPLES</span> <span class="o">=</span> <span class="mi">4</span>
 <span class="n">gaussian_width</span> <span class="o">=</span> <span class="mf">0.03</span>
 
-<span class="n">kernel</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">Lorentzian</span><span class="p">(</span>
+<span class="n">pulse_kernel</span> <span class="o">=</span> <span class="n">Lorentzian</span><span class="p">(</span>
     <span class="n">amplitude</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span>  <span class="c1"># Amplitude range</span>
     <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">),</span>  <span class="c1"># Peak position range</span>
     <span class="n">width</span><span class="o">=</span><span class="n">gaussian_width</span><span class="p">,</span>  <span class="c1"># Width range</span>
 <span class="p">)</span>
 
-<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalDatasetGenerator</span><span class="p">(</span><span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">SignalGenerator</span><span class="p">(</span><span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">)</span>
 
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span>
     <span class="n">n_samples</span><span class="o">=</span><span class="n">NSAMPLES</span><span class="p">,</span>
-    <span class="n">kernel</span><span class="o">=</span><span class="n">kernel</span><span class="p">,</span>
-    <span class="n">n_peaks</span><span class="o">=</span><span class="n">NUM_PEAKS</span><span class="p">,</span>
+    <span class="n">kernel</span><span class="o">=</span><span class="n">pulse_kernel</span><span class="p">,</span>
+    <span class="n">peak_count</span><span class="o">=</span><span class="n">UniformCount</span><span class="p">(</span><span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="n">NUM_PEAKS</span><span class="p">,</span> <span class="n">NUM_PEAKS</span><span class="p">)),</span>
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>  <span class="c1"># Add some noise</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
@@ -515,7 +515,13 @@ the results.</p>
 <span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">region_of_interest</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_amplitude_retrieval_001.png" srcset="../_images/sphx_glr_amplitude_retrieval_001.png" alt="Sample 0, Sample 1, Sample 2" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
+<img src="../_images/sphx_glr_amplitude_retrieval_001.png" srcset="../_images/sphx_glr_amplitude_retrieval_001.png" alt="Sample 0, Sample 1, Sample 2" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>findfont: Font family [&#39;cursive&#39;] not found. Falling back to DejaVu Sans.
+findfont: Generic family &#39;cursive&#39; not found because none of the following families were found: Apple Chancery, Textile, Zapf Chancery, Sand, Script MT, Felipa, Comic Neue, Comic Sans MS, cursive
+findfont: Font family [&#39;Arial&#39;] not found. Falling back to DejaVu Sans.
+findfont: Font family [&#39;Arial&#39;] not found. Falling back to DejaVu Sans.
+findfont: Font family [&#39;Arial&#39;] not found. Falling back to DejaVu Sans.
+
+&lt;Figure size 800x900 with 3 Axes&gt;
 </pre></div>
 </div>
 <p>Configure and run the detector</p>
@@ -547,10 +553,10 @@ the results.</p>
 <span class="n">result</span><span class="o">.</span><span class="n">compare_plot</span><span class="p">(</span><span class="n">true_amplitudes</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">amplitudes</span><span class="p">)</span>
 </pre></div>
 </div>
-<img src="../_images/sphx_glr_amplitude_retrieval_003.png" srcset="../_images/sphx_glr_amplitude_retrieval_003.png" alt="amplitude retrieval" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x500 with 4 Axes&gt;
+<img src="../_images/sphx_glr_amplitude_retrieval_003.png" srcset="../_images/sphx_glr_amplitude_retrieval_003.png" alt="amplitude retrieval" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 640x480 with 4 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.627 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.558 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-amplitude-retrieval-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/18c5d7407121c594154c1cc173fa8eaa/amplitude_retrieval.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">amplitude_retrieval.ipynb</span></code></a></p>

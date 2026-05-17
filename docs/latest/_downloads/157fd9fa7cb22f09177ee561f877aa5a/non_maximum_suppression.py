@@ -9,13 +9,13 @@ the results.
 """
 
 from DeepPeak.algorithms import NonMaximumSuppression
-from DeepPeak.signals import SignalDatasetGenerator
-from DeepPeak.kernel import Gaussian
+from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak import Gaussian, UniformCount
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 400
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 kernel = Gaussian(
     amplitude=(10, 300),  # Amplitude range
@@ -26,7 +26,7 @@ kernel = Gaussian(
 dataset = generator.generate(
     n_samples=6,
     kernel=kernel,
-    n_peaks=(3, 3),
+    peak_count=UniformCount(bounds=(3, 3)),
     noise_std=0,  # Add some noise
     categorical_peak_count=False,
 )

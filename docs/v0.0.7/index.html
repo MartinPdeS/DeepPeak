@@ -31,7 +31,7 @@
 <link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="/opt/hostedtoolcache/Python/3.11.14/x64/lib/python3.11/site-packages/docs/source/_static/default.css" />
+    <link rel="stylesheet" type="text/css" href="/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/docs/source/_static/default.css" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
     <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
@@ -428,7 +428,7 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <p><strong>Date</strong>: Mar 01, 2026, <strong>Version</strong>: 0.0.7</p>
+  <p><strong>Date</strong>: May 17, 2026, <strong>Version</strong>: 0.0.7</p>
 <div class="pst-scrollable-table-container"><table class="table">
 <colgroup>
 <col style="width: 11.8%" />
@@ -472,6 +472,47 @@
 <li><p><strong>Easy-to-Use API</strong>: Train and predict with minimal setup.</p></li>
 </ul>
 </section>
+<section id="analysis-quickstart">
+<h2>Analysis Quickstart<a class="headerlink" href="#analysis-quickstart" title="Link to this heading">#</a></h2>
+<p>For dilution-series analysis, prefer the namespaced <code class="docutils literal notranslate"><span class="pre">DilutionSeries</span></code> API and
+run the standard and CNN detectors explicitly:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">DilutionSeries</span><span class="p">,</span> <span class="n">HeightPeakTrigger</span><span class="p">,</span> <span class="n">SigmaPeakTrigger</span>
+
+<span class="n">series</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="p">(</span>
+    <span class="n">folder</span><span class="o">=</span><span class="s2">&quot;path/to/traces&quot;</span><span class="p">,</span>
+    <span class="n">wavenet</span><span class="o">=</span><span class="n">wavenet</span><span class="p">,</span>
+    <span class="n">initial_concentration</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">nrows</span><span class="o">=</span><span class="mi">100_000</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">standard</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">run_standard</span><span class="p">(</span>
+    <span class="n">std_trigger</span><span class="o">=</span><span class="n">SigmaPeakTrigger</span><span class="p">(</span><span class="n">sigma</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">hysteresis</span><span class="o">=</span><span class="mf">4.0</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">cnn</span> <span class="o">=</span> <span class="n">series</span><span class="o">.</span><span class="n">run_cnn</span><span class="p">(</span>
+    <span class="n">cnn_trigger</span><span class="o">=</span><span class="n">HeightPeakTrigger</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">hysteresis</span><span class="o">=</span><span class="mf">0.03</span><span class="p">),</span>
+    <span class="n">cnn_amplitude_sigma_samples</span><span class="o">=</span><span class="mi">27</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">series</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">standard_detection</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">wavenet_detection</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="n">series</span><span class="o">.</span><span class="n">poisson</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">expected_histogram</span><span class="p">(</span>
+    <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">base_index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">detector</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span>
+    <span class="n">x_axis</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">series</span><span class="o">.</span><span class="n">amplitude</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">detector</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+<span class="n">series</span><span class="o">.</span><span class="n">width</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">detector</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="n">x_axis</span><span class="o">=</span><span class="s2">&quot;time&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you want the old all-in-one execution, <code class="docutils literal notranslate"><span class="pre">series.run()</span></code> still exists, but it
+now requires both the standard and CNN detector configurations to be present.</p>
+<p>The older <code class="docutils literal notranslate"><span class="pre">PeakCountSeries</span></code> name remains available as a backward-compatible
+alias, but new notebook code should prefer <code class="docutils literal notranslate"><span class="pre">DilutionSeries</span></code>.</p>
+</section>
 <section id="contact">
 <h2>Contact<a class="headerlink" href="#contact" title="Link to this heading">#</a></h2>
 <p>For questions or contributions, contact <a class="reference external" href="mailto:martin&#46;poinsinet&#46;de&#46;sivry&#37;&#52;&#48;gmail&#46;com">martin<span>&#46;</span>poinsinet<span>&#46;</span>de<span>&#46;</span>sivry<span>&#64;</span>gmail<span>&#46;</span>com</a>.</p>
@@ -504,6 +545,7 @@
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-features">Key Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-quickstart">Analysis Quickstart</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contact">Contact</a></li>
 </ul>
   </nav></div>

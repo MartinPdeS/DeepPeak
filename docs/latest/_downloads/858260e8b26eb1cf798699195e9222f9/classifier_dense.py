@@ -21,8 +21,8 @@ We will:
 import numpy as np
 
 from DeepPeak.machine_learning.classifier import DenseNet
-from DeepPeak.signals import SignalDatasetGenerator
-from DeepPeak import kernel
+from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak import Lorentzian, UniformCount
 
 np.random.seed(42)
 
@@ -32,18 +32,18 @@ np.random.seed(42)
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-kernel = kernel.Lorentzian(
+pulse_kernel = Lorentzian(
     amplitude=(10, 30),
     position=(0, SEQUENCE_LENGTH),
     width=(3, 6),
 )
 
-generator = SignalDatasetGenerator(sequence_length=SEQUENCE_LENGTH)
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
     n_samples=300,
-    kernel=kernel,
-    n_peaks=(1, NUM_PEAKS),
+    kernel=pulse_kernel,
+    peak_count=UniformCount(bounds=(1, NUM_PEAKS)),
     noise_std=0.1,
     categorical_peak_count=False,
 )
