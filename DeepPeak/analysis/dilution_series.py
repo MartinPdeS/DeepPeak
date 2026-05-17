@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Literal, Mapping, Optional, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.ticker import FuncFormatter
 
 from .distributions import (
     compute_event_arrival_distribution_metrics,
@@ -886,13 +887,62 @@ class DilutionSeries:
         def detected_peaks_per_second_vs_expected_throughput(
             self, **plot_kwargs
         ) -> plt.Figure:
-            """Alias for measured-vs-expected detector flow comparison.
+            """Plot detected peaks per second against dilution-scaled expected throughput.
 
-            This makes the notebook intent explicit: compare detected peaks per
-            second against the throughput predicted from the dilution series.
+            Wraps :meth:`measured_vs_expected_particle_flows` and adds optional
+            dead-time saturation curves and a human-readable throughput tick
+            formatter.  All keyword arguments accepted by the underlying method
+            are forwarded; the extra parameters below are consumed before
+            forwarding.
+
+            Parameters
+            ----------
+            tau_values : float or sequence of float, optional
+                Dead-time value(s) τ to overlay as saturation curves.  When
+                provided the ideal line from the host plot is suppressed so the
+                curves serve as the theoretical reference.
+            use_tick_formatter : bool, default=True
+                Apply :func:`~DeepPeak.analysis.dead_time.throughput_tick_formatter`
+                to both axes so that large flow values are shown as ``1.2M``
+                rather than ``1200000``.
+            x_label : str, default="Expected throughput [#/s]"
+                Override the x-axis label.
+            y_label : str, default="Detected peaks [#/s]"
+                Override the y-axis label.
+            tau_line_width : float, default=1.5
+                Line width for the dead-time saturation curves.
             """
+            from .dead_time import plot_dead_time_saturation, throughput_tick_formatter
 
-            return self.measured_vs_expected_particle_flows(**plot_kwargs)
+            tau_values = plot_kwargs.pop("tau_values", None)
+            use_tick_formatter = plot_kwargs.pop("use_tick_formatter", True)
+            x_label = plot_kwargs.pop("x_label", "Expected throughput [#/s]")
+            y_label = plot_kwargs.pop("y_label", "Detected peaks [#/s]")
+            tau_line_width = plot_kwargs.pop("tau_line_width", 1.5)
+
+            if tau_values is not None:
+                plot_kwargs.setdefault("show_ideal_line", False)
+
+            figure = self.measured_vs_expected_particle_flows(**plot_kwargs)
+            axis = figure.axes[0]
+
+            axis.set_xlabel(x_label)
+            axis.set_ylabel(y_label)
+
+            if tau_values is not None:
+                plot_dead_time_saturation(
+                    tau_values=tau_values,
+                    ax=axis,
+                    show_ideal_line=True,
+                    line_width=tau_line_width,
+                )
+
+            if use_tick_formatter:
+                axis.xaxis.set_major_formatter(FuncFormatter(throughput_tick_formatter))
+                axis.yaxis.set_major_formatter(FuncFormatter(throughput_tick_formatter))
+
+            figure.tight_layout()
+            return figure
 
         def peak_counts(self, **plot_kwargs) -> plt.Figure:
             """Plot standard and WaveNet peak counts for the series."""

@@ -20,8 +20,6 @@ class SignalGenerator:
     - Optional ROI mask computation through the resulting ``DataSet``
     """
 
-    last_rois_: Optional[np.ndarray] = None
-
     def __init__(
         self, sequence_length: int, x_values: Optional[np.ndarray] = None
     ) -> None:
@@ -57,7 +55,6 @@ class SignalGenerator:
         """Drop all buffered generated batches."""
 
         self._dataset_parts.clear()
-        self.last_rois_ = None
 
     def generate(
         self,

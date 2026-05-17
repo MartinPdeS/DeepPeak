@@ -28,6 +28,13 @@ from .metrics import (
     TraceRecord,
     WaveNetAnalyzerConfig,
 )
+from .dead_time import (
+    correct_observed_flow,
+    expected_observed_flow,
+    fraction_missed,
+    plot_dead_time_saturation,
+    throughput_tick_formatter,
+)
 from .triggers import BasePeakTrigger, HeightPeakTrigger, SigmaPeakTrigger
 from .wavenet_trace import CNNTraceAnalyzer, StandardTraceAnalyzer, WaveNetTraceAnalyzer
 
@@ -53,4 +60,9 @@ __all__ = [
     "compute_event_arrival_distribution_metrics",
     "compute_peak_amplitude_distribution_metrics",
     "compute_peak_width_distribution_metrics",
+    "correct_observed_flow",
+    "expected_observed_flow",
+    "fraction_missed",
+    "plot_dead_time_saturation",
+    "throughput_tick_formatter",
 ]

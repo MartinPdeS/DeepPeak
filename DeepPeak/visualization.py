@@ -26,7 +26,9 @@ def plot_conv1D(model, input_signal, layer_name):
     None
     """
     # Create a submodel to output intermediate activations
-    activation_model = Model(inputs=model.input, outputs=model.get_layer(layer_name).output)
+    activation_model = Model(
+        inputs=model.input, outputs=model.get_layer(layer_name).output
+    )
 
     # Get the activations for the input signal
     activations = activation_model.predict(input_signal)
@@ -66,7 +68,9 @@ def plot_dense(model, input_signal, layer_name):
     None
     """
     # Create a submodel to output intermediate activations
-    activation_model = Model(inputs=model.input, outputs=model.get_layer(layer_name).output)
+    activation_model = Model(
+        inputs=model.input, outputs=model.get_layer(layer_name).output
+    )
 
     # Get the activations for the input signal
     activations = activation_model.predict(input_signal)
@@ -140,7 +144,9 @@ def plot_gradcam_with_signal(
     predictions = model.predict(signal.reshape([1, input_length, 1])).flatten()
 
     # Create the figure with subplots
-    num_axes = min(max_channels, heatmaps.shape[-1]) + 1  # 1 for signal, rest for heatmaps
+    num_axes = (
+        min(max_channels, heatmaps.shape[-1]) + 1
+    )  # 1 for signal, rest for heatmaps
     fig, axes = plt.subplots(
         num_axes,
         1,
@@ -181,7 +187,9 @@ def plot_gradcam_with_signal(
     plt.show()
 
 
-def plot_training_history(history, metrics: list, y_scale: str = "log", show: bool = True) -> plt.Figure:
+def plot_training_history(
+    history, metrics: list, y_scale: str = "log", show: bool = True
+) -> plt.Figure:
     """
     Plot training and validation performance metrics (loss and accuracy).
 
@@ -195,7 +203,9 @@ def plot_training_history(history, metrics: list, y_scale: str = "log", show: bo
     metrics = set(metrics).intersection(set(history.history))
 
     with plt.style.context(mps):
-        figure, ax = plt.subplots(nrows=1, ncols=1, sharex=True, squeeze=True, figsize=(8, 3))
+        figure, ax = plt.subplots(
+            nrows=1, ncols=1, sharex=True, squeeze=True, figsize=(8, 3)
+        )
 
     for metric in metrics:
         values = history.history[metric]
@@ -212,62 +222,6 @@ def plot_training_history(history, metrics: list, y_scale: str = "log", show: bo
         plt.show()
 
     return figure
-
-
-# def plot_training_history(*histories, filtering: list = None, y_scale: str = 'log', show: bool = True) -> plt.Figure:
-#     """
-#     Plot training and validation performance metrics (loss and accuracy).
-
-#     Parameters
-#     ----------
-#     history : tensorflow.keras.callbacks.History
-#         The training history object from model.fit().
-#     filtering : list of str, optional
-#         List of wildcard patterns to filter the keys in the history dictionary. Use '*' as a wildcard.
-#     """
-#     # Convert wildcard patterns to regex patterns
-#     def wildcard_to_regex(pattern):
-#         return "^" + re.escape(pattern).replace("\\*", ".*") + "$"
-
-#     with plt.style.context(mps):
-#         figure, axes = plt.subplots(
-#             nrows=len(histories),
-#             ncols=1,
-#             sharex=True,
-#             squeeze=False,
-#             figsize=(8, 3 * len(histories))
-#         )
-
-#     for history in histories:
-#         # Filter the history dictionary based on converted patterns
-#         if filtering is not None:
-#             regex_patterns = [wildcard_to_regex(pattern) for pattern in filtering]
-#             history_dict = {
-#                 k: v for k, v in history.history.items()
-#                 if any(re.fullmatch(regex, k) for regex in regex_patterns)
-#             }
-#         else:
-#             history_dict = history.history
-
-#         if not history_dict:
-#             print("No matching keys found for the provided filtering patterns.")
-#             return
-
-#         for ax, (key, value) in zip(axes.flatten(), history_dict.items()):
-#             ax.plot(value, label=history.name if hasattr(history, 'name') else '')
-#             ax.legend(loc='upper left')
-#             ax.set_ylabel(key.replace('_', ' '))
-#             ax.set_yscale(y_scale)
-
-#     axes.flatten()[-1].set_xlabel('Number of Epochs')
-#     figure.suptitle('Training History')
-
-#     plt.tight_layout()
-
-#     if show:
-#         plt.show()
-
-#     return figure
 
 
 class SignalPlotter:
@@ -301,14 +255,26 @@ class SignalPlotter:
     def __init__(self):
         # Internal storage for required signals and overlays.
         self.signals = None  # 2D array of shape (n_samples, sequence_length)
-        self.x_values = None  # 1D array of shape (sequence_length,), inferred if not provided
+        self.x_values = (
+            None  # 1D array of shape (sequence_length,), inferred if not provided
+        )
 
         # Accumulate overlays in lists
-        self._scatter = []  # List of scatter dictionaries: keys: scatter_x, scatter_y, color, marker, label, alpha.
-        self._vlines = []  # List of vertical line dictionaries: keys: x, color, linestyle, label, linewidth, alpha.
-        self._hlines = []  # List of horizontal line dictionaries: keys: y, color, linestyle, label, linewidth, alpha.
-        self._rois = []  # List of ROI overlay dictionaries: keys: roi_array, color, label, alpha.
-        self._custom_curves = []  # List of custom curve dictionaries: keys: curve_func, label, color, style, kwargs_arrays.
+        self._scatter = (
+            []
+        )  # List of scatter dictionaries: keys: scatter_x, scatter_y, color, marker, label, alpha.
+        self._vlines = (
+            []
+        )  # List of vertical line dictionaries: keys: x, color, linestyle, label, linewidth, alpha.
+        self._hlines = (
+            []
+        )  # List of horizontal line dictionaries: keys: y, color, linestyle, label, linewidth, alpha.
+        self._rois = (
+            []
+        )  # List of ROI overlay dictionaries: keys: roi_array, color, label, alpha.
+        self._custom_curves = (
+            []
+        )  # List of custom curve dictionaries: keys: curve_func, label, color, style, kwargs_arrays.
 
         # Display toggles
         self.show_scatter = True
@@ -337,7 +303,9 @@ class SignalPlotter:
         """
         signals = np.asarray(signals)
         if signals.ndim != 2:
-            raise ValueError("signals must be 2D of shape (n_samples, sequence_length).")
+            raise ValueError(
+                "signals must be 2D of shape (n_samples, sequence_length)."
+            )
         self.signals = signals
 
         if x_values is not None:
@@ -580,10 +548,16 @@ class SignalPlotter:
         """
         roi_array = np.asarray(roi_array)
         if roi_array.ndim != 2:
-            raise ValueError("ROI array must be 2D of shape (n_samples, sequence_length).")
+            raise ValueError(
+                "ROI array must be 2D of shape (n_samples, sequence_length)."
+            )
         if self.signals is not None and roi_array.shape != self.signals.shape:
-            raise ValueError(f"ROI array shape must match signals shape: {roi_array.shape} vs {self.signals.shape}.")
-        self._rois.append({"roi_array": roi_array, "color": color, "label": label, "alpha": alpha})
+            raise ValueError(
+                f"ROI array shape must match signals shape: {roi_array.shape} vs {self.signals.shape}."
+            )
+        self._rois.append(
+            {"roi_array": roi_array, "color": color, "label": label, "alpha": alpha}
+        )
         return self
 
     def add_custom_curves(
@@ -624,12 +598,16 @@ class SignalPlotter:
         """
         shapes = [arr.shape for arr in kwargs_arrays.values()]
         if len(set(shapes)) > 1:
-            raise ValueError(f"All keyword arrays must have the same shape. Got shapes: {shapes}")
+            raise ValueError(
+                f"All keyword arrays must have the same shape. Got shapes: {shapes}"
+            )
         if self.signals is not None:
             n_samples = self.signals.shape[0]
             for name, arr in kwargs_arrays.items():
                 if arr.shape[0] != n_samples:
-                    raise ValueError(f"{name}.shape[0] = {arr.shape[0]} != n_samples={n_samples}")
+                    raise ValueError(
+                        f"{name}.shape[0] = {arr.shape[0]} != n_samples={n_samples}"
+                    )
         self._custom_curves.append(
             {
                 "curve_func": curve_function,
@@ -681,7 +659,9 @@ class SignalPlotter:
         # Determine sample indices
         if sample_indices is None:
             if random_select:
-                sample_indices = np.random.choice(n_samples, size=min(n_examples, n_samples), replace=False)
+                sample_indices = np.random.choice(
+                    n_samples, size=min(n_examples, n_samples), replace=False
+                )
             else:
                 sample_indices = np.arange(min(n_examples, n_samples))
         else:
