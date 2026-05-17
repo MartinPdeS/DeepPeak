@@ -35,35 +35,44 @@ Key Features
 Analysis Quickstart
 -------------------
 
-For dilution-series analysis, prefer the namespaced ``DilutionSeries`` API:
+For dilution-series analysis, prefer the namespaced ``DilutionSeries`` API and
+run the standard and CNN detectors explicitly:
 
 .. code-block:: python
 
-   from DeepPeak.analysis import DilutionSeries, PeakTrigger
+   from DeepPeak.analysis import DilutionSeries, HeightPeakTrigger, SigmaPeakTrigger
 
    series = DilutionSeries(
        folder="path/to/traces",
        wavenet=wavenet,
        initial_concentration=1.0,
        nrows=100_000,
-       std_trigger=PeakTrigger(height=0.15, hysteresis=0.12),
-       cnn_trigger=PeakTrigger(height=0.05, hysteresis=0.03),
    )
 
-   series.run()
+   standard = series.run_standard(
+       std_trigger=SigmaPeakTrigger(sigma=5.0, hysteresis=4.0),
+   )
 
-   series.trace.standard(index=0)
-   series.trace.wavenet(index=0)
+   cnn = series.run_cnn(
+       cnn_trigger=HeightPeakTrigger(height=0.05, hysteresis=0.03),
+       cnn_amplitude_sigma_samples=27,
+   )
 
-   series.poisson.plot_expected_inter_arrival_histogram(
+   series.plot.standard_detection(index=0)
+   series.plot.wavenet_detection(index=0)
+
+   series.poisson.plot.expected_histogram(
        index=0,
        base_index=0,
        detector="standard",
        x_axis="time",
    )
 
-   series.amplitude.plot_histogram(index=0, detector="standard")
-   series.width.plot_histogram(index=0, detector="standard", x_axis="time")
+   series.amplitude.plot.histogram(index=0, detector="standard")
+   series.width.plot.histogram(index=0, detector="standard", x_axis="time")
+
+If you want the old all-in-one execution, ``series.run()`` still exists, but it
+now requires both the standard and CNN detector configurations to be present.
 
 The older ``PeakCountSeries`` name remains available as a backward-compatible
 alias, but new notebook code should prefer ``DilutionSeries``.

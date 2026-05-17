@@ -13,14 +13,27 @@ except ImportError:
     __version__ = "0.0.0"
 
 from .analysis import (
+    BasePeakTrigger,
+    CNNTraceAnalyzer,
     DilutionSeries,
+    HeightPeakTrigger,
     PeakCountSeries,
     PeakCountSeriesResult,
-    PeakTrigger,
+    SigmaPeakTrigger,
+    StandardTraceAnalyzer,
     WaveNetTraceAnalyzer,
 )
 from .dataset import DataSet
-from .kernel import BaseKernel, Gaussian, Lorentzian
+from .kernels import (
+    BaseKernel,
+    CustomKernel,
+    Dirac,
+    Gaussian,
+    Lorentzian,
+    Square,
+    TwoLobeGaussian,
+)
+from .peak_count import NegativeBinomialCount, PeakCount, PoissonCount, UniformCount
 from .signal_generator import SignalGenerator
 
 SignalDatasetGenerator = SignalGenerator
@@ -33,23 +46,47 @@ __all__ = [
     "DataSet",
     "DenseNet",
     "DilutionSeries",
+    "Dirac",
     "Gaussian",
     "Lorentzian",
+    "NegativeBinomialCount",
+    "PeakCount",
+    "PoissonCount",
+    "TwoLobeGaussian",
+    "UniformCount",
+    "Square",
+    "CustomKernel",
     "PeakCountSeries",
     "PeakCountSeriesResult",
-    "PeakTrigger",
+    "BasePeakTrigger",
+    "CNNTraceAnalyzer",
+    "HeightPeakTrigger",
     "SignalGenerator",
+    "ShapeAwarePulseLoss",
+    "SigmaPeakTrigger",
+    "StandardTraceAnalyzer",
     "WaveNet",
     "WaveNetTraceAnalyzer",
+    "WeightedBinaryCrossentropy",
+    "WeightedHuber",
     "plot_predictions",
+    "shape_aware_pulse_loss",
+    "weighted_bce",
+    "weighted_huber",
 ]
 
 _LAZY_CLASSIFIER_EXPORTS = {
     "Autoencoder",
     "BinaryIoU",
     "DenseNet",
+    "ShapeAwarePulseLoss",
     "WaveNet",
+    "WeightedBinaryCrossentropy",
+    "WeightedHuber",
     "plot_predictions",
+    "shape_aware_pulse_loss",
+    "weighted_bce",
+    "weighted_huber",
 }
 
 

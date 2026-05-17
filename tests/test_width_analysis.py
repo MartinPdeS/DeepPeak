@@ -1,12 +1,11 @@
 import numpy as np
 
 from DeepPeak.analysis import (
-    PeakWidthDistributionMetrics,
+    DilutionSeries,
+    HeightPeakTrigger,
     WaveNetTraceAnalyzer,
     compute_peak_width_distribution_metrics,
-    plot_peak_width_ecdf,
-    plot_peak_width_histogram,
-    plot_peak_width_qq,
+    metrics as analysis_metrics,
 )
 
 
@@ -20,8 +19,14 @@ class DummyWaveNet:
 def test_compute_peak_width_distribution_metrics_returns_expected_statistics():
     analyzer = WaveNetTraceAnalyzer(
         wavenet=DummyWaveNet(),
-        std_kwargs={"height": 1.5, "required_samples_below_hysteresis": 2},
-        cnn_kwargs={"height": 0.6, "required_samples_below_hysteresis": 2},
+        std_trigger=HeightPeakTrigger(
+            height=1.5,
+            required_samples_below_hysteresis=2,
+        ),
+        cnn_trigger=HeightPeakTrigger(
+            height=0.6,
+            required_samples_below_hysteresis=2,
+        ),
         signal_normalization="minmax",
     )
 
@@ -36,7 +41,7 @@ def test_compute_peak_width_distribution_metrics_returns_expected_statistics():
     )
 
     standard_metrics = metrics["standard"]
-    assert isinstance(standard_metrics, PeakWidthDistributionMetrics)
+    assert isinstance(standard_metrics, analysis_metrics.PeakWidthDistribution)
     assert standard_metrics.number_of_peaks == 2
     assert standard_metrics.widths.tolist() == [3.0, 4.0]
     assert standard_metrics.mean_width == 3.5
@@ -46,7 +51,7 @@ def test_compute_peak_width_distribution_metrics_returns_expected_statistics():
 
 def test_width_analysis_plot_helpers_return_figures():
     metrics = {
-        "standard": PeakWidthDistributionMetrics(
+        "standard": analysis_metrics.PeakWidthDistribution(
             label="standard",
             x_axis="sample",
             width_unit_label="Samples",
@@ -68,6 +73,6 @@ def test_width_analysis_plot_helpers_return_figures():
         )
     }
 
-    assert plot_peak_width_histogram(metrics).__class__.__name__ == "Figure"
-    assert plot_peak_width_qq(metrics).__class__.__name__ == "Figure"
-    assert plot_peak_width_ecdf(metrics).__class__.__name__ == "Figure"
+    assert metrics["standard"].plot.histogram().__class__.__name__ == "Figure"
+    assert metrics["standard"].plot.qq().__class__.__name__ == "Figure"
+    assert metrics["standard"].plot.ecdf().__class__.__name__ == "Figure"

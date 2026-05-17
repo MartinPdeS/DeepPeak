@@ -1,15 +1,15 @@
-from __future__ import annotations
-
 from typing import Literal
+import numpy as np
 import matplotlib.pyplot as plt
 from MPSPlots import helper
-import numpy as np
+
 from DeepPeak import processing
 
 
 Profile = Literal["gaussian", "lorentzian"]
 WidthDefinition = Literal["fwhm", "sigma", "gamma"]
 NormalizationMode = Literal["analytic", "sampled"]
+AmplitudeThresholdReference = Literal["absolute", "sample_max_amplitude", "signal_max"]
 
 
 class DataSet:
@@ -27,16 +27,92 @@ class DataSet:
 
     list_of_attributes = None
 
-    def __init__(self, **kwargs):
+    def __init__(
+        self,
+        *,
+        n_samples: int | None = None,
+        sequence_length: int | None = None,
+        **kwargs,
+    ):
         self.list_of_attributes = []
         for key, value in kwargs.items():
             setattr(self, key, value)
             self.list_of_attributes.append(key)
 
+        inferred_n_samples = n_samples
+        inferred_sequence_length = sequence_length
+
+        signals = getattr(self, "signals", None)
+        if isinstance(signals, np.ndarray) and signals.ndim >= 2:
+            if inferred_n_samples is None:
+                inferred_n_samples = int(signals.shape[0])
+            if inferred_sequence_length is None:
+                inferred_sequence_length = int(signals.shape[-1])
+
+        x_values = getattr(self, "x_values", None)
+        if (
+            inferred_sequence_length is None
+            and isinstance(x_values, np.ndarray)
+            and x_values.ndim == 1
+        ):
+            inferred_sequence_length = int(x_values.size)
+
+        if inferred_n_samples is not None:
+            self.n_samples = int(inferred_n_samples)
+            self.list_of_attributes.append("n_samples")
+        if inferred_sequence_length is not None:
+            self.sequence_length = int(inferred_sequence_length)
+            self.list_of_attributes.append("sequence_length")
+
     def __repr__(self):
         class_name = self.__class__.__name__
         attributes = ", ".join(f"{key}" for key in self.list_of_attributes)
         return f"{class_name}({attributes})"
+
+    def shuffle(self, seed: int | None = None, inplace: bool = False) -> "DataSet":
+        """Shuffle sample-aligned attributes with one shared permutation."""
+
+        n_samples = self._resolve_n_samples()
+        permutation = np.random.default_rng(seed).permutation(n_samples)
+
+        if inplace:
+            target = self
+        else:
+            copied_attributes = {
+                key: self._copy_attribute_value(getattr(self, key))
+                for key in self.list_of_attributes
+                if hasattr(self, key)
+            }
+            target = DataSet(**copied_attributes)
+
+        for key in target.list_of_attributes:
+            value = getattr(target, key)
+            if (
+                isinstance(value, np.ndarray)
+                and value.ndim >= 1
+                and value.shape[0] == n_samples
+            ):
+                setattr(target, key, value[permutation].copy())
+
+        return target
+
+    def _resolve_n_samples(self) -> int:
+        if hasattr(self, "n_samples"):
+            return int(self.n_samples)
+
+        signals = getattr(self, "signals", None)
+        if isinstance(signals, np.ndarray) and signals.ndim >= 1:
+            return int(signals.shape[0])
+
+        raise AttributeError(
+            "Cannot determine n_samples for shuffle(); provide n_samples in the DataSet constructor or include a sample-aligned signals array."
+        )
+
+    @staticmethod
+    def _copy_attribute_value(value):
+        if isinstance(value, np.ndarray):
+            return value.copy()
+        return value
 
     def get_normalized_signal(self, normalization: str = "zscore"):
         """
@@ -469,6 +545,10 @@ class DataSet:
         *,
         normalization_mode: NormalizationMode = "analytic",
         sampled_normalization_epsilon: float = 1e-12,
+        min_peak_distance: float | None = None,
+        min_peak_amplitude: float | None = None,
+        amplitude_threshold_reference: AmplitudeThresholdReference = "absolute",
+        max_peak_overlap: float | None = None,
     ) -> np.ndarray:
         """
         Build an idealized reference trace by summing analytic pulses at known peak positions.
@@ -494,6 +574,25 @@ class DataSet:
             "sampled" normalizes by the sampled maximum along x, robust to sub sample peak centers.
         sampled_normalization_epsilon
             Floor to avoid division by zero in sampled normalization.
+        min_peak_distance
+            If provided, suppress reference pulses for peaks that are closer than this
+            distance in `self.x_values` units to any other valid peak in the same sample.
+            Both peaks in each too-close pair are suppressed.
+        min_peak_amplitude
+            If provided, suppress reference pulses for peaks whose absolute amplitude is
+            below the computed threshold.
+        amplitude_threshold_reference
+            Reference scale used with `min_peak_amplitude`:
+            "absolute" compares against the raw peak amplitude,
+            "sample_max_amplitude" compares against the largest absolute peak amplitude
+            in the same sample, and
+            "signal_max" compares against the largest absolute signal value in the same
+            sample.
+        max_peak_overlap
+            If provided, suppress reference pulses whose neighboring reference pulses
+            contribute more than this fraction of the peak's own reference height at
+            that peak center. Overlap is computed from the selected pulse profile,
+            width, and reference amplitudes.
 
         Returns
         -------
@@ -511,10 +610,91 @@ class DataSet:
         valid_amp = np.isfinite(amplitudes) & (amplitudes != 0.0)
         valid = valid_pos & valid_amp  # (n_samples, n_peaks)
 
+        if min_peak_distance is not None:
+            min_peak_distance = float(min_peak_distance)
+            if min_peak_distance < 0.0:
+                raise ValueError("min_peak_distance must be non-negative")
+
+            distance = np.abs(positions[:, :, None] - positions[:, None, :])
+            close_pairs = distance < min_peak_distance
+            diagonal = np.eye(close_pairs.shape[1], dtype=bool)[None, :, :]
+            close_pairs &= ~diagonal
+            close_pairs &= valid[:, :, None] & valid[:, None, :]
+
+            crowded_peaks = np.any(close_pairs, axis=2)
+            valid &= ~crowded_peaks
+
+        if min_peak_amplitude is not None:
+            min_peak_amplitude = float(min_peak_amplitude)
+            if min_peak_amplitude < 0.0:
+                raise ValueError("min_peak_amplitude must be non-negative")
+
+            abs_amplitudes = np.abs(amplitudes)
+            threshold_mode = amplitude_threshold_reference.lower()
+
+            if threshold_mode == "absolute":
+                threshold = np.full_like(abs_amplitudes, min_peak_amplitude)
+            elif threshold_mode == "sample_max_amplitude":
+                sample_max_amplitude = np.max(
+                    np.where(valid, abs_amplitudes, 0.0), axis=1, keepdims=True
+                )
+                threshold = min_peak_amplitude * sample_max_amplitude
+            elif threshold_mode == "signal_max":
+                signal_max = np.max(np.abs(signals), axis=1, keepdims=True)
+                threshold = min_peak_amplitude * signal_max
+            else:
+                raise ValueError(
+                    "amplitude_threshold_reference must be 'absolute', "
+                    "'sample_max_amplitude', or 'signal_max'"
+                )
+
+            valid &= abs_amplitudes >= threshold
+
         if amplitude is None:
             amplitude_per_peak = amplitudes
         else:
             amplitude_per_peak = np.full_like(amplitudes, float(amplitude))
+
+        if max_peak_overlap is not None:
+            max_peak_overlap = float(max_peak_overlap)
+            if max_peak_overlap < 0.0:
+                raise ValueError("max_peak_overlap must be non-negative")
+
+            overlap_valid = valid.copy()
+            positions_overlap = np.where(overlap_valid, positions, 0.0)
+            center_delta = positions_overlap[:, :, None] - positions_overlap[:, None, :]
+
+            if profile.lower() == "gaussian":
+                pairwise_pulse = self._gaussian_pulse(
+                    delta=center_delta,
+                    width=width,
+                    width_definition=width_definition,
+                )  # type: ignore[arg-type]
+            elif profile.lower() == "lorentzian":
+                pairwise_pulse = self._lorentzian_pulse(
+                    delta=center_delta,
+                    width=width,
+                    width_definition=width_definition,
+                )  # type: ignore[arg-type]
+            else:
+                raise ValueError("profile must be 'gaussian' or 'lorentzian'")
+
+            pairwise_valid = overlap_valid[:, :, None] & overlap_valid[:, None, :]
+            pairwise_pulse = np.where(pairwise_valid, pairwise_pulse, 0.0)
+
+            diagonal = np.eye(pairwise_pulse.shape[1], dtype=bool)[None, :, :]
+            pairwise_pulse = np.where(diagonal, 0.0, pairwise_pulse)
+
+            reference_amplitude = np.where(overlap_valid, amplitude_per_peak, 0.0)
+            abs_reference_amplitude = np.abs(reference_amplitude)
+            neighbor_height = np.sum(
+                abs_reference_amplitude[:, None, :] * pairwise_pulse,
+                axis=2,
+            )
+            own_height = np.maximum(abs_reference_amplitude, 1e-12)
+            overlap_fraction = neighbor_height / own_height
+
+            valid &= overlap_fraction <= max_peak_overlap
 
         amplitude_per_peak = np.where(valid, amplitude_per_peak, 0.0)
 

@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Union
+from typing import Any, Mapping, Optional, Tuple, Union
 from dataclasses import dataclass, field
 import tempfile
 import os
@@ -9,7 +9,138 @@ from tensorflow.keras import layers, models  # type: ignore
 from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
 
 from DeepPeak.machine_learning.classifier.base import BaseClassifier
+from DeepPeak.machine_learning.classifier.losses import (
+    ShapeAwarePulseLoss,
+    WeightedBinaryCrossentropy,
+    WeightedHuber,
+    shape_aware_pulse_loss,
+    weighted_bce,
+    weighted_huber,
+)
 from DeepPeak.machine_learning.classifier.metrics import BinaryIoU
+
+
+def _build_custom_object_map(
+    custom_objects: Optional[Mapping[str, Any]] = None,
+) -> dict[str, Any]:
+    resolved = {
+        "BinaryIoU": BinaryIoU,
+        "ShapeAwarePulseLoss": ShapeAwarePulseLoss,
+        "WeightedBinaryCrossentropy": WeightedBinaryCrossentropy,
+        "WeightedHuber": WeightedHuber,
+        "shape_aware_pulse_loss": shape_aware_pulse_loss,
+        "weighted_bce": weighted_bce,
+        "weighted_huber": weighted_huber,
+    }
+    if custom_objects:
+        resolved.update(custom_objects)
+    return resolved
+
+
+def _serialize_compile_identifier(identifier: Any) -> Any:
+    if isinstance(identifier, str):
+        return identifier
+    return tf.keras.utils.serialize_keras_object(identifier)
+
+
+def _deserialize_compile_identifier(
+    identifier: Any,
+    custom_objects: Mapping[str, Any],
+) -> Any:
+    if not isinstance(identifier, dict):
+        return identifier
+    try:
+        return tf.keras.utils.deserialize_keras_object(
+            identifier,
+            custom_objects=dict(custom_objects),
+        )
+    except TypeError:
+        return identifier
+
+
+def _deserialize_optimizer_identifier(
+    identifier: Any,
+    custom_objects: Mapping[str, Any],
+) -> Any:
+    identifier = _deserialize_compile_identifier(identifier, custom_objects)
+
+    if not isinstance(identifier, dict):
+        return identifier
+
+    return tf.keras.optimizers.deserialize(
+        identifier,
+        custom_objects=dict(custom_objects),
+    )
+
+
+def _resolve_loss_identifier(identifier: Any, custom_objects: Mapping[str, Any]) -> Any:
+    serialized_identifier = identifier
+
+    try:
+        identifier = _deserialize_compile_identifier(identifier, custom_objects)
+    except (TypeError, ValueError) as exc:
+        if isinstance(serialized_identifier, dict):
+            loss_name = serialized_identifier.get(
+                "config",
+                serialized_identifier.get("class_name", serialized_identifier),
+            )
+            raise ValueError(
+                "Unknown loss identifier during WaveNet.load(): "
+                f"{loss_name!r}. Pass it via custom_objects, for example "
+                f"WaveNet.load(path, custom_objects={{'{loss_name}': your_loss}})."
+            ) from exc
+        raise
+
+    if not isinstance(identifier, str):
+        if isinstance(identifier, dict):
+            try:
+                return tf.keras.losses.deserialize(
+                    identifier,
+                    custom_objects=dict(custom_objects),
+                )
+            except (TypeError, ValueError) as exc:
+                loss_name = identifier.get("class_name", identifier)
+                raise ValueError(
+                    "Unknown loss identifier during WaveNet.load(): "
+                    f"{loss_name!r}. Pass it via custom_objects, for example "
+                    f"WaveNet.load(path, custom_objects={{'{loss_name}': your_loss}})."
+                ) from exc
+        return identifier
+
+    if identifier in custom_objects:
+        loss = custom_objects[identifier]
+        return loss() if isinstance(loss, type) else loss
+
+    try:
+        tf.keras.losses.get(identifier)
+    except ValueError as exc:
+        raise ValueError(
+            "Unknown loss identifier during WaveNet.load(): "
+            f"{identifier!r}. Pass it via custom_objects, for example "
+            f"WaveNet.load(path, custom_objects={{'{identifier}': your_loss}})."
+        ) from exc
+
+    return identifier
+
+
+def _resolve_metric_identifier(
+    identifier: Any, custom_objects: Mapping[str, Any]
+) -> Any:
+    identifier = _deserialize_compile_identifier(identifier, custom_objects)
+
+    if not isinstance(identifier, str):
+        if isinstance(identifier, dict):
+            return tf.keras.metrics.deserialize(
+                identifier,
+                custom_objects=dict(custom_objects),
+            )
+        return identifier
+
+    if identifier in custom_objects:
+        metric = custom_objects[identifier]
+        return metric() if isinstance(metric, type) else metric
+
+    return identifier
 
 
 @dataclass
@@ -146,43 +277,15 @@ class WaveNet(BaseClassifier):
 
         os.makedirs(path, exist_ok=True)
 
-        # --- JSON-safe serialization helpers ---
-        def serialize_metric(metric):
-            if isinstance(metric, str):
-                return metric
-            if hasattr(metric, "name"):
-                return metric.name
-            if hasattr(metric, "__class__"):
-                return metric.__class__.__name__
-            return str(metric)
-
-        def serialize_loss(loss):
-            if isinstance(loss, str):
-                return loss
-            if hasattr(loss, "__name__"):
-                return loss.__name__
-            if hasattr(loss, "__class__"):
-                return loss.__class__.__name__
-            return str(loss)
-
-        def serialize_optimizer(opt):
-            if isinstance(opt, str):
-                return opt
-            if hasattr(opt, "_name"):
-                return opt._name
-            if hasattr(opt, "__class__"):
-                return opt.__class__.__name__
-            return str(opt)
-
         # --- Build config dict ---
         config = {
             "sequence_length": self.sequence_length,
             "num_filters": self.num_filters,
             "num_dilation_layers": self.num_dilation_layers,
             "kernel_size": self.kernel_size,
-            "optimizer": serialize_optimizer(self.optimizer),
-            "loss": serialize_loss(self.loss),
-            "metrics": [serialize_metric(m) for m in self.metrics],
+            "optimizer": _serialize_compile_identifier(self.optimizer),
+            "loss": _serialize_compile_identifier(self.loss),
+            "metrics": [_serialize_compile_identifier(m) for m in self.metrics],
             "seed": self.seed,
         }
 
@@ -202,7 +305,12 @@ class WaveNet(BaseClassifier):
         print(f"Model saved to {path}")
 
     @classmethod
-    def load(cls, path: str) -> "WaveNet":
+    def load(
+        cls,
+        path: str,
+        *,
+        custom_objects: Optional[Mapping[str, Any]] = None,
+    ) -> "WaveNet":
         """
         Load a complete WaveNet instance (architecture, weights, and metadata)
         from a directory or a single .h5/.keras file.
@@ -224,10 +332,12 @@ class WaveNet(BaseClassifier):
         import json
         from tensorflow import keras
 
+        resolved_custom_objects = _build_custom_object_map(custom_objects)
+
         # Case 1 — direct .h5 or .keras model file
         if os.path.isfile(path) and (path.endswith(".h5") or path.endswith(".keras")):
             model = keras.models.load_model(
-                path, custom_objects={"BinaryIoU": BinaryIoU}
+                path, custom_objects=resolved_custom_objects
             )
             instance = cls(
                 sequence_length=model.input_shape[1],
@@ -257,11 +367,15 @@ class WaveNet(BaseClassifier):
             config = json.load(f)
 
         # Map metric names back to instances
-        metric_map = {
-            "accuracy": "accuracy",
-            "BinaryIoU": BinaryIoU(),
-        }
-        metrics = [metric_map.get(m, m) for m in config["metrics"]]
+        metrics = [
+            _resolve_metric_identifier(metric, resolved_custom_objects)
+            for metric in config["metrics"]
+        ]
+        loss = _resolve_loss_identifier(config["loss"], resolved_custom_objects)
+        optimizer = _deserialize_optimizer_identifier(
+            config["optimizer"],
+            resolved_custom_objects,
+        )
 
         # Instantiate model class
         instance = cls(
@@ -269,8 +383,8 @@ class WaveNet(BaseClassifier):
             num_filters=config["num_filters"],
             num_dilation_layers=config["num_dilation_layers"],
             kernel_size=config["kernel_size"],
-            optimizer=config["optimizer"],
-            loss=config["loss"],
+            optimizer=optimizer,
+            loss=loss,
             metrics=tuple(metrics),
             seed=config.get("seed"),
         )

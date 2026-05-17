@@ -1,4 +1,4 @@
-"""Peak-amplitude distribution diagnostics and plots.
+"""Peak-amplitude distribution diagnostics.
 
 These helpers mirror the event-arrival analysis workflow for peak amplitudes.
 They operate on the canonical trace records produced by the analysis pipeline,
@@ -6,29 +6,21 @@ compute summary statistics for detected peak amplitudes on the processed trace,
 and provide small, explicit plotting helpers for notebooks.
 """
 
-from pathlib import Path
-from typing import Dict, Literal, Optional, Tuple, Union
+from typing import Dict, Literal, Optional
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
-from matplotlib import colors as mcolors
 
-from ..results import PeakAmplitudeDistributionMetrics, resolve_series_or_result
-from ..trace_plots import (
-    finalize_single_axis_figure,
-    make_or_reuse_single_axis,
-    plot_style_context,
-)
+from .. import metrics
 
 
-DetectorLabel = Literal["standard", "cnn", "both"]
+DetectorLabel = Literal["standard", "cnn"]
 
 
 def _resolve_single_label_metrics(
-    metrics_by_label: Dict[str, PeakAmplitudeDistributionMetrics],
+    metrics_by_label: Dict[str, metrics.PeakAmplitudeDistribution],
     label: Optional[str],
-) -> PeakAmplitudeDistributionMetrics:
+) -> metrics.PeakAmplitudeDistribution:
     if label is None:
         if len(metrics_by_label) != 1:
             raise ValueError(
@@ -50,12 +42,31 @@ def _detector_labels(detector: DetectorLabel) -> tuple[str, ...]:
         return ("standard",)
     if detector == "cnn":
         return ("cnn",)
-    if detector == "both":
-        return ("standard", "cnn")
-    raise ValueError('detector must be either "standard", "cnn", or "both".')
+    raise ValueError('detector must be either "standard" or "cnn".')
 
 
-def _extract_peak_amplitudes(values: np.ndarray, detection: object) -> np.ndarray:
+def _extract_peak_amplitudes(
+    values: np.ndarray,
+    detection: object,
+    *,
+    use_recovered_amplitudes: bool,
+) -> np.ndarray:
+    if use_recovered_amplitudes:
+        recovered_amplitudes = getattr(detection, "amplitudes", None)
+        if recovered_amplitudes is not None:
+            recovered_amplitudes = np.asarray(recovered_amplitudes, dtype=float).ravel()
+            recovered_amplitudes = recovered_amplitudes[
+                np.isfinite(recovered_amplitudes)
+            ]
+            if recovered_amplitudes.size > 0:
+                return recovered_amplitudes
+
+        raise ValueError(
+            "cnn: recovered amplitudes are unavailable. "
+            "Provide cnn_amplitude_sigma_samples when analyzing the trace so CNN amplitude plots "
+            "use overlap-corrected amplitudes instead of raw signal samples."
+        )
+
     peak_indices = np.asarray(getattr(detection, "peaks", np.asarray([])), dtype=int)
     peak_indices = peak_indices[(peak_indices >= 0) & (peak_indices < values.size)]
 
@@ -66,8 +77,8 @@ def _extract_peak_amplitudes(values: np.ndarray, detection: object) -> np.ndarra
 def compute_peak_amplitude_distribution_metrics(
     series_or_result,
     index: int,
-    detector: DetectorLabel = "both",
-) -> Dict[str, PeakAmplitudeDistributionMetrics]:
+    detector: DetectorLabel = "standard",
+) -> Dict[str, metrics.PeakAmplitudeDistribution]:
     """Compute peak-amplitude diagnostics for one trace and one or more detectors.
 
     Parameters
@@ -77,7 +88,9 @@ def compute_peak_amplitude_distribution_metrics(
     index:
         Index of the trace record inside the sorted series result.
     detector:
-        Which detector output to analyze: standard, CNN, or both.
+        Which detector output to analyze: standard or CNN. CNN metrics require
+        recovered amplitudes and therefore require analysis with
+        ``cnn_amplitude_sigma_samples``.
 
     Returns
     -------
@@ -85,10 +98,10 @@ def compute_peak_amplitude_distribution_metrics(
         Mapping from detector label to amplitude diagnostics.
     """
 
-    resolved_result = resolve_series_or_result(series_or_result)
+    resolved_result = metrics.resolve_series_or_result(series_or_result)
     record = resolved_result.records[index]
 
-    metrics_by_label: Dict[str, PeakAmplitudeDistributionMetrics] = {}
+    metrics_by_label: Dict[str, metrics.PeakAmplitudeDistribution] = {}
 
     for label in _detector_labels(detector):
         values = np.asarray(record.signal, dtype=float).ravel()
@@ -97,7 +110,11 @@ def compute_peak_amplitude_distribution_metrics(
         else:
             detection = record.cnn
 
-        amplitudes = _extract_peak_amplitudes(values=values, detection=detection)
+        amplitudes = _extract_peak_amplitudes(
+            values=values,
+            detection=detection,
+            use_recovered_amplitudes=(label == "cnn"),
+        )
         if amplitudes.size == 0:
             raise ValueError(
                 f"{label}: at least one detected peak amplitude is required."
@@ -142,7 +159,7 @@ def compute_peak_amplitude_distribution_metrics(
             ks_normal_statistic = np.nan
             ks_normal_p_value = np.nan
 
-        metrics_by_label[label] = PeakAmplitudeDistributionMetrics(
+        metrics_by_label[label] = metrics.PeakAmplitudeDistribution(
             label=label,
             number_of_peaks=int(amplitudes.size),
             mean_amplitude=mean_amplitude,
@@ -163,241 +180,6 @@ def compute_peak_amplitude_distribution_metrics(
     return metrics_by_label
 
 
-def plot_peak_amplitude_histogram(
-    metrics_by_label: Dict[str, PeakAmplitudeDistributionMetrics],
-    *,
-    label: Optional[str] = None,
-    figsize: Tuple[float, float] = (8.0, 4.0),
-    bins: int = 40,
-    histogram_alpha: float = 0.75,
-    histogram_color: str = "C0",
-    edge_color: str = "black",
-    edge_line_width: float = 0.8,
-    line_width: float = 1.2,
-    show_legend: bool = True,
-    title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None,
-    save_path: Optional[Union[str, Path]] = None,
-    dpi: int = 300,
-    show: bool = False,
-    close: bool = False,
-) -> plt.Figure:
-    """Plot the peak-amplitude histogram against a fitted normal density.
-
-    Parameters
-    ----------
-    histogram_color : str, default="C0"
-        Face color used for the histogram bars.
-    edge_color : str, default="black"
-        Edge color used for the histogram bars.
-    edge_line_width : float, default=0.8
-        Edge line width used for the histogram bars.
-
-    Returns
-    -------
-    matplotlib.figure.Figure
-        Figure containing the peak-amplitude histogram.
-    """
-
-    metrics = _resolve_single_label_metrics(metrics_by_label, label)
-
-    with plot_style_context():
-        figure, axis, created_figure = make_or_reuse_single_axis(figsize=figsize, ax=ax)
-        axis.hist(
-            metrics.amplitudes,
-            bins=bins,
-            density=True,
-            color=mcolors.to_rgba(histogram_color, histogram_alpha),
-            edgecolor=edge_color,
-            linewidth=edge_line_width,
-            label="Observed",
-            zorder=2,
-        )
-
-        if metrics.fitted_normal_standard_deviation > 0.0:
-            x_values = np.linspace(
-                metrics.minimum_amplitude, metrics.maximum_amplitude, 400
-            )
-            density = stats.norm.pdf(
-                x_values,
-                loc=metrics.fitted_normal_mean,
-                scale=metrics.fitted_normal_standard_deviation,
-            )
-            axis.plot(
-                x_values,
-                density,
-                color="C1",
-                linewidth=line_width,
-                label="Fitted normal",
-                zorder=3,
-            )
-
-        return finalize_single_axis_figure(
-            figure=figure,
-            axis=axis,
-            xlabel="Peak amplitude",
-            ylabel="Density",
-            title=title,
-            show_legend=show_legend,
-            legend_loc="upper right",
-            show_grid=True,
-            tight_layout=created_figure,
-            save_path=save_path,
-            dpi=dpi,
-            show=show,
-            close=close,
-        )
-
-
-def plot_peak_amplitude_qq(
-    metrics_by_label: Dict[str, PeakAmplitudeDistributionMetrics],
-    *,
-    label: Optional[str] = None,
-    figsize: Tuple[float, float] = (5.0, 5.0),
-    marker_size: float = 18.0,
-    line_width: float = 1.2,
-    show_legend: bool = True,
-    title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None,
-    save_path: Optional[Union[str, Path]] = None,
-    dpi: int = 300,
-    show: bool = False,
-    close: bool = False,
-) -> plt.Figure:
-    """Plot a normal Q-Q diagnostic for detected peak amplitudes."""
-
-    metrics = _resolve_single_label_metrics(metrics_by_label, label)
-
-    with plot_style_context():
-        figure, axis, created_figure = make_or_reuse_single_axis(figsize=figsize, ax=ax)
-        amplitudes = np.sort(metrics.amplitudes)
-
-        if amplitudes.size > 0:
-            probabilities = (
-                np.arange(1, amplitudes.size + 1, dtype=float) - 0.5
-            ) / amplitudes.size
-
-            if metrics.fitted_normal_standard_deviation > 0.0:
-                expected_quantiles = stats.norm.ppf(
-                    probabilities,
-                    loc=metrics.fitted_normal_mean,
-                    scale=metrics.fitted_normal_standard_deviation,
-                )
-            else:
-                expected_quantiles = np.full_like(
-                    amplitudes, metrics.fitted_normal_mean
-                )
-
-            axis.scatter(
-                expected_quantiles,
-                amplitudes,
-                s=marker_size,
-                color="black",
-                zorder=3,
-                rasterized=True,
-            )
-            line_min = float(min(np.min(expected_quantiles), np.min(amplitudes)))
-            line_max = float(max(np.max(expected_quantiles), np.max(amplitudes)))
-            axis.plot(
-                [line_min, line_max],
-                [line_min, line_max],
-                color="C1",
-                linewidth=line_width,
-                linestyle="--",
-                label="Ideal normal",
-                zorder=2,
-            )
-
-        return finalize_single_axis_figure(
-            figure=figure,
-            axis=axis,
-            xlabel="Expected normal quantile",
-            ylabel="Observed peak amplitude",
-            title=title,
-            show_legend=show_legend,
-            legend_loc="upper left",
-            show_grid=True,
-            tight_layout=created_figure,
-            save_path=save_path,
-            dpi=dpi,
-            show=show,
-            close=close,
-        )
-
-
-def plot_peak_amplitude_ecdf(
-    metrics_by_label: Dict[str, PeakAmplitudeDistributionMetrics],
-    *,
-    label: Optional[str] = None,
-    figsize: Tuple[float, float] = (8.0, 4.0),
-    line_width: float = 1.2,
-    show_legend: bool = True,
-    title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None,
-    save_path: Optional[Union[str, Path]] = None,
-    dpi: int = 300,
-    show: bool = False,
-    close: bool = False,
-) -> plt.Figure:
-    """Plot the empirical peak-amplitude CDF against the fitted normal CDF."""
-
-    metrics = _resolve_single_label_metrics(metrics_by_label, label)
-
-    with plot_style_context():
-        figure, axis, created_figure = make_or_reuse_single_axis(figsize=figsize, ax=ax)
-        amplitudes = np.sort(metrics.amplitudes)
-        empirical_cdf = (
-            np.arange(1, amplitudes.size + 1, dtype=float) - 0.5
-        ) / amplitudes.size
-        axis.step(
-            amplitudes,
-            empirical_cdf,
-            where="mid",
-            linewidth=line_width,
-            color="black",
-            label="Empirical CDF",
-            zorder=3,
-        )
-
-        if metrics.fitted_normal_standard_deviation > 0.0:
-            x_values = np.linspace(
-                metrics.minimum_amplitude, metrics.maximum_amplitude, 400
-            )
-            fitted_cdf = stats.norm.cdf(
-                x_values,
-                loc=metrics.fitted_normal_mean,
-                scale=metrics.fitted_normal_standard_deviation,
-            )
-            axis.plot(
-                x_values,
-                fitted_cdf,
-                color="C1",
-                linewidth=line_width,
-                label="Fitted normal CDF",
-                zorder=2,
-            )
-
-        axis.set_ylim(0.0, 1.0)
-        return finalize_single_axis_figure(
-            figure=figure,
-            axis=axis,
-            xlabel="Peak amplitude",
-            ylabel="Cumulative probability",
-            title=title,
-            show_legend=show_legend,
-            legend_loc="lower right",
-            show_grid=True,
-            tight_layout=created_figure,
-            save_path=save_path,
-            dpi=dpi,
-            show=show,
-            close=close,
-        )
-
-
 __all__ = [
     "compute_peak_amplitude_distribution_metrics",
-    "plot_peak_amplitude_ecdf",
-    "plot_peak_amplitude_histogram",
-    "plot_peak_amplitude_qq",
 ]

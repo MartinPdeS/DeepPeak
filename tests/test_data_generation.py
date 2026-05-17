@@ -348,6 +348,222 @@ def test_generator_reproducibility_with_seed():
     assert np.allclose(s1, s2, equal_nan=True)
 
 
+def test_generator_can_sample_peak_counts_from_poisson_distribution():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
+
+    ds = gen.generate(
+        n_samples=4000,
+        kernel=kernel,
+        n_peaks=(0, 12),
+        noise_std=0.0,
+        categorical_peak_count=False,
+        peak_count_distribution="poisson",
+        peak_count_rate=2.7,
+    )
+
+    counts = np.asarray(ds.num_peaks)
+    assert counts.shape == (4000,)
+    assert np.all(counts >= 0)
+    assert np.all(counts <= 12)
+    assert len(np.unique(counts)) >= 5
+    assert np.mean(counts) == pytest.approx(2.7, abs=0.2)
+
+
+def test_generator_rejects_poisson_peak_counts_without_rate():
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
+
+    with pytest.raises(ValueError, match="peak_count_rate must be provided"):
+        gen.generate(
+            n_samples=8,
+            kernel=kernel,
+            n_peaks=(0, 4),
+            noise_std=0.0,
+            categorical_peak_count=False,
+            peak_count_distribution="poisson",
+        )
+
+
+def test_generator_can_accumulate_multiple_generated_batches():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(10, 50), position=(0.3, 0.7), width=0.02)
+
+    first_batch = gen.add_to_set(
+        n_samples=3,
+        kernel=kernel,
+        n_peaks=(1, 2),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
+    second_batch = gen.add_to_set(
+        n_samples=4,
+        kernel=kernel,
+        n_peaks=(1, 2),
+        noise_std=0.05,
+        categorical_peak_count=False,
+    )
+
+    ds = gen.dataset()
+
+    assert first_batch.signals.shape[0] == 3
+    assert second_batch.signals.shape[0] == 4
+    assert ds.signals.shape[0] == 7
+    assert ds.labels.shape == (7, N)
+    assert ds.num_peaks.shape == (7,)
+    assert ds.n_samples == 7
+    assert ds.sequence_length == N
+
+
+def test_generator_clear_resets_buffered_batches():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(10, 50), position=(0.3, 0.7), width=0.02)
+
+    gen.add_to_set(
+        n_samples=2,
+        kernel=kernel,
+        n_peaks=(1, 1),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
+
+    gen.clear()
+
+    with pytest.raises(RuntimeError, match="No generated batches are buffered"):
+        gen.dataset()
+
+
+def test_generator_accumulated_dataset_supports_reference_trace_after_mixed_batches():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+
+    gen.add_to_set(
+        n_samples=3,
+        kernel=Gaussian(amplitude=(10, 30), position=(0.2, 0.8), width=0.02),
+        n_peaks=(1, 2),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
+    gen.add_to_set(
+        n_samples=2,
+        kernel=Dirac(amplitude=(5, 10), position=(0.2, 0.8)),
+        n_peaks=(1, 2),
+        noise_std=0.0,
+        categorical_peak_count=False,
+    )
+
+    ds = gen.dataset()
+    reference = ds.get_reference_pulse_trace(
+        width=0.02,
+        amplitude=1.0,
+        profile="gaussian",
+        width_definition="fwhm",
+    )
+
+    assert reference.shape == (5, N)
+
+
+def test_generator_can_sample_poisson_peak_count_rate_from_a_range():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
+
+    ds = gen.generate(
+        n_samples=4000,
+        kernel=kernel,
+        n_peaks=(0, 12),
+        noise_std=0.0,
+        categorical_peak_count=False,
+        peak_count_distribution="poisson",
+        peak_count_rate=(1.0, 2.5),
+    )
+
+    counts = np.asarray(ds.num_peaks)
+    assert counts.shape == (4000,)
+    assert np.all(counts >= 0)
+    assert np.all(counts <= 12)
+    assert np.mean(counts) == pytest.approx(1.75, abs=0.25)
+    assert len(np.unique(counts)) >= 4
+
+
+def test_generator_can_shift_each_trace_minimum_to_zero():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
+
+    ds = gen.generate(
+        n_samples=8,
+        kernel=kernel,
+        n_peaks=(1, 2),
+        noise_std=0.3,
+        drift=(-0.4, -0.2),
+        categorical_peak_count=False,
+        shift_min_to_zero=True,
+    )
+
+    signals = ds.signals
+    assert signals is not None
+    if signals.ndim == 3:
+        signals = _sum_components(signals)
+
+    minimum_per_trace = np.min(signals, axis=1)
+    assert np.all(minimum_per_trace >= -1e-12)
+    assert np.allclose(minimum_per_trace, 0.0, atol=1e-12)
+
+
+def test_generator_can_set_a_fixed_trace_minimum_level():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
+
+    ds = gen.generate(
+        n_samples=8,
+        kernel=kernel,
+        n_peaks=(1, 2),
+        noise_std=0.3,
+        drift=(-0.4, -0.2),
+        categorical_peak_count=False,
+        minimum_level=0.2,
+    )
+
+    signals = ds.signals
+    assert signals is not None
+    if signals.ndim == 3:
+        signals = _sum_components(signals)
+
+    minimum_per_trace = np.min(signals, axis=1)
+    assert np.allclose(minimum_per_trace, 0.2, atol=1e-12)
+
+
+def test_generator_can_sample_trace_minimum_levels_from_a_range():
+    np.random.seed(SEED)
+    gen = SignalGenerator(sequence_length=N)
+    kernel = Gaussian(amplitude=(5, 5), position=(0.25, 0.75), width=0.02)
+
+    ds = gen.generate(
+        n_samples=8,
+        kernel=kernel,
+        n_peaks=(1, 2),
+        noise_std=0.3,
+        drift=(-0.4, -0.2),
+        categorical_peak_count=False,
+        minimum_level=(0.1, 0.4),
+    )
+
+    signals = ds.signals
+    assert signals is not None
+    if signals.ndim == 3:
+        signals = _sum_components(signals)
+
+    minimum_per_trace = np.min(signals, axis=1)
+    assert np.all(minimum_per_trace >= 0.1 - 1e-12)
+    assert np.all(minimum_per_trace <= 0.4 + 1e-12)
+    assert np.ptp(minimum_per_trace) > 0.0
+
+
 def test_generator_time_axis_if_present():
     """
     If the dataset exposes a time axis, verify it is 1D and monotonic increasing

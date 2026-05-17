@@ -297,8 +297,3 @@ class CsvTrace:
         axes[1].set_xlabel("Amplitude")
 
         return figure
-
-
-Data = CsvTrace
-
-__all__ = ["CsvTrace", "Data"]

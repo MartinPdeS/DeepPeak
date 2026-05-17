@@ -1,24 +1,15 @@
-"""Event-arrival diagnostics and single-purpose Poisson-style plots.
+"""Event-arrival diagnostics.
 
 The functions in this module operate on detected event times and summarize how
 closely the observed arrivals resemble a Poisson process, both numerically and
 through dedicated plotting helpers.
 """
 
-from pathlib import Path
-from typing import Dict, Literal, Optional, Tuple, Union
+from typing import Dict, Literal, Optional, Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
-from matplotlib import colors as mcolors
-
-from ..trace_plots import (
-    finalize_single_axis_figure,
-    make_or_reuse_single_axis,
-    plot_style_context,
-)
-from ..results import EventArrivalDistributionMetrics, resolve_series_or_result
+from .. import metrics
 
 
 def _clean_sorted_event_time(event_time: np.ndarray) -> np.ndarray:
@@ -102,27 +93,25 @@ def _poisson_counts_chi2(
 def compute_event_arrival_distribution_metrics(
     series_or_result,
     index: int,
-    detector: Literal["standard", "cnn", "both"] = "both",
+    detector: Literal["standard", "cnn"] = "standard",
     x_axis: Literal["sample", "time"] = "sample",
     number_of_count_bins: int = 50,
     observation_start: Optional[float] = None,
     observation_end: Optional[float] = None,
-) -> Dict[str, EventArrivalDistributionMetrics]:
-    resolved_result = resolve_series_or_result(series_or_result)
+) -> Dict[str, metrics.EventArrivalDistribution]:
+    resolved_result = metrics.resolve_series_or_result(series_or_result)
     record = resolved_result.records[index]
 
     if detector == "standard":
         detector_labels = ("standard",)
     elif detector == "cnn":
         detector_labels = ("cnn",)
-    elif detector == "both":
-        detector_labels = ("standard", "cnn")
     else:
-        raise ValueError('detector must be either "standard", "cnn", or "both".')
+        raise ValueError('detector must be either "standard" or "cnn".')
 
     def compute_metrics_for_label(
         label: str, raw_event_times: np.ndarray, dx: float
-    ) -> EventArrivalDistributionMetrics:
+    ) -> metrics.EventArrivalDistribution:
         event_times = _clean_sorted_event_time(raw_event_times)
 
         if x_axis == "time":
@@ -220,7 +209,7 @@ def compute_event_arrival_distribution_metrics(
         else:
             fano_factor_count_per_bin = np.nan
 
-        return EventArrivalDistributionMetrics(
+        return metrics.EventArrivalDistribution(
             label=label,
             number_of_events=number_of_events,
             observation_start=observation_start_value,
@@ -248,7 +237,7 @@ def compute_event_arrival_distribution_metrics(
             counts_per_bin=counts_per_bin,
         )
 
-    metrics_by_label: Dict[str, EventArrivalDistributionMetrics] = {}
+    metrics_by_label: Dict[str, metrics.EventArrivalDistribution] = {}
     for label in detector_labels:
         raw_event_times = np.asarray(
             record.standard.peaks if label == "standard" else record.cnn.peaks,
@@ -291,275 +280,6 @@ def _compute_count_chi_square_test(
     )
 
 
-def _resolve_single_label_metrics(
-    metrics_by_label: Dict[str, EventArrivalDistributionMetrics],
-    label: Optional[str],
-) -> EventArrivalDistributionMetrics:
-    if label is None:
-        if len(metrics_by_label) != 1:
-            raise ValueError(
-                "label is required when metrics_by_label contains multiple entries."
-            )
-        return next(iter(metrics_by_label.values()))
-    if label not in metrics_by_label:
-        raise ValueError(
-            f'Unknown label "{label}". Available labels are {tuple(metrics_by_label.keys())}.'
-        )
-    return metrics_by_label[label]
-
-
-def plot_event_raster(
-    metrics_by_label: Dict[str, EventArrivalDistributionMetrics],
-    *,
-    label: Optional[str] = None,
-    figsize: Tuple[float, float] = (8.0, 2.5),
-    title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None,
-    save_path: Optional[Union[str, Path]] = None,
-    dpi: int = 300,
-    show: bool = False,
-    close: bool = False,
-) -> plt.Figure:
-    metrics = _resolve_single_label_metrics(metrics_by_label, label)
-    with plot_style_context():
-        figure, axis, created_figure = make_or_reuse_single_axis(figsize=figsize, ax=ax)
-        axis.vlines(
-            metrics.event_times, 0.0, 1.0, linewidth=0.8, color="black", zorder=2
-        )
-        axis.set_xlim(metrics.observation_start, metrics.observation_end)
-        axis.set_ylim(0.0, 1.0)
-        axis.set_yticks([])
-        return finalize_single_axis_figure(
-            figure=figure,
-            axis=axis,
-            xlabel="Event time",
-            ylabel="Events",
-            title=title,
-            show_grid=True,
-            tight_layout=created_figure,
-            save_path=save_path,
-            dpi=dpi,
-            show=show,
-            close=close,
-        )
-
-
-def plot_inter_arrival_histogram(
-    metrics_by_label: Dict[str, EventArrivalDistributionMetrics],
-    *,
-    label: Optional[str] = None,
-    expected_lambda_hat: Optional[float] = None,
-    expected_label: str = "Expected Poisson",
-    figsize: Tuple[float, float] = (8.0, 4.0),
-    bins: int = 40,
-    max_percentile: float = 99.0,
-    line_width: float = 1.2,
-    histogram_alpha: float = 0.75,
-    histogram_color: str = "C0",
-    edge_color: str = "black",
-    edge_line_width: float = 0.8,
-    show_legend: bool = True,
-    title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None,
-    save_path: Optional[Union[str, Path]] = None,
-    dpi: int = 300,
-    show: bool = False,
-    close: bool = False,
-) -> plt.Figure:
-    metrics = _resolve_single_label_metrics(metrics_by_label, label)
-    with plot_style_context():
-        figure, axis, created_figure = make_or_reuse_single_axis(figsize=figsize, ax=ax)
-        inter_arrival_times = metrics.inter_arrival_times
-        if inter_arrival_times.size > 0:
-            histogram_upper = float(np.percentile(inter_arrival_times, max_percentile))
-            histogram_upper = max(
-                histogram_upper, float(np.max(inter_arrival_times)), 1e-12
-            )
-            x_values = np.linspace(0.0, histogram_upper, 400)
-            axis.hist(
-                inter_arrival_times,
-                bins=bins,
-                density=True,
-                color=mcolors.to_rgba(histogram_color, histogram_alpha),
-                edgecolor=edge_color,
-                linewidth=edge_line_width,
-                label="Observed",
-                zorder=2,
-            )
-            if metrics.lambda_hat > 0.0:
-                exponential_density = stats.expon.pdf(
-                    x_values, loc=0.0, scale=1.0 / metrics.lambda_hat
-                )
-                axis.plot(
-                    x_values,
-                    exponential_density,
-                    linewidth=line_width,
-                    color="C1",
-                    label="Fitted exponential",
-                    zorder=3,
-                )
-            if expected_lambda_hat is not None:
-                expected_lambda_hat = float(expected_lambda_hat)
-                if expected_lambda_hat > 0.0:
-                    expected_density = stats.expon.pdf(
-                        x_values, loc=0.0, scale=1.0 / expected_lambda_hat
-                    )
-                    axis.plot(
-                        x_values,
-                        expected_density,
-                        linewidth=line_width,
-                        color="C2",
-                        linestyle=":",
-                        label=expected_label,
-                        zorder=4,
-                    )
-        return finalize_single_axis_figure(
-            figure=figure,
-            axis=axis,
-            xlabel="Inter-arrival time",
-            ylabel="Density",
-            title=title,
-            show_legend=show_legend,
-            legend_loc="upper right",
-            show_grid=True,
-            tight_layout=created_figure,
-            save_path=save_path,
-            dpi=dpi,
-            show=show,
-            close=close,
-        )
-
-
-def plot_rescaled_uniform_qq(
-    metrics_by_label: Dict[str, EventArrivalDistributionMetrics],
-    *,
-    label: Optional[str] = None,
-    figsize: Tuple[float, float] = (5.0, 5.0),
-    line_width: float = 1.2,
-    marker_size: float = 18.0,
-    show_legend: bool = True,
-    title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None,
-    save_path: Optional[Union[str, Path]] = None,
-    dpi: int = 300,
-    show: bool = False,
-    close: bool = False,
-) -> plt.Figure:
-    metrics = _resolve_single_label_metrics(metrics_by_label, label)
-    with plot_style_context():
-        figure, axis, created_figure = make_or_reuse_single_axis(figsize=figsize, ax=ax)
-        if metrics.inter_arrival_times.size > 0 and metrics.lambda_hat > 0.0:
-            rescaled_uniform_values = 1.0 - np.exp(
-                -metrics.lambda_hat * metrics.inter_arrival_times
-            )
-            rescaled_uniform_values = np.sort(rescaled_uniform_values)
-            expected_uniform_quantiles = (
-                np.arange(1, rescaled_uniform_values.size + 1, dtype=float) - 0.5
-            ) / rescaled_uniform_values.size
-            axis.scatter(
-                expected_uniform_quantiles,
-                rescaled_uniform_values,
-                s=marker_size,
-                color="black",
-                zorder=3,
-                rasterized=True,
-            )
-            axis.plot(
-                [0.0, 1.0],
-                [0.0, 1.0],
-                color="C1",
-                linewidth=line_width,
-                linestyle="--",
-                label="Ideal Uniform(0, 1)",
-                zorder=2,
-            )
-        return finalize_single_axis_figure(
-            figure=figure,
-            axis=axis,
-            xlabel="Expected Uniform quantile",
-            ylabel="Observed rescaled quantile",
-            xlim=(0.0, 1.0),
-            ylim=(0.0, 1.0),
-            title=title,
-            show_legend=show_legend,
-            legend_loc="upper left",
-            show_grid=True,
-            tight_layout=created_figure,
-            save_path=save_path,
-            dpi=dpi,
-            show=show,
-            close=close,
-        )
-
-
-def plot_count_distribution(
-    metrics_by_label: Dict[str, EventArrivalDistributionMetrics],
-    *,
-    label: Optional[str] = None,
-    figsize: Tuple[float, float] = (8.0, 4.0),
-    line_width: float = 1.2,
-    histogram_alpha: float = 0.75,
-    histogram_color: str = "C0",
-    edge_color: str = "black",
-    edge_line_width: float = 0.8,
-    show_legend: bool = True,
-    title: Optional[str] = None,
-    ax: Optional[plt.Axes] = None,
-    save_path: Optional[Union[str, Path]] = None,
-    dpi: int = 300,
-    show: bool = False,
-    close: bool = False,
-) -> plt.Figure:
-    metrics = _resolve_single_label_metrics(metrics_by_label, label)
-    with plot_style_context():
-        figure, axis, created_figure = make_or_reuse_single_axis(figsize=figsize, ax=ax)
-        counts_per_bin = np.asarray(metrics.counts_per_bin, dtype=int)
-        if counts_per_bin.size > 0:
-            observed_frequency = np.bincount(counts_per_bin)
-            count_values = np.arange(observed_frequency.size)
-            axis.bar(
-                count_values,
-                observed_frequency,
-                color=mcolors.to_rgba(histogram_color, histogram_alpha),
-                edgecolor=edge_color,
-                linewidth=edge_line_width,
-                label="Observed",
-                zorder=2,
-            )
-            expected_frequency = (
-                stats.poisson.pmf(count_values, metrics.mean_count_per_bin)
-                * metrics.number_of_count_bins
-            )
-            axis.plot(
-                count_values,
-                expected_frequency,
-                marker="o",
-                linewidth=line_width,
-                color="C1",
-                label="Fitted Poisson",
-                zorder=3,
-            )
-        return finalize_single_axis_figure(
-            figure=figure,
-            axis=axis,
-            xlabel="Count per bin",
-            ylabel="Frequency",
-            title=title,
-            show_legend=show_legend,
-            legend_loc="upper right",
-            show_grid=True,
-            tight_layout=created_figure,
-            save_path=save_path,
-            dpi=dpi,
-            show=show,
-            close=close,
-        )
-
-
 __all__ = [
     "compute_event_arrival_distribution_metrics",
-    "plot_count_distribution",
-    "plot_event_raster",
-    "plot_inter_arrival_histogram",
-    "plot_rescaled_uniform_qq",
 ]
