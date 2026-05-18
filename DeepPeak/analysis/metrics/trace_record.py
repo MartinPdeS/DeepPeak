@@ -214,38 +214,7 @@ class TraceRecord:
             plt.close(figure)
         return figure
 
-    def plot_wavenet_detection(
-        self,
-        x_axis: str = "sample",
-        xlim: Optional[tuple[float, float]] = None,
-        ylim: Optional[tuple[float, float]] = None,
-        figsize: tuple[float, float] = (10.0, 4.0),
-        line_width: float = 0.8,
-        marker_size: float = 18.0,
-        threshold_line_width: float = 0.8,
-        show_signal: bool = True,
-        show_prediction: bool = True,
-        show_cnn_signal_peaks: bool = False,
-        show_cnn_recovered_signal_peaks: bool = False,
-        show_cnn_reconstructed_trace: bool = False,
-        show_cnn_prediction_peaks: bool = True,
-        show_cnn_threshold: bool = True,
-        show_legend: bool = True,
-        show_grid: bool = False,
-        show_title: bool = True,
-        title: Optional[str] = None,
-        signal_color: str = "C0",
-        prediction_color: str = "C1",
-        reconstructed_trace_color: str = "C3",
-        marker_color: str = "black",
-        threshold_color: str = "black",
-        rasterize_dense_artists: bool = True,
-        ax: Optional[Any] = None,
-        show: bool = False,
-        close: bool = False,
-        save_path: Optional[Path | str] = None,
-        dpi: int = 300,
-    ) -> plt.Figure:
+    def plot_wavenet_detection(self, **plot_kwargs) -> plt.Figure:
         """Plot the trace together with its WaveNet prediction and CNN peaks.
 
         Parameters
@@ -261,12 +230,40 @@ class TraceRecord:
         show_signal, show_prediction, show_cnn_signal_peaks,
         show_cnn_recovered_signal_peaks, show_cnn_reconstructed_trace,
         show_cnn_prediction_peaks, show_cnn_threshold : bool
-            Toggles controlling displayed plot elements. By default, CNN detections
-            are shown on the prediction rather than projected onto the signal.
+            Toggles controlling displayed plot elements.
         show_legend, show_grid, show_title : bool
             Axes presentation toggles.
         title : str, optional
             Explicit title override.
+        expected_particle_flow : float, optional
+            Expected throughput value shown in the figure suptitle when
+            ``show_throughput`` is true.
+        show_throughput : bool, default=False
+            Whether to add a throughput suptitle.
+        throughput_template : str, default="Throughput: {label} / second"
+            Format string for the throughput suptitle.
+        throughput_label_formatter : callable, optional
+            Callable converting ``expected_particle_flow`` to a compact string.
+        suptitle_kwargs : dict, optional
+            Keyword arguments forwarded to ``figure.suptitle``.
+        show_inset : bool, default=False
+            Whether to add a zoomed inset axis.
+        inset_width, inset_height, inset_loc, inset_borderpad
+            Inset placement parameters forwarded to ``inset_axes``.
+        inset_xlim, inset_ylim : tuple of float, optional
+            Axis limits applied to the inset.
+        inset_show_ticks : bool, default=False
+            Whether to show ticks and labels on the inset.
+        inset_show_grid : bool, default=False
+            Whether to enable the grid on the inset.
+        inset_plot_kwargs : dict, optional
+            Additional keyword arguments forwarded to the inset trace plot.
+        mark_inset : bool, default=True
+            Whether to draw connectors between the main trace and the inset.
+        mark_inset_kwargs : dict, optional
+            Keyword arguments forwarded to ``mark_inset``.
+        subplots_adjust : dict, optional
+            Layout arguments forwarded to ``figure.subplots_adjust``.
         signal_color, prediction_color, reconstructed_trace_color,
         marker_color, threshold_color : str
             Matplotlib colors used for the plotted artists.
@@ -288,6 +285,80 @@ class TraceRecord:
         """
 
         from ..trace_plots import get_detection_threshold, reconstruct_gaussian_trace
+
+        x_axis = plot_kwargs.pop("x_axis", "sample")
+        xlim = plot_kwargs.pop("xlim", None)
+        ylim = plot_kwargs.pop("ylim", None)
+        figsize = plot_kwargs.pop("figsize", (10.0, 4.0))
+        line_width = plot_kwargs.pop("line_width", 0.8)
+        marker_size = plot_kwargs.pop("marker_size", 18.0)
+        threshold_line_width = plot_kwargs.pop("threshold_line_width", 0.8)
+        show_signal = plot_kwargs.pop("show_signal", True)
+        show_prediction = plot_kwargs.pop("show_prediction", True)
+        show_cnn_signal_peaks = plot_kwargs.pop("show_cnn_signal_peaks", False)
+        show_cnn_recovered_signal_peaks = plot_kwargs.pop(
+            "show_cnn_recovered_signal_peaks", False
+        )
+        show_cnn_reconstructed_trace = plot_kwargs.pop(
+            "show_cnn_reconstructed_trace", False
+        )
+        show_cnn_prediction_peaks = plot_kwargs.pop("show_cnn_prediction_peaks", True)
+        show_cnn_threshold = plot_kwargs.pop("show_cnn_threshold", True)
+        show_legend = plot_kwargs.pop("show_legend", True)
+        show_grid = plot_kwargs.pop("show_grid", False)
+        show_title = plot_kwargs.pop("show_title", True)
+        title = plot_kwargs.pop("title", None)
+        expected_particle_flow = plot_kwargs.pop("expected_particle_flow", None)
+        show_throughput = plot_kwargs.pop("show_throughput", False)
+        throughput_template = plot_kwargs.pop(
+            "throughput_template", "Throughput: {label} / second"
+        )
+        throughput_label_formatter = plot_kwargs.pop(
+            "throughput_label_formatter", get_throughput_label
+        )
+        suptitle_kwargs = dict(plot_kwargs.pop("suptitle_kwargs", {}))
+        show_inset = plot_kwargs.pop("show_inset", False)
+        inset_width = plot_kwargs.pop("inset_width", "52%")
+        inset_height = plot_kwargs.pop("inset_height", "50%")
+        inset_loc = plot_kwargs.pop("inset_loc", "upper right")
+        inset_borderpad = plot_kwargs.pop("inset_borderpad", 2.2)
+        inset_xlim = plot_kwargs.pop("inset_xlim", None)
+        inset_ylim = plot_kwargs.pop("inset_ylim", None)
+        inset_show_ticks = plot_kwargs.pop("inset_show_ticks", False)
+        inset_show_grid = plot_kwargs.pop("inset_show_grid", False)
+        inset_plot_kwargs = dict(plot_kwargs.pop("inset_plot_kwargs", {}))
+        mark_inset_enabled = plot_kwargs.pop("mark_inset", True)
+        mark_inset_kwargs = dict(
+            plot_kwargs.pop(
+                "mark_inset_kwargs",
+                {"loc1": 2, "loc2": 4, "fc": "none", "ec": "0.05", "lw": 2.0},
+            )
+        )
+        subplots_adjust = plot_kwargs.pop(
+            "subplots_adjust",
+            {
+                "left": 0.10,
+                "right": 0.97,
+                "bottom": 0.14,
+                "top": 0.88 if show_title else 0.95,
+            },
+        )
+        signal_color = plot_kwargs.pop("signal_color", "C0")
+        prediction_color = plot_kwargs.pop("prediction_color", "C1")
+        reconstructed_trace_color = plot_kwargs.pop("reconstructed_trace_color", "C3")
+        marker_color = plot_kwargs.pop("marker_color", "black")
+        threshold_color = plot_kwargs.pop("threshold_color", "black")
+        rasterize_dense_artists = plot_kwargs.pop("rasterize_dense_artists", True)
+        ax = plot_kwargs.pop("ax", None)
+        show = plot_kwargs.pop("show", False)
+        close = plot_kwargs.pop("close", False)
+        save_path = plot_kwargs.pop("save_path", None)
+        dpi = plot_kwargs.pop("dpi", 300)
+        if plot_kwargs:
+            unexpected_arguments = ", ".join(sorted(plot_kwargs))
+            raise TypeError(
+                f"plot_wavenet_detection() got unexpected keyword argument(s): {unexpected_arguments}"
+            )
 
         signal = np.asarray(self.signal).ravel()
         prediction = np.asarray(self.prediction).ravel()
@@ -375,6 +446,7 @@ class TraceRecord:
         else:
             figure, axis = plt.subplots(figsize=figsize)
             created_figure = True
+
         if show_signal:
             axis.plot(
                 x_values,
@@ -418,12 +490,11 @@ class TraceRecord:
         if (
             show_cnn_signal_peaks or show_cnn_recovered_signal_peaks
         ) and cnn_peak_indices_for_signal.size > 0:
-            if x_axis == "sample":
-                cnn_signal_peak_x_values = cnn_peak_indices_for_signal.astype(float)
-            else:
-                cnn_signal_peak_x_values = cnn_peak_indices_for_signal.astype(
-                    float
-                ) * float(self.dx)
+            cnn_signal_peak_x_values = (
+                cnn_peak_indices_for_signal.astype(float)
+                if x_axis == "sample"
+                else cnn_peak_indices_for_signal.astype(float) * float(self.dx)
+            )
             axis.scatter(
                 cnn_signal_peak_x_values,
                 cnn_signal_peak_values,
@@ -435,14 +506,11 @@ class TraceRecord:
                 rasterized=rasterize_dense_artists,
             )
         if show_cnn_prediction_peaks and cnn_peak_indices_for_prediction.size > 0:
-            if x_axis == "sample":
-                cnn_prediction_peak_x_values = cnn_peak_indices_for_prediction.astype(
-                    float
-                )
-            else:
-                cnn_prediction_peak_x_values = cnn_peak_indices_for_prediction.astype(
-                    float
-                ) * float(self.dx)
+            cnn_prediction_peak_x_values = (
+                cnn_peak_indices_for_prediction.astype(float)
+                if x_axis == "sample"
+                else cnn_peak_indices_for_prediction.astype(float) * float(self.dx)
+            )
             axis.scatter(
                 cnn_prediction_peak_x_values,
                 prediction[cnn_peak_indices_for_prediction],
@@ -455,17 +523,14 @@ class TraceRecord:
                 rasterized=rasterize_dense_artists,
             )
 
-        figure.subplots_adjust(
-            left=0.10, right=0.97, bottom=0.14, top=0.88 if show_title else 0.95
-        )
         if xlim is not None:
             axis.set_xlim(xlim)
         if ylim is not None:
             axis.set_ylim(ylim)
         axis.set_xlabel(x_label)
         axis.set_ylabel("Signal / prediction amplitude")
-        if show_title and title is not None:
-            axis.set_title(title)
+        if show_title:
+            axis.set_title(title or "CNN detection")
         if show_grid:
             axis.grid(True, which="both", alpha=0.2, zorder=0)
         if show_legend:
@@ -477,8 +542,95 @@ class TraceRecord:
                 edgecolor="black",
             )
             legend.set_zorder(1000)
+
+        if show_inset:
+            inset_axis = inset_axes(
+                axis,
+                width=inset_width,
+                height=inset_height,
+                loc=inset_loc,
+                borderpad=inset_borderpad,
+            )
+            inset_call_kwargs = {
+                "x_axis": inset_plot_kwargs.pop("x_axis", x_axis),
+                "xlim": inset_plot_kwargs.pop("xlim", inset_xlim),
+                "ylim": inset_plot_kwargs.pop(
+                    "ylim", inset_ylim if inset_ylim is not None else ylim
+                ),
+                "figsize": inset_plot_kwargs.pop("figsize", figsize),
+                "line_width": inset_plot_kwargs.pop("line_width", line_width),
+                "marker_size": inset_plot_kwargs.pop("marker_size", marker_size),
+                "threshold_line_width": inset_plot_kwargs.pop(
+                    "threshold_line_width", threshold_line_width
+                ),
+                "show_signal": inset_plot_kwargs.pop("show_signal", show_signal),
+                "show_prediction": inset_plot_kwargs.pop(
+                    "show_prediction", show_prediction
+                ),
+                "show_cnn_signal_peaks": inset_plot_kwargs.pop(
+                    "show_cnn_signal_peaks", show_cnn_signal_peaks
+                ),
+                "show_cnn_recovered_signal_peaks": inset_plot_kwargs.pop(
+                    "show_cnn_recovered_signal_peaks", show_cnn_recovered_signal_peaks
+                ),
+                "show_cnn_reconstructed_trace": inset_plot_kwargs.pop(
+                    "show_cnn_reconstructed_trace", show_cnn_reconstructed_trace
+                ),
+                "show_cnn_prediction_peaks": inset_plot_kwargs.pop(
+                    "show_cnn_prediction_peaks", show_cnn_prediction_peaks
+                ),
+                "show_cnn_threshold": inset_plot_kwargs.pop(
+                    "show_cnn_threshold", show_cnn_threshold
+                ),
+                "show_legend": inset_plot_kwargs.pop("show_legend", False),
+                "show_grid": inset_plot_kwargs.pop("show_grid", inset_show_grid),
+                "show_title": inset_plot_kwargs.pop("show_title", False),
+                "title": inset_plot_kwargs.pop("title", None),
+                "signal_color": inset_plot_kwargs.pop("signal_color", signal_color),
+                "prediction_color": inset_plot_kwargs.pop(
+                    "prediction_color", prediction_color
+                ),
+                "reconstructed_trace_color": inset_plot_kwargs.pop(
+                    "reconstructed_trace_color", reconstructed_trace_color
+                ),
+                "marker_color": inset_plot_kwargs.pop("marker_color", marker_color),
+                "threshold_color": inset_plot_kwargs.pop(
+                    "threshold_color", threshold_color
+                ),
+                "rasterize_dense_artists": inset_plot_kwargs.pop(
+                    "rasterize_dense_artists", rasterize_dense_artists
+                ),
+            }
+            inset_call_kwargs.update(inset_plot_kwargs)
+            self.plot_wavenet_detection(
+                **inset_call_kwargs,
+                ax=inset_axis,
+                show=False,
+                close=False,
+                save_path=None,
+                dpi=dpi,
+            )
+            if not inset_show_ticks:
+                inset_axis.set_xticks([])
+                inset_axis.set_yticks([])
+                inset_axis.set_xlabel("")
+                inset_axis.set_ylabel("")
+            if mark_inset_enabled:
+                mark_inset(axis, inset_axis, **mark_inset_kwargs)
+
+        if show_throughput and expected_particle_flow is not None:
+            throughput_label = throughput_label_formatter(expected_particle_flow)
+            default_suptitle_kwargs = {"x": 0.5, "y": 0.98}
+            default_suptitle_kwargs.update(suptitle_kwargs)
+            figure.suptitle(
+                throughput_template.format(
+                    flow=expected_particle_flow, label=throughput_label
+                ),
+                **default_suptitle_kwargs,
+            )
+
         if created_figure:
-            figure.tight_layout()
+            figure.subplots_adjust(**subplots_adjust)
         if save_path is not None:
             figure.savefig(save_path, dpi=dpi)
         if show:
