@@ -28,6 +28,7 @@ dependencies = [
     "pandas",
     "matplotlib",
     "MPSPlots",
+    "tensorflow",
 ]
 
 [project.urls]
@@ -47,14 +48,6 @@ local_scheme = "no-local-version"
 
 
 [project.optional-dependencies]
-ml = [
-    "tensorflow",
-]
-
-all = [
-    "tensorflow",
-]
-
 testing = [
     "pytest>=0.6",
     "pytest-cov>=2.0",
