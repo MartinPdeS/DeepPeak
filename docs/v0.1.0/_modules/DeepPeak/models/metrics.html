@@ -504,8 +504,6 @@
   <h1>Source code for DeepPeak.models.metrics</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Typed metrics used by the optional neural-network models.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
 <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
 
@@ -513,7 +511,15 @@
 <a class="viewcode-back" href="../../../code.html#DeepPeak.models.BinaryIoU">[docs]</a>
 <span class="nd">@tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">&quot;DeepPeak&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BinaryIoU</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">Metric</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Intersection-over-union for binary sequence predictions.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Intersection-over-union for binary sequence predictions.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name : str, default=&quot;binary_iou&quot;</span>
+<span class="sd">        Metric name used by Keras.</span>
+<span class="sd">    threshold : float, default=0.5</span>
+<span class="sd">        Threshold used to binarize predictions and targets.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;binary_iou&quot;</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>

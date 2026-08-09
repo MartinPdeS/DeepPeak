@@ -147,7 +147,7 @@ Plot the detector output
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.170 seconds)
+   **Total running time of the script:** (0 minutes 0.167 seconds)
 
 
 .. _sphx_glr_download_gallery_classical_detection_pipeline.py:

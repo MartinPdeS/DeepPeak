@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DeepPeak.generation.noises.nonstationary_gaussian &#8212; DeepPeak  documentation</title>
+    <title>DeepPeak.generation.noises.correlated_gaussian &#8212; DeepPeak  documentation</title>
   
   
   
@@ -46,7 +46,7 @@
     <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
     <script src="../../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/DeepPeak/generation/noises/nonstationary_gaussian';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/DeepPeak/generation/noises/correlated_gaussian';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/MartinPdeS/DeepPeak/documentation_page/version_switcher.json';
@@ -484,7 +484,7 @@
     
     <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">Module code</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DeepPeak.generation.noises.nonstationary_gaussian</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DeepPeak.generation.noises.correlated_gaussian</span></li>
   </ul>
 </nav>
 </div>
@@ -501,8 +501,8 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for DeepPeak.generation.noises.nonstationary_gaussian</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Gaussian noise models whose variance changes over a trace.&quot;&quot;&quot;</span>
+  <h1>Source code for DeepPeak.generation.noises.correlated_gaussian</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Correlated Gaussian noise for realistic acquisition traces.&quot;&quot;&quot;</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
@@ -512,38 +512,36 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseNoise</span>
 
 
-<div class="viewcode-block" id="NonstationaryGaussianNoise">
-<a class="viewcode-back" href="../../../../code.html#DeepPeak.NonstationaryGaussianNoise">[docs]</a>
+<div class="viewcode-block" id="CorrelatedGaussianNoise">
+<a class="viewcode-back" href="../../../../code.html#DeepPeak.CorrelatedGaussianNoise">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">NonstationaryGaussianNoise</span><span class="p">(</span><span class="n">BaseNoise</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gaussian noise with a linearly varying standard deviation.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CorrelatedGaussianNoise</span><span class="p">(</span><span class="n">BaseNoise</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gaussian noise with exponentially correlated samples.</span>
 
-<span class="sd">    ``std`` is the standard deviation at the start of each trace and</span>
-<span class="sd">    ``end_scale`` multiplies it at the end. For example, ``end_scale=2``</span>
-<span class="sd">    produces noise whose standard deviation doubles across the acquisition.</span>
+<span class="sd">    ``correlation_length`` is expressed in samples. A value of zero produces</span>
+<span class="sd">    independent noise; larger values produce slowly varying baseline noise.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    std : float or tuple of float</span>
-<span class="sd">        Starting standard deviation or sampling range.</span>
-<span class="sd">    end_scale : float or tuple of float, default=1.0</span>
-<span class="sd">        End-to-start standard-deviation ratio.</span>
+<span class="sd">        Standard deviation or sampling range.</span>
+<span class="sd">    correlation_length : float, default=3.0</span>
+<span class="sd">        Exponential correlation length in samples.</span>
 <span class="sd">    mean : float or tuple of float, default=0.0</span>
 <span class="sd">        Mean or sampling range.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">std</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
-    <span class="n">end_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">correlation_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3.0</span>
     <span class="n">mean</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">0.0</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_std</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_range</span><span class="p">(</span>
             <span class="s2">&quot;std&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">std</span><span class="p">,</span> <span class="n">minimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">inclusive_minimum</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_end_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_range</span><span class="p">(</span>
-            <span class="s2">&quot;end_scale&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_scale</span><span class="p">,</span> <span class="n">minimum</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">inclusive_minimum</span><span class="o">=</span><span class="kc">True</span>
-        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_range</span><span class="p">(</span><span class="s2">&quot;mean&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">correlation_length</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation_length</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;correlation_length must be finite and non-negative.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -552,7 +550,7 @@
         <span class="n">x_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return independent Gaussian samples with a linear variance trend.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return noise samples with an exponential autocorrelation profile.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -566,17 +564,26 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ndarray</span>
-<span class="sd">            Nonstationary Gaussian noise samples.</span>
+<span class="sd">            Correlated Gaussian noise samples.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
         <span class="n">n_samples</span><span class="p">,</span> <span class="n">sequence_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">starts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
-        <span class="n">end_scales</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_end_scale</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+        <span class="n">stds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_std</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
         <span class="n">means</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sample_uniform</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
-        <span class="n">coordinate</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">sequence_length</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="n">stds</span> <span class="o">=</span> <span class="n">starts</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">coordinate</span> <span class="o">*</span> <span class="p">(</span><span class="n">end_scales</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">means</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">sequence_length</span><span class="p">))</span> <span class="o">*</span> <span class="n">stds</span></div>
+        <span class="n">white</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">sequence_length</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation_length</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">means</span> <span class="o">+</span> <span class="n">white</span> <span class="o">*</span> <span class="n">stds</span>
+
+        <span class="n">rho</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">correlation_length</span><span class="p">))</span>
+        <span class="n">correlated</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="n">white</span><span class="p">)</span>
+        <span class="n">correlated</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">white</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">innovation_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">rho</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">sequence_length</span><span class="p">):</span>
+            <span class="n">correlated</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">rho</span> <span class="o">*</span> <span class="n">correlated</span><span class="p">[:,</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">innovation_scale</span> <span class="o">*</span> <span class="n">white</span><span class="p">[:,</span> <span class="n">index</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">means</span> <span class="o">+</span> <span class="n">correlated</span> <span class="o">*</span> <span class="n">stds</span></div>
 
 </pre></div>
 

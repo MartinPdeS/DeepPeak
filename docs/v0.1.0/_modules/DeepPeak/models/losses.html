@@ -504,8 +504,6 @@
   <h1>Source code for DeepPeak.models.losses</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Typed losses for one-dimensional pulse-trace deconvolution.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
 <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
 
@@ -523,7 +521,15 @@
 <a class="viewcode-back" href="../../../code.html#DeepPeak.models.WeightedHuber">[docs]</a>
 <span class="nd">@tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">&quot;DeepPeak&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedHuber</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">Loss</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Huber reconstruction loss weighted by clean pulse amplitude.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Huber reconstruction loss weighted by clean pulse amplitude.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    delta : float, default=1.0</span>
+<span class="sd">        Huber transition point.</span>
+<span class="sd">    alpha : float, default=1.0</span>
+<span class="sd">        Weight applied to pulse amplitude.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -549,7 +555,17 @@
 <a class="viewcode-back" href="../../../code.html#DeepPeak.models.ShapeAwarePulseLoss">[docs]</a>
 <span class="nd">@tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">&quot;DeepPeak&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ShapeAwarePulseLoss</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">Loss</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reconstruction loss combining amplitude, shape, and smoothness terms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Reconstruction loss combining amplitude, shape, and smoothness terms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    amplitude_weight : float, default=1.0</span>
+<span class="sd">        Weight of amplitude reconstruction error.</span>
+<span class="sd">    shape_weight : float, default=0.25</span>
+<span class="sd">        Weight of normalized shape error.</span>
+<span class="sd">    smoothness_weight : float, default=0.05</span>
+<span class="sd">        Weight of first-derivative error.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -608,7 +624,13 @@
 <a class="viewcode-back" href="../../../code.html#DeepPeak.models.WeightedBinaryCrossentropy">[docs]</a>
 <span class="nd">@tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">&quot;DeepPeak&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">WeightedBinaryCrossentropy</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">Loss</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Binary crossentropy with increased weight for positive targets.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Binary crossentropy with increased weight for positive targets.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alpha : float, default=1.0</span>
+<span class="sd">        Additional positive-target weight.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -628,7 +650,17 @@
 <a class="viewcode-back" href="../../../code.html#DeepPeak.models.SmoothBinaryCrossentropy">[docs]</a>
 <span class="nd">@tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">&quot;DeepPeak&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SmoothBinaryCrossentropy</span><span class="p">(</span><span class="n">WeightedBinaryCrossentropy</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weighted BCE with optional temporal smoothness and confidence terms.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weighted BCE with optional temporal smoothness and confidence terms.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    alpha : float, default=1.0</span>
+<span class="sd">        Additional positive-target weight.</span>
+<span class="sd">    smoothness_weight : float, default=0.05</span>
+<span class="sd">        Weight of temporal smoothness error.</span>
+<span class="sd">    confidence_weight : float, default=0.0</span>
+<span class="sd">        Weight of prediction uncertainty penalty.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -673,7 +705,20 @@
     <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured weighted Huber reconstruction loss.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured weighted Huber reconstruction loss.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_true, y_pred : tensor-like, optional</span>
+<span class="sd">        If provided, evaluate the loss; otherwise return a configured loss.</span>
+<span class="sd">    delta, alpha : float, optional</span>
+<span class="sd">        Parameters forwarded to :class:`WeightedHuber`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    WeightedHuber or tensor</span>
+<span class="sd">        Configured loss object or evaluated loss value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">loss</span> <span class="o">=</span> <span class="n">WeightedHuber</span><span class="p">(</span><span class="n">delta</span><span class="o">=</span><span class="n">delta</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">y_true</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -693,7 +738,20 @@
     <span class="n">smoothness_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured shape-aware reconstruction loss.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured shape-aware reconstruction loss.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_true, y_pred : tensor-like, optional</span>
+<span class="sd">        If provided, evaluate the loss; otherwise return a configured loss.</span>
+<span class="sd">    amplitude_weight, shape_weight, smoothness_weight : float, optional</span>
+<span class="sd">        Component weights.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ShapeAwarePulseLoss or tensor</span>
+<span class="sd">        Configured loss object or evaluated loss value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">loss</span> <span class="o">=</span> <span class="n">ShapeAwarePulseLoss</span><span class="p">(</span>
         <span class="n">amplitude_weight</span><span class="o">=</span><span class="n">amplitude_weight</span><span class="p">,</span>
@@ -710,7 +768,20 @@
 <div class="viewcode-block" id="weighted_bce">
 <a class="viewcode-back" href="../../../code.html#DeepPeak.models.weighted_bce">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">weighted_bce</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured weighted binary crossentropy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured weighted binary crossentropy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_true, y_pred : tensor-like, optional</span>
+<span class="sd">        If provided, evaluate the loss; otherwise return a configured loss.</span>
+<span class="sd">    alpha : float, default=1.0</span>
+<span class="sd">        Additional positive-target weight.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    WeightedBinaryCrossentropy or tensor</span>
+<span class="sd">        Configured loss object or evaluated loss value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">loss</span> <span class="o">=</span> <span class="n">WeightedBinaryCrossentropy</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">y_true</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -729,7 +800,20 @@
     <span class="n">smoothness_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
     <span class="n">confidence_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured smooth weighted binary crossentropy.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured smooth weighted binary crossentropy.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    y_true, y_pred : tensor-like, optional</span>
+<span class="sd">        If provided, evaluate the loss; otherwise return a configured loss.</span>
+<span class="sd">    alpha, smoothness_weight, confidence_weight : float, optional</span>
+<span class="sd">        Loss component weights.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    SmoothBinaryCrossentropy or tensor</span>
+<span class="sd">        Configured loss object or evaluated loss value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">loss</span> <span class="o">=</span> <span class="n">SmoothBinaryCrossentropy</span><span class="p">(</span>
         <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>

@@ -504,10 +504,10 @@
   <h1>Source code for DeepPeak.core.config</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Validated configuration objects shared by DeepPeak domains.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">InvalidConfigurationError</span>
 
@@ -515,11 +515,113 @@
 <span class="n">_NORMALIZATIONS</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;none&quot;</span><span class="p">,</span> <span class="s2">&quot;zscore&quot;</span><span class="p">,</span> <span class="s2">&quot;robust_zscore&quot;</span><span class="p">,</span> <span class="s2">&quot;minmax&quot;</span><span class="p">,</span> <span class="s2">&quot;min-max&quot;</span><span class="p">,</span> <span class="s2">&quot;maxabs&quot;</span><span class="p">}</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_jsonable</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;to_dict&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">callable</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">to_dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;tolist&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_jsonable</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_jsonable</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="n">_jsonable</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SerializableConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mixin providing JSON-compatible config serialization.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the configuration to JSON-compatible values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Configuration fields represented by standard Python values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_jsonable</span><span class="p">(</span><span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_dict</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a configuration from a mapping.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        values : mapping</span>
+<span class="sd">            Configuration fields. Unknown fields are ignored.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SerializableConfig</span>
+<span class="sd">            Reconstructed configuration instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">allowed</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">cls</span><span class="p">)}</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">})</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_json</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">indent</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Serialize the configuration to JSON.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        path : path-like, optional</span>
+<span class="sd">            If provided, write the JSON document to this path.</span>
+<span class="sd">        indent : int, default=2</span>
+<span class="sd">            Indentation level for the JSON document.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Serialized JSON text.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">indent</span><span class="o">=</span><span class="n">indent</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span><span class="n">text</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">text</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a configuration from JSON text or a JSON file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        source : str or path-like</span>
+<span class="sd">            JSON document or path to a JSON document.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        SerializableConfig</span>
+<span class="sd">            Reconstructed configuration instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">text</span><span class="o">.</span><span class="n">lstrip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">((</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="s2">&quot;[&quot;</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">source</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                    <span class="n">text</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="c1"># A JSON document can be longer than the platform&#39;s filename limit.</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+
+
 <div class="viewcode-block" id="TraceConfig">
 <a class="viewcode-back" href="../../../code.html#DeepPeak.core.TraceConfig">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">TraceConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sampling and preprocessing settings for a trace workflow.&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TraceConfig</span><span class="p">(</span><span class="n">SerializableConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sampling and preprocessing settings for a trace workflow.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sequence_length : int, optional</span>
+<span class="sd">        Expected number of samples per trace.</span>
+<span class="sd">    normalization : str, default=&quot;zscore&quot;</span>
+<span class="sd">        Normalization strategy.</span>
+<span class="sd">    sampling_rate_hz : float, optional</span>
+<span class="sd">        Sampling frequency in hertz.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">sequence_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zscore&quot;</span>
@@ -546,7 +648,21 @@
 <a class="viewcode-back" href="../../../code.html#DeepPeak.core.DetectionConfig">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DetectionConfig</span><span class="p">(</span><span class="n">TraceConfig</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration shared by standard and neural detectors.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration shared by standard and neural detectors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    trigger : object, optional</span>
+<span class="sd">        Trigger configuration used by the detector.</span>
+<span class="sd">    low_pass : float, optional</span>
+<span class="sd">        Low-pass filter cutoff.</span>
+<span class="sd">    amplitude_sigma_samples : float, optional</span>
+<span class="sd">        Gaussian width used for amplitude estimation.</span>
+<span class="sd">    amplitude_cluster_radius_sigma : float, default=4.0</span>
+<span class="sd">        Radius used to group overlapping peaks.</span>
+<span class="sd">    amplitude_baseline : float or {&quot;median&quot;}, optional</span>
+<span class="sd">        Baseline subtraction setting.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">trigger</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">low_pass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -584,7 +700,19 @@
 <a class="viewcode-back" href="../../../code.html#DeepPeak.core.SeriesConfig">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SeriesConfig</span><span class="p">(</span><span class="n">TraceConfig</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration shared by dilution-series workflows.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration shared by dilution-series workflows.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    initial_concentration : float, default=1.0</span>
+<span class="sd">        Starting concentration for the series.</span>
+<span class="sd">    nrows : int, default=200000</span>
+<span class="sd">        Number of rows allocated to the series.</span>
+<span class="sd">    low_pass : float, optional</span>
+<span class="sd">        Standard detector filter cutoff.</span>
+<span class="sd">    cnn_low_pass : float, optional</span>
+<span class="sd">        Neural detector filter cutoff.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">initial_concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
     <span class="n">nrows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200_000</span>
@@ -609,8 +737,22 @@
 <div class="viewcode-block" id="PlotConfig">
 <a class="viewcode-back" href="../../../code.html#DeepPeak.core.PlotConfig">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">PlotConfig</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Non-interactive plotting defaults shared by plotting entry points.&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlotConfig</span><span class="p">(</span><span class="n">SerializableConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Non-interactive plotting defaults shared by plotting entry points.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    figsize : tuple of float, default=(10.0, 4.0)</span>
+<span class="sd">        Figure width and height in inches.</span>
+<span class="sd">    show : bool, default=False</span>
+<span class="sd">        Whether to display the figure.</span>
+<span class="sd">    close : bool, default=False</span>
+<span class="sd">        Whether to close the figure after creation.</span>
+<span class="sd">    dpi : int, default=300</span>
+<span class="sd">        Figure resolution.</span>
+<span class="sd">    title : str, optional</span>
+<span class="sd">        Optional figure title.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">figsize</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">)</span>
     <span class="n">show</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
@@ -626,7 +768,240 @@
 
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DetectionConfig&quot;</span><span class="p">,</span> <span class="s2">&quot;PlotConfig&quot;</span><span class="p">,</span> <span class="s2">&quot;SeriesConfig&quot;</span><span class="p">,</span> <span class="s2">&quot;TraceConfig&quot;</span><span class="p">]</span>
+<div class="viewcode-block" id="GenerationConfig">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.core.GenerationConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GenerationConfig</span><span class="p">(</span><span class="n">SerializableConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializable acquisition effects for ``SignalGenerator``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sequence_length : int</span>
+<span class="sd">        Number of samples in each generated trace.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Random seed for reproducible generation.</span>
+<span class="sd">    noise_std : float or tuple of float, optional</span>
+<span class="sd">        Noise standard deviation or sampling range.</span>
+<span class="sd">    noise_profile : {&quot;constant&quot;, &quot;linear&quot;}, default=&quot;constant&quot;</span>
+<span class="sd">        Noise profile across each trace.</span>
+<span class="sd">    baseline_level : float or tuple of float, optional</span>
+<span class="sd">        Additive baseline level or sampling range.</span>
+<span class="sd">    drift : float or tuple of float, optional</span>
+<span class="sd">        Linear baseline drift or sampling range.</span>
+<span class="sd">    instrument_response : tuple of float, optional</span>
+<span class="sd">        Finite impulse response kernel.</span>
+<span class="sd">    saturation : float or tuple of float, optional</span>
+<span class="sd">        Upper limit or explicit clipping bounds.</span>
+<span class="sd">    quantization_step : float, optional</span>
+<span class="sd">        Quantization interval.</span>
+<span class="sd">    missing_peak_probability : float, default=0.0</span>
+<span class="sd">        Probability of dropping each generated peak.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sequence_length</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">noise_std</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">noise_profile</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;linear&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;constant&quot;</span>
+    <span class="n">noise_end_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">baseline_level</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">drift</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">instrument_response</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">saturation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">quantization_step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">missing_peak_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">categorical_peak_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">shift_min_to_zero</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">minimum_level</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span><span class="s2">&quot;sequence_length must be positive.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">noise_profile</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;linear&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                <span class="s2">&quot;noise_profile must be &#39;constant&#39; or &#39;linear&#39;.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">missing_peak_probability</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                <span class="s2">&quot;missing_peak_probability must be between 0 and 1.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantization_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quantization_step</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span><span class="s2">&quot;quantization_step must be positive.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shift_min_to_zero</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimum_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                <span class="s2">&quot;shift_min_to_zero and minimum_level are mutually exclusive.&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">signal_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return keyword arguments accepted by ``SignalGenerator.generate``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Generation keyword arguments excluding ``sequence_length``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;sequence_length&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">values</span></div>
+
+
+
+<div class="viewcode-block" id="NoiseConfig">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.core.NoiseConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NoiseConfig</span><span class="p">(</span><span class="n">SerializableConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializable description of a synthetic noise process.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    kind : {&quot;gaussian&quot;, &quot;laplace&quot;, &quot;nonstationary_gaussian&quot;, &quot;correlated_gaussian&quot;}</span>
+<span class="sd">        Noise process to construct.</span>
+<span class="sd">    scale : float or tuple of float, default=0.0</span>
+<span class="sd">        Noise scale or sampling range.</span>
+<span class="sd">    mean : float or tuple of float, default=0.0</span>
+<span class="sd">        Noise mean or sampling range.</span>
+<span class="sd">    end_scale : float or tuple of float, default=1.0</span>
+<span class="sd">        End-to-start scale ratio for nonstationary noise.</span>
+<span class="sd">    correlation_length : float, default=0.0</span>
+<span class="sd">        Correlation length for correlated Gaussian noise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kind</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span>
+        <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;laplace&quot;</span><span class="p">,</span> <span class="s2">&quot;nonstationary_gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;correlated_gaussian&quot;</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gaussian&quot;</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">end_scale</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">correlation_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span>
+            <span class="s2">&quot;gaussian&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;laplace&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;nonstationary_gaussian&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;correlated_gaussian&quot;</span><span class="p">,</span>
+        <span class="p">}:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span><span class="s2">&quot;Unsupported noise kind.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">correlation_length</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span><span class="s2">&quot;correlation_length must be non-negative.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">build</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct the configured :class:`~DeepPeak.generation.BaseNoise`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        BaseNoise</span>
+<span class="sd">            Configured noise generator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">..generation.noises</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">CorrelatedGaussianNoise</span><span class="p">,</span>
+            <span class="n">GaussianNoise</span><span class="p">,</span>
+            <span class="n">LaplaceNoise</span><span class="p">,</span>
+            <span class="n">NonstationaryGaussianNoise</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;gaussian&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">GaussianNoise</span><span class="p">(</span><span class="n">std</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;laplace&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">LaplaceNoise</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="s2">&quot;nonstationary_gaussian&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">NonstationaryGaussianNoise</span><span class="p">(</span>
+                <span class="n">std</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
+                <span class="n">end_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">end_scale</span><span class="p">,</span>
+                <span class="n">mean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">CorrelatedGaussianNoise</span><span class="p">(</span>
+            <span class="n">std</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span>
+            <span class="n">correlation_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">correlation_length</span><span class="p">,</span>
+            <span class="n">mean</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ModelConfig">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.core.ModelConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ModelConfig</span><span class="p">(</span><span class="n">SerializableConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializable common model settings for experiment manifests.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    architecture : {&quot;dense&quot;, &quot;wavenet&quot;, &quot;unet1d&quot;}</span>
+<span class="sd">        Neural architecture name.</span>
+<span class="sd">    sequence_length : int</span>
+<span class="sd">        Number of input samples.</span>
+<span class="sd">    output_activation : str, default=&quot;linear&quot;</span>
+<span class="sd">        Output-layer activation.</span>
+<span class="sd">    optimizer : str, default=&quot;adam&quot;</span>
+<span class="sd">        Optimizer name.</span>
+<span class="sd">    loss : str, default=&quot;huber&quot;</span>
+<span class="sd">        Loss name.</span>
+<span class="sd">    metrics : tuple of str, default=(&quot;mae&quot;,)</span>
+<span class="sd">        Metric names.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">architecture</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;dense&quot;</span><span class="p">,</span> <span class="s2">&quot;wavenet&quot;</span><span class="p">,</span> <span class="s2">&quot;unet1d&quot;</span><span class="p">]</span>
+    <span class="n">sequence_length</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">output_activation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;linear&quot;</span>
+    <span class="n">optimizer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;adam&quot;</span>
+    <span class="n">loss</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;huber&quot;</span>
+    <span class="n">metrics</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;mae&quot;</span><span class="p">,)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">architecture</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;dense&quot;</span><span class="p">,</span> <span class="s2">&quot;wavenet&quot;</span><span class="p">,</span> <span class="s2">&quot;unet1d&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                <span class="s2">&quot;architecture must be dense, wavenet, or unet1d.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span><span class="s2">&quot;sequence_length must be positive.&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AnalysisConfig">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.core.AnalysisConfig">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalysisConfig</span><span class="p">(</span><span class="n">SerializableConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Serializable options for one high-level pipeline analysis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    detector : {&quot;standard&quot;, &quot;cnn&quot;}, default=&quot;standard&quot;</span>
+<span class="sd">        Detector record selected by the pipeline.</span>
+<span class="sd">    dx : float, default=1.0</span>
+<span class="sd">        Sample spacing.</span>
+<span class="sd">    filename : str, default=&quot;&lt;memory&gt;&quot;</span>
+<span class="sd">        Input filename metadata.</span>
+<span class="sd">    dilution : float, default=nan</span>
+<span class="sd">        Optional dilution metadata.</span>
+<span class="sd">    concentration : float, default=nan</span>
+<span class="sd">        Optional concentration metadata.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">detector</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;cnn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span>
+    <span class="n">dx</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&lt;memory&gt;&quot;</span>
+    <span class="n">dilution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+    <span class="n">concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;cnn&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span><span class="s2">&quot;detector must be &#39;standard&#39; or &#39;cnn&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span><span class="s2">&quot;dx must be positive.&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;AnalysisConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;DetectionConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GenerationConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ModelConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NoiseConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;PlotConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SeriesConfig&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TraceConfig&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 </pre></div>
 
                 </article>

@@ -102,7 +102,7 @@ Pass the same configuration to DenseNet, WaveNet, or UNet1D:
 
  .. code-block:: none
 
-    TrainingConfig(epochs=20, batch_size=32, validation_split=0.2, patience=5, monitor='val_loss', use_early_stopping=True, restore_best_weights=True, reduce_lr_on_plateau=True, learning_rate_factor=0.5, min_learning_rate=1e-06, verbose=1, shuffle=True)
+    TrainingConfig(epochs=20, batch_size=32, validation_split=0.2, patience=5, monitor='val_loss', use_early_stopping=True, restore_best_weights=True, reduce_lr_on_plateau=True, learning_rate_factor=0.5, min_learning_rate=1e-06, min_delta=0.0, monitor_mode='auto', seed=None, checkpoint_path=None, save_best_only=True, save_weights_only=True, verbose=1, shuffle=True)
 
 
 

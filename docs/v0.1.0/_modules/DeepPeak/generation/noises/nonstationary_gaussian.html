@@ -504,8 +504,6 @@
   <h1>Source code for DeepPeak.generation.noises.nonstationary_gaussian</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Gaussian noise models whose variance changes over a trace.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -523,6 +521,15 @@
 <span class="sd">    ``std`` is the standard deviation at the start of each trace and</span>
 <span class="sd">    ``end_scale`` multiplies it at the end. For example, ``end_scale=2``</span>
 <span class="sd">    produces noise whose standard deviation doubles across the acquisition.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    std : float or tuple of float</span>
+<span class="sd">        Starting standard deviation or sampling range.</span>
+<span class="sd">    end_scale : float or tuple of float, default=1.0</span>
+<span class="sd">        End-to-start standard-deviation ratio.</span>
+<span class="sd">    mean : float or tuple of float, default=0.0</span>
+<span class="sd">        Mean or sampling range.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">std</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
@@ -545,7 +552,22 @@
         <span class="n">x_values</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">rng</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return independent Gaussian samples with a linear variance trend.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return independent Gaussian samples with a linear variance trend.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        shape : tuple of int</span>
+<span class="sd">            Requested output shape.</span>
+<span class="sd">        x_values : ndarray, optional</span>
+<span class="sd">            Sample coordinates retained for interface compatibility.</span>
+<span class="sd">        rng : numpy.random.Generator, optional</span>
+<span class="sd">            Random number generator.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray</span>
+<span class="sd">            Nonstationary Gaussian noise samples.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span> <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">rng</span>
         <span class="n">n_samples</span><span class="p">,</span> <span class="n">sequence_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>

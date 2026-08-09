@@ -32,3 +32,26 @@ For a fast local check, run the lightweight API and analysis tests first:
 Examples in the Sphinx-Gallery are executable documentation. They should
 return figures rather than call ``plt.show()`` so that the same examples work
 in documentation builds, notebooks, and headless CI.
+
+Docstring style
+---------------
+
+DeepPeak uses NumPy-style docstrings. Public callables should document inputs
+and outputs with underlined sections:
+
+.. code-block:: text
+
+   Parameters
+   ----------
+   signal : array-like
+       Input signal samples.
+
+   Returns
+   -------
+   ndarray
+       Processed signal.
+
+Use ``Raises``, ``Examples``, and ``Notes`` sections in the same format when
+they add useful information. Google-style ``Args:`` and ``Returns:`` blocks
+are not used. Sphinx is configured with NumPy parsing enabled and Google
+parsing disabled.

@@ -540,6 +540,26 @@ diagnostics;</p></li>
 <p>Examples in the Sphinx-Gallery are executable documentation. They should
 return figures rather than call <code class="docutils literal notranslate"><span class="pre">plt.show()</span></code> so that the same examples work
 in documentation builds, notebooks, and headless CI.</p>
+<section id="docstring-style">
+<h2>Docstring style<a class="headerlink" href="#docstring-style" title="Link to this heading">#</a></h2>
+<p>DeepPeak uses NumPy-style docstrings. Public callables should document inputs
+and outputs with underlined sections:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Parameters
+----------
+signal : array-like
+    Input signal samples.
+
+Returns
+-------
+ndarray
+    Processed signal.
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">Raises</span></code>, <code class="docutils literal notranslate"><span class="pre">Examples</span></code>, and <code class="docutils literal notranslate"><span class="pre">Notes</span></code> sections in the same format when
+they add useful information. Google-style <code class="docutils literal notranslate"><span class="pre">Args:</span></code> and <code class="docutils literal notranslate"><span class="pre">Returns:</span></code> blocks
+are not used. Sphinx is configured with NumPy parsing enabled and Google
+parsing disabled.</p>
+</section>
 </section>
 
 
@@ -556,6 +576,18 @@ in documentation builds, notebooks, and headless CI.</p>
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#docstring-style">Docstring style</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">

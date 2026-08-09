@@ -519,19 +519,27 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">SignalGenerator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate synthetic 1D peak signals from kernel parameter samplers.</span>
 
-<span class="sd">    Key features:</span>
-<span class="sd">    - Supports all kernel classes derived from ``BaseKernel``</span>
-<span class="sd">    - Returns labels marking discrete peak locations</span>
-<span class="sd">    - Optional Gaussian noise</span>
-<span class="sd">    - Optional instrument response, baseline offset, saturation, and quantization</span>
-<span class="sd">    - Optional NumPy-based one-hot encoding for the number of peaks</span>
-<span class="sd">    - Clean pulse traces are retained alongside noisy observations for</span>
-<span class="sd">      reconstruction-model training</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The generator supports all kernel classes derived from ``BaseKernel``,</span>
+<span class="sd">    labels discrete peak locations, and can add Gaussian noise, instrument</span>
+<span class="sd">    response, baseline offset, saturation, and quantization. Clean pulse</span>
+<span class="sd">    traces are retained alongside noisy observations for reconstruction-model</span>
+<span class="sd">    training.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">sequence_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">x_values</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a generator on a shared one-dimensional sampling grid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        sequence_length : int</span>
+<span class="sd">            Number of samples in every generated trace.</span>
+<span class="sd">        x_values : ndarray, optional</span>
+<span class="sd">            Explicit one-dimensional sampling coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="n">sequence_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">x_values</span> <span class="k">if</span> <span class="n">x_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span>
@@ -544,14 +552,36 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_parts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">DataSet</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">add_to_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">generate_kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataSet</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate one batch and append it to the internal dataset buffer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate one batch and append it to the internal dataset buffer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        **generate_kwargs : object</span>
+<span class="sd">            Arguments forwarded to :meth:`generate`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataSet</span>
+<span class="sd">            Newly generated batch.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="o">**</span><span class="n">generate_kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataSet</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one dataset built by concatenating all buffered batches.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return one dataset built by concatenating all buffered batches.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        DataSet</span>
+<span class="sd">            Concatenated buffered batches.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If no batches have been buffered.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataset_parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
@@ -581,6 +611,7 @@
         <span class="n">quantization_step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">noise_profile</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;linear&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
         <span class="n">noise_end_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">missing_peak_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
         <span class="n">categorical_peak_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">shift_min_to_zero</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">minimum_level</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -633,6 +664,8 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;noise_profile is only supported with noise_std, not a custom noise object.&quot;</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">missing_peak_probability</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;missing_peak_probability must be between 0 and 1.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">shift_min_to_zero</span> <span class="ow">and</span> <span class="n">minimum_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -651,6 +684,13 @@
             <span class="n">peak_count</span><span class="o">=</span><span class="n">peak_count</span><span class="p">,</span>
             <span class="n">rng</span><span class="o">=</span><span class="n">rng</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">peak_presence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">peak_components</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">missing_peak_probability</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="n">peak_presence</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="n">peak_presence</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">missing_peak_probability</span>
+            <span class="k">for</span> <span class="n">sample_index</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">kernel</span><span class="o">.</span><span class="n">num_peaks</span><span class="p">):</span>
+                <span class="n">peak_presence</span><span class="p">[</span><span class="n">sample_index</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">count</span><span class="p">)</span> <span class="p">:]</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">peak_components</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">peak_components</span><span class="p">,</span> <span class="n">nan</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">peak_components</span> <span class="o">=</span> <span class="n">peak_components</span> <span class="o">*</span> <span class="n">peak_presence</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span>
         <span class="n">clean_signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">peak_components</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">signals</span> <span class="o">=</span> <span class="n">clean_signals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -667,7 +707,8 @@
         <span class="n">peak_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">peak_indices</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">):</span>
-            <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">peak_indices</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span> <span class="n">kernel</span><span class="o">.</span><span class="n">num_peaks</span><span class="p">[</span><span class="n">i</span><span class="p">]]]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">active</span> <span class="o">=</span> <span class="n">peak_presence</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span> <span class="n">kernel</span><span class="o">.</span><span class="n">num_peaks</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+            <span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">peak_indices</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:</span> <span class="n">kernel</span><span class="o">.</span><span class="n">num_peaks</span><span class="p">[</span><span class="n">i</span><span class="p">]][</span><span class="n">active</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">1</span>
 
         <span class="n">resolved_noise</span> <span class="o">=</span> <span class="n">noise</span>
         <span class="k">if</span> <span class="n">resolved_noise</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">noise_std</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -727,6 +768,8 @@
             <span class="n">instrument_response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
             <span class="n">saturation</span><span class="o">=</span><span class="n">saturation_bounds</span><span class="p">,</span>
             <span class="n">quantization_step</span><span class="o">=</span><span class="n">quantization_step</span><span class="p">,</span>
+            <span class="n">peak_presence</span><span class="o">=</span><span class="n">peak_presence</span><span class="p">,</span>
+            <span class="n">active_num_peaks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">peak_presence</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span>
 

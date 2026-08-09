@@ -504,10 +504,9 @@
   <h1>Source code for DeepPeak.models.training</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Typed training options for DeepPeak neural models.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">tensorflow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tf</span>
 
@@ -518,13 +517,37 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">TrainingConfig</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Reusable options for a supervised model training run.</span>
 
-<span class="sd">    The callback options add early stopping and learning-rate scheduling for</span>
-<span class="sd">    validation runs while allowing callers to provide additional callbacks.</span>
+<span class="sd">    The callback options add early stopping, learning-rate scheduling,</span>
+<span class="sd">    deterministic seeding, and optional best-model checkpointing. Validation</span>
+<span class="sd">    callbacks are enabled for either ``validation_split`` or explicit</span>
+<span class="sd">    ``validation_data`` passed to ``fit``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; config = TrainingConfig(epochs=50, patience=6, verbose=0)</span>
 <span class="sd">    &gt;&gt;&gt; model.fit(x_train, y_train, config=config)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    epochs : int, default=1</span>
+<span class="sd">        Maximum number of training epochs.</span>
+<span class="sd">    batch_size : int, default=32</span>
+<span class="sd">        Number of samples per optimization step.</span>
+<span class="sd">    validation_split : float, default=0.0</span>
+<span class="sd">        Fraction of training data reserved for validation.</span>
+<span class="sd">    patience : int, default=10</span>
+<span class="sd">        Number of unimproved epochs before adaptive callbacks act.</span>
+<span class="sd">    monitor : str, default=&quot;val_loss&quot;</span>
+<span class="sd">        History metric monitored by validation callbacks.</span>
+<span class="sd">    seed : int, optional</span>
+<span class="sd">        Random seed applied before fitting.</span>
+<span class="sd">    checkpoint_path : path-like, optional</span>
+<span class="sd">        Destination for an optional best-model checkpoint.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The remaining fields control callback behavior and are passed to Keras as</span>
+<span class="sd">    documented by their names.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
@@ -537,6 +560,12 @@
     <span class="n">reduce_lr_on_plateau</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">learning_rate_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
     <span class="n">min_learning_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-6</span>
+    <span class="n">min_delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">monitor_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">save_best_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">save_weights_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">shuffle</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -553,32 +582,92 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;learning_rate_factor must be in (0, 1)&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_learning_rate</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_learning_rate must be non-negative&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;min_delta must be non-negative&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor_mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;max&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;monitor_mode must be &#39;auto&#39;, &#39;min&#39;, or &#39;max&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;checkpoint_path must not be empty&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build fresh callbacks for this training run.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callbacks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">validation_available</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build fresh callbacks for this training run.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        validation_available : bool, default=False</span>
+<span class="sd">            Whether explicit ``validation_data`` was supplied to ``fit``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of tensorflow.keras.callbacks.Callback</span>
+<span class="sd">            Newly constructed callbacks for this run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">callbacks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">Callback</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_early_stopping</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_split</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">has_validation</span> <span class="o">=</span> <span class="n">validation_available</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_split</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor_mode</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;max&quot;</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                    <span class="n">token</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="p">(</span>
+                        <span class="s2">&quot;acc&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;auc&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;f1&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;iou&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;dice&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;precision&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;recall&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">else</span> <span class="s2">&quot;min&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_early_stopping</span> <span class="ow">and</span> <span class="n">has_validation</span><span class="p">:</span>
             <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">EarlyStopping</span><span class="p">(</span>
                     <span class="n">monitor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="p">,</span>
                     <span class="n">patience</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">patience</span><span class="p">,</span>
+                    <span class="n">min_delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
                     <span class="n">restore_best_weights</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">restore_best_weights</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce_lr_on_plateau</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_split</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reduce_lr_on_plateau</span> <span class="ow">and</span> <span class="n">has_validation</span><span class="p">:</span>
             <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ReduceLROnPlateau</span><span class="p">(</span>
                     <span class="n">monitor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="p">,</span>
                     <span class="n">factor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_rate_factor</span><span class="p">,</span>
                     <span class="n">patience</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">patience</span> <span class="o">//</span> <span class="mi">2</span><span class="p">),</span>
+                    <span class="n">min_delta</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_delta</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
                     <span class="n">min_lr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">min_learning_rate</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">checkpoint_has_monitor</span> <span class="o">=</span> <span class="n">has_validation</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;val_&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">checkpoint_has_monitor</span><span class="p">:</span>
+            <span class="n">callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">ModelCheckpoint</span><span class="p">(</span>
+                    <span class="n">filepath</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_path</span><span class="p">),</span>
+                    <span class="n">monitor</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">monitor</span><span class="p">,</span>
+                    <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span>
+                    <span class="n">save_best_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_best_only</span><span class="p">,</span>
+                    <span class="n">save_weights_only</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_weights_only</span><span class="p">,</span>
+                    <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">callbacks</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fit_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the Keras ``fit`` keyword arguments represented by config.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the Keras ``fit`` keyword arguments represented by config.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Keyword arguments compatible with ``Model.fit``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;epochs&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">epochs</span><span class="p">,</span>
