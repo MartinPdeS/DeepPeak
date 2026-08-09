@@ -1,0 +1,263 @@
+:orphan:
+
+
+Examples
+========
+
+Welcome to the DeepPeak examples gallery! This directory contains executable
+examples demonstrating the public DeepPeak API for signal processing, peak
+detection, analysis, and visualization. Examples are designed to run with a
+non-interactive Matplotlib backend and return figures instead of requiring a
+user to close plot windows.
+
+
+DeepPeak is a Python library designed for generating, detecting, and analyzing peaks in 1D signals. These examples showcase the library's main features:
+
+- **Signal Generation**: Create synthetic datasets with controllable noise and peak characteristics
+- **Classical Detection**: Detect peaks with trigger and suppression algorithms
+- **Neural deconvolution**: Train models to reconstruct clean pulse traces
+- **Direct-versus-deconvolved comparison**: Compare arrival, amplitude, and width distributions
+- **Stable Results**: Pass trace, detection, and metric objects between pipeline stages
+- **Trace Analysis**: Characterize noise and pulse shapes
+- **Peak Detection Algorithms**: Apply traditional and ML-enhanced peak detection methods
+- **Visualization Tools**: Plot and analyze results with built-in visualization utilities
+
+Suggested order
+---------------
+
+#. Start with ``core_result_objects.py`` to learn the stable data contracts.
+#. Continue with ``classical_detection_pipeline.py`` for a complete detector
+   workflow.
+#. Use ``data_generation.py`` and ``data_generation_custom_kernel.py`` to
+   create controlled training signals.
+#. Explore ``noise_and_pulse_analysis.py`` and ``amplitude_retrieval.py`` for
+   downstream trace diagnostics.
+#. Use the classifier examples only when TensorFlow and a trained model are
+   required.
+#. Read the direct-versus-deconvolved comparison section in ``getting_started``
+   before training a model for reconstruction.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates the use of the NonMaximumSuppression class to detect Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset of Gaussian pulses, applies the non-maximum suppression algorithm, and plots the results.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_amplitude_retrieval_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_amplitude_retrieval.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Amplitude Retrieval for Overlapping Pulses</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Generate a noisy synthetic signal, run the classical detector, wrap its raw output in a stable DetectionResult, and visualize the result.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_classical_detection_pipeline_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_classical_detection_pipeline.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Classical Detection Pipeline with Stable Results</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s U-Net as a deconvolver.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_classifier_autoencoder_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_classifier_autoencoder.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">U-Net Deconvolver: Reconstructing Clean Pulse Traces</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s DenseNet as a deconvolver.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_classifier_dense_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_classifier_dense.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s WaveNet as a deconvolver.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_classifier_wavenet_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_classifier_wavenet.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example introduces the lightweight result objects shared by the new DeepPeak architecture. They contain numerical data and metadata, but no TensorFlow or plotting dependencies.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_core_result_objects_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_core_result_objects.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Core Result Objects: Trace, DetectionResult, and MetricResult</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_data_generation_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_data_generation.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generating and Visualizing Signal Data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_data_generation_custom_kernel_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_data_generation_custom_kernel.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generating data With a Custom Kernel</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="DeepPeak neural losses and configurable training.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_neural_losses_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_neural_losses.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">DeepPeak neural losses and configurable training.</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Use the analysis layer to characterize noise regions and align detected pulses for shape statistics.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_noise_and_pulse_analysis_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_noise_and_pulse_analysis.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Noise and Pulse-Shape Analysis</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates the use of the NonMaximumSuppression class to detect Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset of Gaussian pulses, applies the non-maximum suppression algorithm, and plots the results.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_non_maximum_suppression_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_non_maximum_suppression.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Non-Maximum Suppression for Gaussian Pulse Detection</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /gallery/amplitude_retrieval
+   /gallery/classical_detection_pipeline
+   /gallery/classifier_autoencoder
+   /gallery/classifier_dense
+   /gallery/classifier_wavenet
+   /gallery/core_result_objects
+   /gallery/data_generation
+   /gallery/data_generation_custom_kernel
+   /gallery/neural_losses
+   /gallery/noise_and_pulse_analysis
+   /gallery/non_maximum_suppression
+
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_
