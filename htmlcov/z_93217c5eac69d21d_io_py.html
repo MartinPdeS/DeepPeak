@@ -4,14 +4,14 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Coverage for DeepPeak/utils/io.py: 13.64%</title>
     <link rel="icon" sizes="32x32" href="favicon_32_cb_c827f16f.png">
-    <link rel="stylesheet" href="style_cb_9ff733b0.css" type="text/css">
+    <link rel="stylesheet" href="style_cb_4667309f.css" type="text/css">
     <script src="coverage_html_cb_dd2e7eb5.js" defer></script>
 </head>
 <body class="pyfile">
 <header>
     <div class="content">
         <h1>
-            <span class="text">Coverage for </span><b>DeepPeak&#8201;/&#8201;utils&#8201;/&#8201;io.py</b>:
+            <span class="text">Coverage for </span><b>DeepPeak<span class="sep">/</span>utils<span class="sep">/</span>io.py</b>:
             <span class="pc_cov">13.64%</span>
         </h1>
         <aside id="help_panel_wrapper">
@@ -66,8 +66,8 @@
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="z_93217c5eac69d21d_iterables_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.5">coverage.py v7.13.5</a>,
-            created at 2026-05-17 21:43 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.15.2">coverage.py v7.15.2</a>,
+            created at 2026-08-09 07:28 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"></button>
@@ -91,7 +91,7 @@
     <p class="run run2"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t">    <span class="nam">filename_regex</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="str">r"^dilution_(\d+)x_\d+\.csv$"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="run run2"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t"><span class="op">)</span> <span class="op">-></span> <span class="nam">list</span><span class="op">[</span><span class="nam">tuple</span><span class="op">[</span><span class="nam">str</span><span class="op">,</span> <span class="nam">int</span><span class="op">]</span><span class="op">]</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc show_exc"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="str">    Find dilution trace files in a folder and build a PeakCountSeries-compatible</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="str">    Find dilution trace files in a folder and build a dilution-series-compatible</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="str">    trace_files list.</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="str">    Parameters</span>&nbsp;</span><span class="r"></span></p>
@@ -114,8 +114,8 @@
     <p class="exc exc2 show_exc"><span class="n"><a id="t30" href="#t30">30</a></span><span class="t"><span class="str">        List of tuples:</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t31" href="#t31">31</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t32" href="#t32">32</a></span><span class="t"><span class="str">            [</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t"><span class="str">                ("dilution_1000x_1.csv", 1000),</span>&nbsp;</span><span class="r"></span></p>
-    <p class="exc exc2 show_exc"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t"><span class="str">                ("dilution_300x_1.csv", 300),</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t33" href="#t33">33</a></span><span class="t"><span class="str">                ("/absolute/path/to/dilution_1000x_1.csv", 1000),</span>&nbsp;</span><span class="r"></span></p>
+    <p class="exc exc2 show_exc"><span class="n"><a id="t34" href="#t34">34</a></span><span class="t"><span class="str">                ("/absolute/path/to/dilution_300x_1.csv", 300),</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t35" href="#t35">35</a></span><span class="t"><span class="str">                ...</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t36" href="#t36">36</a></span><span class="t"><span class="str">            ]</span>&nbsp;</span><span class="r"></span></p>
     <p class="exc exc2 show_exc"><span class="n"><a id="t37" href="#t37">37</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -136,7 +136,7 @@
     <p class="mis show_mis"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">            <span class="key">continue</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t54" href="#t54">54</a></span><span class="t">        <span class="nam">dilution_factor</span> <span class="op">=</span> <span class="nam">int</span><span class="op">(</span><span class="nam">match</span><span class="op">.</span><span class="nam">group</span><span class="op">(</span><span class="num">1</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">        <span class="nam">trace_files</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="op">(</span><span class="nam">file_path</span><span class="op">.</span><span class="nam">name</span><span class="op">,</span> <span class="nam">dilution_factor</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t55" href="#t55">55</a></span><span class="t">        <span class="nam">trace_files</span><span class="op">.</span><span class="nam">append</span><span class="op">(</span><span class="op">(</span><span class="nam">str</span><span class="op">(</span><span class="nam">file_path</span><span class="op">.</span><span class="nam">resolve</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">,</span> <span class="nam">dilution_factor</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t56" href="#t56">56</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t57" href="#t57">57</a></span><span class="t">    <span class="nam">trace_files</span><span class="op">.</span><span class="nam">sort</span><span class="op">(</span><span class="nam">key</span><span class="op">=</span><span class="key">lambda</span> <span class="nam">item</span><span class="op">:</span> <span class="nam">item</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">,</span> <span class="nam">reverse</span><span class="op">=</span><span class="key">True</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t58" href="#t58">58</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -149,8 +149,8 @@
             <a class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a class="nav" href="z_93217c5eac69d21d_iterables_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
-            <a class="nav" href="https://coverage.readthedocs.io/en/7.13.5">coverage.py v7.13.5</a>,
-            created at 2026-05-17 21:43 +0000
+            <a class="nav" href="https://coverage.readthedocs.io/en/7.15.2">coverage.py v7.15.2</a>,
+            created at 2026-08-09 07:28 +0000
         </p>
     </div>
 </footer>
