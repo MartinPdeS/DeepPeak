@@ -38,7 +38,13 @@ dataset = generator.generate(
     n_samples=sample_count,
     kernel=pulse_kernel,
     peak_count=UniformCount(bounds=(3, 3)),
-    noise_std=0,  # Add some noise
+    noise_std=(0.05, 0.1),
+    noise_profile="linear",
+    noise_end_scale=(1.0, 2.0),
+    baseline_level=(0.0, 0.5),
+    instrument_response=[0.2, 0.6, 0.2],
+    saturation=250.0,
+    quantization_step=0.05,
     categorical_peak_count=False,
 )
 

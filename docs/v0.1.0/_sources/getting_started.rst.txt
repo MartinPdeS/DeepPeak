@@ -116,8 +116,7 @@ distributions. With ``deconvolver=None``, the direct branch remains available
 without requiring a neural model.
 
 The reconstruction model should be trained against clean pulse traces. For a
-WaveNet-style model, use a linear output head and a regression loss rather than
-the sigmoid/binary-crossentropy configuration used for ROI classification:
+WaveNet-style model, use a linear output head and a regression loss:
 
 .. code-block:: python
 

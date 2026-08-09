@@ -44,8 +44,8 @@
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/DeepPeak/generation/signal_generator';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -125,8 +125,8 @@
       
     
     
-    <img src="../../../_static/thumbnail.png" class="logo__image only-light" alt=""/>
-    <img src="../../../_static/thumbnail.png" class="logo__image only-dark pst-js-only" alt=""/>
+    <img src="../../../_static/logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">DeepPeak</p>
@@ -504,13 +504,13 @@
   <h1>Source code for DeepPeak.generation.signal_generator</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Synthetic signal dataset generation utilities.&quot;&quot;&quot;</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataSet</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.kernels</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseKernel</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.noises</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseNoise</span><span class="p">,</span> <span class="n">GaussianNoise</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.noises</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseNoise</span><span class="p">,</span> <span class="n">GaussianNoise</span><span class="p">,</span> <span class="n">NonstationaryGaussianNoise</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.peak_count</span><span class="w"> </span><span class="kn">import</span> <span class="n">PeakCount</span>
 
 
@@ -523,6 +523,7 @@
 <span class="sd">    - Supports all kernel classes derived from ``BaseKernel``</span>
 <span class="sd">    - Returns labels marking discrete peak locations</span>
 <span class="sd">    - Optional Gaussian noise</span>
+<span class="sd">    - Optional instrument response, baseline offset, saturation, and quantization</span>
 <span class="sd">    - Optional NumPy-based one-hot encoding for the number of peaks</span>
 <span class="sd">    - Clean pulse traces are retained alongside noisy observations for</span>
 <span class="sd">      reconstruction-model training</span>
@@ -574,6 +575,12 @@
         <span class="n">noise_std</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">noise</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BaseNoise</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">drift</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">baseline_level</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instrument_response</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">saturation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">quantization_step</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">noise_profile</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;linear&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;constant&quot;</span><span class="p">,</span>
+        <span class="n">noise_end_scale</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">categorical_peak_count</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">shift_min_to_zero</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">minimum_level</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -593,6 +600,18 @@
 <span class="sd">            Desired per-trace minimum after generation. A scalar applies the same</span>
 <span class="sd">            minimum to every trace. A ``(low, high)`` tuple samples one minimum</span>
 <span class="sd">            uniformly per trace. Cannot be combined with ``shift_min_to_zero``.</span>
+<span class="sd">        baseline_level : float or tuple of float, optional</span>
+<span class="sd">            Constant additive baseline sampled independently for each trace.</span>
+<span class="sd">        instrument_response : 1D array, optional</span>
+<span class="sd">            Finite impulse response applied to the clean signal before noise.</span>
+<span class="sd">        saturation : float or tuple of float, optional</span>
+<span class="sd">            Upper clipping limit, or explicit ``(lower, upper)`` clipping bounds.</span>
+<span class="sd">        quantization_step : float, optional</span>
+<span class="sd">            Quantization interval applied to the observed signal.</span>
+<span class="sd">        noise_profile : {&quot;constant&quot;, &quot;linear&quot;}, default=&quot;constant&quot;</span>
+<span class="sd">            Whether ``noise_std`` is stationary or changes linearly across time.</span>
+<span class="sd">        noise_end_scale : float or tuple of float, default=1.0</span>
+<span class="sd">            End-to-start standard-deviation ratio for a linear noise profile.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span> <span class="o">=</span> <span class="n">n_samples</span>
         <span class="n">n_peaks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_tuple</span><span class="p">(</span><span class="n">peak_count</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
@@ -601,6 +620,19 @@
         <span class="n">minimum_level</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_tuple</span><span class="p">(</span><span class="n">minimum_level</span><span class="p">)</span> <span class="k">if</span> <span class="n">minimum_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
+        <span class="n">baseline_level</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_ensure_tuple</span><span class="p">(</span><span class="n">baseline_level</span><span class="p">)</span> <span class="k">if</span> <span class="n">baseline_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_instrument_response</span><span class="p">(</span><span class="n">instrument_response</span><span class="p">)</span>
+        <span class="n">saturation_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_saturation</span><span class="p">(</span><span class="n">saturation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">quantization_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">quantization_step</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;quantization_step must be greater than zero.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">noise_profile</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="s2">&quot;linear&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;noise_profile must be &#39;constant&#39; or &#39;linear&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">noise</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">noise_profile</span> <span class="o">!=</span> <span class="s2">&quot;constant&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;noise_profile is only supported with noise_std, not a custom noise object.&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">shift_min_to_zero</span> <span class="ow">and</span> <span class="n">minimum_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -622,6 +654,12 @@
         <span class="n">clean_signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nansum</span><span class="p">(</span><span class="n">peak_components</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">signals</span> <span class="o">=</span> <span class="n">clean_signals</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
+        <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">convolve</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;same&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">signal</span> <span class="ow">in</span> <span class="n">signals</span><span class="p">],</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+
         <span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">))</span>
         <span class="n">true_positions</span> <span class="o">=</span> <span class="n">kernel</span><span class="o">.</span><span class="n">positions_for_labels</span>
         <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">true_positions</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:])</span>
@@ -633,7 +671,14 @@
 
         <span class="n">resolved_noise</span> <span class="o">=</span> <span class="n">noise</span>
         <span class="k">if</span> <span class="n">resolved_noise</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">noise_std</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">resolved_noise</span> <span class="o">=</span> <span class="n">GaussianNoise</span><span class="p">(</span><span class="n">std</span><span class="o">=</span><span class="n">noise_std</span><span class="p">)</span>
+            <span class="n">resolved_noise</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">NonstationaryGaussianNoise</span><span class="p">(</span>
+                    <span class="n">std</span><span class="o">=</span><span class="n">noise_std</span><span class="p">,</span>
+                    <span class="n">end_scale</span><span class="o">=</span><span class="n">noise_end_scale</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">noise_profile</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span>
+                <span class="k">else</span> <span class="n">GaussianNoise</span><span class="p">(</span><span class="n">std</span><span class="o">=</span><span class="n">noise_std</span><span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">resolved_noise</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">signals</span> <span class="o">=</span> <span class="n">signals</span> <span class="o">+</span> <span class="n">resolved_noise</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span>
@@ -647,6 +692,12 @@
             <span class="n">baseline</span> <span class="o">=</span> <span class="n">drift_levels</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span>
             <span class="n">signals</span> <span class="o">=</span> <span class="n">signals</span> <span class="o">+</span> <span class="n">baseline</span>
 
+        <span class="k">if</span> <span class="n">baseline_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">baseline_levels</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span>
+                <span class="n">baseline_level</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">baseline_level</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="n">signals</span> <span class="o">+</span> <span class="n">baseline_levels</span>
+
         <span class="k">if</span> <span class="n">shift_min_to_zero</span><span class="p">:</span>
             <span class="n">minimum_per_trace</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">signals</span> <span class="o">=</span> <span class="n">signals</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">minimum_per_trace</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
@@ -658,6 +709,11 @@
             <span class="n">minimum_per_trace</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">signals</span> <span class="o">=</span> <span class="n">signals</span> <span class="o">+</span> <span class="p">(</span><span class="n">target_minimum</span> <span class="o">-</span> <span class="n">minimum_per_trace</span><span class="p">)</span>
 
+        <span class="k">if</span> <span class="n">saturation_bounds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">signals</span><span class="p">,</span> <span class="o">*</span><span class="n">saturation_bounds</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">quantization_step</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">signals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">signals</span> <span class="o">/</span> <span class="n">quantization_step</span><span class="p">)</span> <span class="o">*</span> <span class="n">quantization_step</span>
+
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">DataSet</span><span class="p">(</span>
             <span class="n">n_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_samples</span><span class="p">,</span>
             <span class="n">sequence_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
@@ -667,6 +723,10 @@
             <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
             <span class="n">x_values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">x_values</span><span class="p">,</span>
             <span class="n">num_peaks</span><span class="o">=</span><span class="n">kernel</span><span class="o">.</span><span class="n">num_peaks</span><span class="p">,</span>
+            <span class="n">baseline_level</span><span class="o">=</span><span class="n">baseline_level</span><span class="p">,</span>
+            <span class="n">instrument_response</span><span class="o">=</span><span class="n">response</span><span class="p">,</span>
+            <span class="n">saturation</span><span class="o">=</span><span class="n">saturation_bounds</span><span class="p">,</span>
+            <span class="n">quantization_step</span><span class="o">=</span><span class="n">quantization_step</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span>
 
@@ -831,7 +891,38 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;If value is a scalar, return ``(v, v)``; otherwise return value.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>  <span class="c1"># type: ignore[return-value]</span>
-        <span class="k">return</span> <span class="n">value</span>  <span class="c1"># type: ignore[return-value]</span></div>
+        <span class="k">return</span> <span class="n">value</span>  <span class="c1"># type: ignore[return-value]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_instrument_response</span><span class="p">(</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">response</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;instrument_response must be a non-empty 1D array.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">response</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;instrument_response must contain finite values.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">response</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;instrument_response must contain a non-zero value.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_saturation</span><span class="p">(</span>
+        <span class="n">saturation</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
+        <span class="k">if</span> <span class="n">saturation</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">saturation</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">saturation</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">saturation</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;saturation must be a limit or a (low, high) pair.&quot;</span><span class="p">)</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">saturation</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">saturation</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;saturation must satisfy low &lt;= high.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">bounds</span></div>
 
 </pre></div>
 
@@ -883,7 +974,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     <br/>
   </p>
 </div>

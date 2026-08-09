@@ -45,8 +45,8 @@
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="../_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="../_static/doctools.js?v=9bcbadda"></script>
-    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'gallery/classifier_autoencoder';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -128,8 +128,8 @@
       
     
     
-    <img src="../_static/thumbnail.png" class="logo__image only-light" alt=""/>
-    <img src="../_static/thumbnail.png" class="logo__image only-dark pst-js-only" alt=""/>
+    <img src="../_static/logo.svg" class="logo__image only-light" alt=""/>
+    <img src="../_static/logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">DeepPeak</p>
@@ -547,7 +547,7 @@ to download the full example code.</p>
 <h2>Imports and reproducibility<a class="headerlink" href="#imports-and-reproducibility" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNet1D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingConfig</span><span class="p">,</span> <span class="n">UNet1D</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lorentzian</span><span class="p">,</span> <span class="n">UniformCount</span>
 
@@ -742,92 +742,62 @@ to download the full example code.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">history</span> <span class="o">=</span> <span class="n">unet</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">clean_signals</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
-    <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-    <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">TrainingConfig</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">),</span>
 <span class="p">)</span>
 </pre></div>
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 6s 7s/step - loss: 0.6510 - mae: 1.0448
-2/2 ━━━━━━━━━━━━━━━━━━━━ 8s 620ms/step - loss: 0.6230 - mae: 1.0144 - val_loss: 0.0011 - val_mae: 0.0208
+1/2 ━━━━━━━━━━━━━━━━━━━━ 7s 7s/step - loss: 0.6729 - mae: 1.0720
+2/2 ━━━━━━━━━━━━━━━━━━━━ 8s 661ms/step - loss: 0.6298 - mae: 1.0235 - val_loss: 0.0015 - val_mae: 0.0145 - learning_rate: 0.0010
 Epoch 2/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 132ms/step - loss: 0.3324 - mae: 0.6804
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 85ms/step - loss: 0.3228 - mae: 0.6675 - val_loss: 0.0016 - val_mae: 0.0371
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 133ms/step - loss: 0.3066 - mae: 0.6491
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.2946 - mae: 0.6320 - val_loss: 0.0015 - val_mae: 0.0146 - learning_rate: 0.0010
 Epoch 3/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 123ms/step - loss: 0.1919 - mae: 0.4922
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.1966 - mae: 0.4991 - val_loss: 0.0020 - val_mae: 0.0469
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 128ms/step - loss: 0.1695 - mae: 0.4577
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 98ms/step - loss: 0.1750 - mae: 0.4648 - val_loss: 0.0014 - val_mae: 0.0057 - learning_rate: 0.0010
 Epoch 4/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.1345 - mae: 0.4066
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 85ms/step - loss: 0.1338 - mae: 0.4058 - val_loss: 0.0021 - val_mae: 0.0486
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 128ms/step - loss: 0.1116 - mae: 0.3621
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - loss: 0.1135 - mae: 0.3661 - val_loss: 0.0015 - val_mae: 0.0198 - learning_rate: 0.0010
 Epoch 5/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 217ms/step - loss: 0.0973 - mae: 0.3447
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0964 - mae: 0.3426 - val_loss: 0.0020 - val_mae: 0.0465
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0771 - mae: 0.2995
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0773 - mae: 0.2998 - val_loss: 0.0018 - val_mae: 0.0326 - learning_rate: 0.0010
 Epoch 6/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0715 - mae: 0.2941
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0723 - mae: 0.2959 - val_loss: 0.0019 - val_mae: 0.0434
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 127ms/step - loss: 0.0555 - mae: 0.2524
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0558 - mae: 0.2530 - val_loss: 0.0020 - val_mae: 0.0380 - learning_rate: 0.0010
 Epoch 7/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 123ms/step - loss: 0.0535 - mae: 0.2553
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - loss: 0.0549 - mae: 0.2582 - val_loss: 0.0018 - val_mae: 0.0415
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0408 - mae: 0.2166
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0418 - mae: 0.2184 - val_loss: 0.0020 - val_mae: 0.0394 - learning_rate: 5.0000e-04
 Epoch 8/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 124ms/step - loss: 0.0432 - mae: 0.2284
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 85ms/step - loss: 0.0444 - mae: 0.2308 - val_loss: 0.0018 - val_mae: 0.0422
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0334 - mae: 0.1953
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0339 - mae: 0.1966 - val_loss: 0.0020 - val_mae: 0.0391 - learning_rate: 5.0000e-04
 Epoch 9/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 124ms/step - loss: 0.0360 - mae: 0.2070
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0368 - mae: 0.2089 - val_loss: 0.0020 - val_mae: 0.0462
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.0287 - mae: 0.1810
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0342 - mae: 0.1942 - val_loss: 0.0020 - val_mae: 0.0380 - learning_rate: 5.0000e-04
 Epoch 10/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0293 - mae: 0.1871
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0302 - mae: 0.1895 - val_loss: 0.0023 - val_mae: 0.0528
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0251 - mae: 0.1693
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0259 - mae: 0.1710 - val_loss: 0.0019 - val_mae: 0.0362 - learning_rate: 5.0000e-04
 Epoch 11/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.0244 - mae: 0.1723
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0249 - mae: 0.1734 - val_loss: 0.0027 - val_mae: 0.0588
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 127ms/step - loss: 0.0207 - mae: 0.1536
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0210 - mae: 0.1552 - val_loss: 0.0019 - val_mae: 0.0345 - learning_rate: 5.0000e-04
 Epoch 12/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 123ms/step - loss: 0.0202 - mae: 0.1563
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0208 - mae: 0.1586 - val_loss: 0.0030 - val_mae: 0.0652
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0176 - mae: 0.1433
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0188 - mae: 0.1474 - val_loss: 0.0019 - val_mae: 0.0343 - learning_rate: 2.5000e-04
 Epoch 13/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 127ms/step - loss: 0.0176 - mae: 0.1455
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 85ms/step - loss: 0.0177 - mae: 0.1455 - val_loss: 0.0032 - val_mae: 0.0677
-Epoch 14/20
-
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0152 - mae: 0.1350
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0159 - mae: 0.1378 - val_loss: 0.0033 - val_mae: 0.0687
-Epoch 15/20
-
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0133 - mae: 0.1263
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - loss: 0.0134 - mae: 0.1272 - val_loss: 0.0033 - val_mae: 0.0690
-Epoch 16/20
-
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0116 - mae: 0.1182
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0130 - mae: 0.1240 - val_loss: 0.0031 - val_mae: 0.0663
-Epoch 17/20
-
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0101 - mae: 0.1112
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0104 - mae: 0.1124 - val_loss: 0.0029 - val_mae: 0.0628
-Epoch 18/20
-
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 123ms/step - loss: 0.0097 - mae: 0.1080
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - loss: 0.0098 - mae: 0.1085 - val_loss: 0.0026 - val_mae: 0.0579
-Epoch 19/20
-
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 149ms/step - loss: 0.0082 - mae: 0.0991
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0086 - mae: 0.1008 - val_loss: 0.0023 - val_mae: 0.0520
-Epoch 20/20
-
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0074 - mae: 0.0943
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 86ms/step - loss: 0.0081 - mae: 0.0977 - val_loss: 0.0020 - val_mae: 0.0459
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 130ms/step - loss: 0.0167 - mae: 0.1397
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - loss: 0.0170 - mae: 0.1409 - val_loss: 0.0019 - val_mae: 0.0344 - learning_rate: 2.5000e-04
 </pre></div>
 </div>
 </section>
@@ -839,7 +809,7 @@ Epoch 20/20
 <img src="../_images/sphx_glr_classifier_autoencoder_002.png" srcset="../_images/sphx_glr_classifier_autoencoder_002.png" alt="Losses, Metrics" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 900x720 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 15.003 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 13.816 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-autoencoder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/027ad6dec8c2fb9e539fbd7af3497d66/classifier_autoencoder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_autoencoder.ipynb</span></code></a></p>
@@ -936,7 +906,7 @@ Epoch 20/20
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     <br/>
   </p>
 </div>

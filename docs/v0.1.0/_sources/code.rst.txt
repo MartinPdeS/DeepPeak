@@ -133,6 +133,10 @@ Plotting is kept in ``DeepPeak.plotting`` and returns Matplotlib figures.
 Neural-network API
 ------------------
 
+All neural models reconstruct clean pulse traces. They accept a
+``TrainingConfig`` through ``fit(config=...)`` for reproducible training with
+optional early stopping and learning-rate scheduling.
+
 .. autoclass:: DeepPeak.models.WaveNet
    :members:
    :undoc-members:
@@ -164,8 +168,31 @@ Neural-network API
    :members:
    :undoc-members:
 
+.. autoclass:: DeepPeak.models.BinaryIoU
+   :members:
+   :undoc-members:
+
+.. autoclass:: DeepPeak.models.TrainingConfig
+   :members:
+   :undoc-members:
+
+.. autofunction:: DeepPeak.models.weighted_bce
+
+.. autofunction:: DeepPeak.models.smooth_bce
+
+.. autofunction:: DeepPeak.models.weighted_huber
+
+.. autofunction:: DeepPeak.models.shape_aware_pulse_loss
+
+.. autofunction:: DeepPeak.models.plot_predictions
+
 Signal-generation API
 ----------------------
+
+``SignalGenerator`` supports optional acquisition effects while keeping the
+underlying ``clean_signals`` target available: constant or linearly varying
+noise, baseline offsets and drift, finite instrument responses, saturation,
+and quantization.
 
 .. autoclass:: DeepPeak.SignalGenerator
    :members:
@@ -173,6 +200,11 @@ Signal-generation API
    :show-inheritance:
 
 .. autoclass:: DeepPeak.Gaussian
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: DeepPeak.NonstationaryGaussianNoise
    :members:
    :undoc-members:
    :show-inheritance:

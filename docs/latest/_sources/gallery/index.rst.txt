@@ -35,8 +35,7 @@ Suggested order
 #. Use the classifier examples only when TensorFlow and a trained model are
    required.
 #. Read the direct-versus-deconvolved comparison section in ``getting_started``
-   before training a model for reconstruction. The ROI-classification gallery
-   examples use binary masks and are a different objective.
+   before training a model for reconstruction.
 
 
 
@@ -184,6 +183,23 @@ Suggested order
 
 .. raw:: html
 
+    <div class="sphx-glr-thumbcontainer" tooltip="DeepPeak neural losses and configurable training.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_neural_losses_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_neural_losses.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">DeepPeak neural losses and configurable training.</div>
+    </div>
+
+
+.. raw:: html
+
     <div class="sphx-glr-thumbcontainer" tooltip="Use the analysis layer to characterize noise regions and align detected pulses for shape statistics.">
 
 .. only:: html
@@ -234,6 +250,7 @@ Suggested order
    /gallery/core_result_objects
    /gallery/data_generation
    /gallery/data_generation_custom_kernel
+   /gallery/neural_losses
    /gallery/noise_and_pulse_analysis
    /gallery/non_maximum_suppression
 

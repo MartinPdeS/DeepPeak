@@ -44,8 +44,8 @@
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
     <script src="_static/documentation_options.js?v=5929fcd5"></script>
-    <script src="_static/doctools.js?v=9bcbadda"></script>
-    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
@@ -125,8 +125,8 @@
       
     
     
-    <img src="_static/thumbnail.png" class="logo__image only-light" alt=""/>
-    <img src="_static/thumbnail.png" class="logo__image only-dark pst-js-only" alt=""/>
+    <img src="_static/logo.svg" class="logo__image only-light" alt=""/>
+    <img src="_static/logo.svg" class="logo__image only-dark pst-js-only" alt=""/>
   
   
     <p class="title logo__title">DeepPeak</p>
@@ -511,6 +511,10 @@
       <li><a href="code.html#DeepPeak.analysis.BasePeakTrigger">BasePeakTrigger (class in DeepPeak.analysis)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="code.html#DeepPeak.models.BinaryIoU">BinaryIoU (class in DeepPeak.models)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
@@ -573,15 +577,21 @@
       <li><a href="code.html#DeepPeak.analysis.NoiseAnalyzer">NoiseAnalyzer (class in DeepPeak.analysis)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="code.html#DeepPeak.NonstationaryGaussianNoise">NonstationaryGaussianNoise (class in DeepPeak)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="code.html#DeepPeak.core.PlotConfig">PlotConfig (class in DeepPeak.core)</a>
+      <li><a href="code.html#DeepPeak.models.plot_predictions">plot_predictions() (in module DeepPeak.models)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="code.html#DeepPeak.core.PlotConfig">PlotConfig (class in DeepPeak.core)</a>
+</li>
       <li><a href="code.html#DeepPeak.analysis.PulseShapeAnalyzer">PulseShapeAnalyzer (class in DeepPeak.analysis)</a>
 </li>
   </ul></td>
@@ -596,12 +606,16 @@
 </li>
       <li><a href="code.html#DeepPeak.core.SeriesResult">SeriesResult (class in DeepPeak.core)</a>
 </li>
+      <li><a href="code.html#DeepPeak.models.shape_aware_pulse_loss">shape_aware_pulse_loss() (in module DeepPeak.models)</a>
+</li>
       <li><a href="code.html#DeepPeak.models.ShapeAwarePulseLoss">ShapeAwarePulseLoss (class in DeepPeak.models)</a>
 </li>
       <li><a href="code.html#DeepPeak.SignalGenerator">SignalGenerator (class in DeepPeak)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="code.html#DeepPeak.models.smooth_bce">smooth_bce() (in module DeepPeak.models)</a>
+</li>
       <li><a href="code.html#DeepPeak.models.SmoothBinaryCrossentropy">SmoothBinaryCrossentropy (class in DeepPeak.models)</a>
 </li>
       <li><a href="code.html#DeepPeak.plotting.standard_detection">standard_detection() (in module DeepPeak.plotting)</a>
@@ -628,6 +642,8 @@
 </li>
       <li><a href="code.html#DeepPeak.core.TraceConfig">TraceConfig (class in DeepPeak.core)</a>
 </li>
+      <li><a href="code.html#DeepPeak.models.TrainingConfig">TrainingConfig (class in DeepPeak.models)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -648,9 +664,13 @@
 </li>
       <li><a href="code.html#DeepPeak.plotting.wavenet_detection_with_histogram">wavenet_detection_with_histogram() (in module DeepPeak.plotting)</a>
 </li>
+      <li><a href="code.html#DeepPeak.analysis.WaveNetTraceAnalyzer">WaveNetTraceAnalyzer (class in DeepPeak.analysis)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="code.html#DeepPeak.analysis.WaveNetTraceAnalyzer">WaveNetTraceAnalyzer (class in DeepPeak.analysis)</a>
+      <li><a href="code.html#DeepPeak.models.weighted_bce">weighted_bce() (in module DeepPeak.models)</a>
+</li>
+      <li><a href="code.html#DeepPeak.models.weighted_huber">weighted_huber() (in module DeepPeak.models)</a>
 </li>
       <li><a href="code.html#DeepPeak.models.WeightedBinaryCrossentropy">WeightedBinaryCrossentropy (class in DeepPeak.models)</a>
 </li>
@@ -709,7 +729,7 @@
         <div class="footer-item">
 
   <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
     <br/>
   </p>
 </div>
