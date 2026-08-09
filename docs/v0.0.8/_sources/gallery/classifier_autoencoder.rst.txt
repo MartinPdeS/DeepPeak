@@ -18,33 +18,32 @@
 .. _sphx_glr_gallery_classifier_autoencoder.py:
 
 
-DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals
-=======================================================================
+U-Net Deconvolver: Reconstructing Clean Pulse Traces
+====================================================================
 
-This example demonstrates how to use DeepPeak's DenseNet classifier to identify
-regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.
+This example demonstrates how to train DeepPeak's U-Net as a deconvolver.
 
 We will:
 - Generate a dataset of noisy signals with random Gaussian peaks
-- Build and train a DenseNet classifier to detect ROIs
-- Visualize the training process and model predictions
+- Build and train a U-Net reconstruction model
+- Visualize the training process and reconstructed signals
 
 .. note::
     This example is fully reproducible and suitable for Sphinx-Gallery documentation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-21
+.. GENERATED FROM PYTHON SOURCE LINES 18-20
 
 Imports and reproducibility
---------------------------
+-----------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-29
+.. GENERATED FROM PYTHON SOURCE LINES 20-28
 
 .. code-block:: Python
 
     import numpy as np
 
-    from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
-    from DeepPeak.signal_generator import SignalGenerator
+    from DeepPeak.models import UNet1D
+    from DeepPeak.generation import SignalGenerator
     from DeepPeak import Lorentzian, UniformCount
 
     np.random.seed(42)
@@ -56,12 +55,12 @@ Imports and reproducibility
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-32
+.. GENERATED FROM PYTHON SOURCE LINES 29-31
 
 Generate synthetic dataset
--------------------------
+---------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 32-53
+.. GENERATED FROM PYTHON SOURCE LINES 31-50
 
 .. code-block:: Python
 
@@ -84,7 +83,6 @@ Generate synthetic dataset
         categorical_peak_count=False,
     )
 
-    roi = dataset.get_region_of_interest(width_in_pixels=5)
 
 
 
@@ -92,17 +90,16 @@ Generate synthetic dataset
 
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 51-53
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-56
+Visualize observed and clean example signals
+-------------------------------------------------------------
 
-Visualize a few example signals and their regions of interest
-------------------------------------------------------------
-
-.. GENERATED FROM PYTHON SOURCE LINES 56-58
+.. GENERATED FROM PYTHON SOURCE LINES 53-55
 
 .. code-block:: Python
 
-    dataset.plot(number_of_samples=3, region_of_interest=roi)
+    dataset.plot(number_of_samples=3, reference_pulse_trace=dataset.clean_signals)
 
 
 
@@ -122,28 +119,26 @@ Visualize a few example signals and their regions of interest
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-61
+.. GENERATED FROM PYTHON SOURCE LINES 56-58
 
-Build and summarize the WaveNet classifier
+Build and summarize the U-Net deconvolver
 ------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-75
+.. GENERATED FROM PYTHON SOURCE LINES 58-70
 
 .. code-block:: Python
 
-    dense_net = Autoencoder(
+    unet = UNet1D(
         sequence_length=SEQUENCE_LENGTH,
-        dropout_rate=0.30,
-        filters=(32, 64, 128),
+        num_filters=32,
+        num_levels=3,
         kernel_size=3,
-        pool_size=2,
-        upsample_size=2,
         optimizer="adam",
-        loss="binary_crossentropy",
-        metrics=[BinaryIoU(threshold=0.5)],
+        loss="huber",
+        metrics=["mae"],
     )
-    dense_net.build()
-    dense_net.summary()
+    unet.build()
+    unet.summary()
 
 
 
@@ -153,57 +148,154 @@ Build and summarize the WaveNet classifier
 
  .. code-block:: none
 
-    Model: "AutoencoderROILocator"
-    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
-    ┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
-    ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
-    │ input (InputLayer)              │ (None, 200, 1)         │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_conv0 (Conv1D)              │ (None, 200, 32)        │           128 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_drop0 (Dropout)             │ (None, 200, 32)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_pool0 (MaxPooling1D)        │ (None, 100, 32)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_conv1 (Conv1D)              │ (None, 100, 64)        │         6,208 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_drop1 (Dropout)             │ (None, 100, 64)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_pool1 (MaxPooling1D)        │ (None, 50, 64)         │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ bottleneck_conv (Conv1D)        │ (None, 50, 128)        │        24,704 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ bottleneck_drop (Dropout)       │ (None, 50, 128)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_up0 (UpSampling1D)          │ (None, 100, 128)       │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_conv0 (Conv1D)              │ (None, 100, 64)        │        24,640 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_up1 (UpSampling1D)          │ (None, 200, 64)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_conv1 (Conv1D)              │ (None, 200, 32)        │         6,176 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ ROI (Conv1D)                    │ (None, 200, 1)         │            33 │
-    └─────────────────────────────────┴────────────────────────┴───────────────┘
-     Total params: 61,889 (241.75 KB)
-     Trainable params: 61,889 (241.75 KB)
-     Non-trainable params: 0 (0.00 B)
+    Model: "UNet1DDeconvolver"
+    ┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
+    ┃ Layer (type)        ┃ Output Shape      ┃    Param # ┃ Connected to      ┃
+    ┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
+    │ input (InputLayer)  │ (None, 200, 1)    │          0 │ -                 │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_0_conv_a    │ (None, 200, 32)   │        128 │ input[0][0]       │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_0_bn_a      │ (None, 200, 32)   │        128 │ encoder_0_conv_a… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_0_conv_b    │ (None, 200, 32)   │      3,104 │ encoder_0_bn_a[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_0_bn_b      │ (None, 200, 32)   │        128 │ encoder_0_conv_b… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_pool_0      │ (None, 100, 32)   │          0 │ encoder_0_bn_b[0… │
+    │ (MaxPooling1D)      │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_1_conv_a    │ (None, 100, 64)   │      6,208 │ encoder_pool_0[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_1_bn_a      │ (None, 100, 64)   │        256 │ encoder_1_conv_a… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_1_conv_b    │ (None, 100, 64)   │     12,352 │ encoder_1_bn_a[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_1_bn_b      │ (None, 100, 64)   │        256 │ encoder_1_conv_b… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_pool_1      │ (None, 50, 64)    │          0 │ encoder_1_bn_b[0… │
+    │ (MaxPooling1D)      │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_2_conv_a    │ (None, 50, 128)   │     24,704 │ encoder_pool_1[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_2_bn_a      │ (None, 50, 128)   │        512 │ encoder_2_conv_a… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_2_conv_b    │ (None, 50, 128)   │     49,280 │ encoder_2_bn_a[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_2_bn_b      │ (None, 50, 128)   │        512 │ encoder_2_conv_b… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ encoder_pool_2      │ (None, 25, 128)   │          0 │ encoder_2_bn_b[0… │
+    │ (MaxPooling1D)      │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ bottleneck_conv_a   │ (None, 25, 256)   │     98,560 │ encoder_pool_2[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ bottleneck_bn_a     │ (None, 25, 256)   │      1,024 │ bottleneck_conv_… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ bottleneck_conv_b   │ (None, 25, 256)   │    196,864 │ bottleneck_bn_a[… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ bottleneck_bn_b     │ (None, 25, 256)   │      1,024 │ bottleneck_conv_… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_up_2        │ (None, 50, 256)   │          0 │ bottleneck_bn_b[… │
+    │ (UpSampling1D)      │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_match_2     │ (None, 50, 256)   │          0 │ decoder_up_2[0][… │
+    │ (Lambda)            │                   │            │ encoder_2_bn_b[0… │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_concat_2    │ (None, 50, 384)   │          0 │ decoder_match_2[… │
+    │ (Concatenate)       │                   │            │ encoder_2_bn_b[0… │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_2_conv_a    │ (None, 50, 128)   │    147,584 │ decoder_concat_2… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_2_bn_a      │ (None, 50, 128)   │        512 │ decoder_2_conv_a… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_2_conv_b    │ (None, 50, 128)   │     49,280 │ decoder_2_bn_a[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_2_bn_b      │ (None, 50, 128)   │        512 │ decoder_2_conv_b… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_up_1        │ (None, 100, 128)  │          0 │ decoder_2_bn_b[0… │
+    │ (UpSampling1D)      │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_match_1     │ (None, 100, 128)  │          0 │ decoder_up_1[0][… │
+    │ (Lambda)            │                   │            │ encoder_1_bn_b[0… │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_concat_1    │ (None, 100, 192)  │          0 │ decoder_match_1[… │
+    │ (Concatenate)       │                   │            │ encoder_1_bn_b[0… │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_1_conv_a    │ (None, 100, 64)   │     36,928 │ decoder_concat_1… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_1_bn_a      │ (None, 100, 64)   │        256 │ decoder_1_conv_a… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_1_conv_b    │ (None, 100, 64)   │     12,352 │ decoder_1_bn_a[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_1_bn_b      │ (None, 100, 64)   │        256 │ decoder_1_conv_b… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_up_0        │ (None, 200, 64)   │          0 │ decoder_1_bn_b[0… │
+    │ (UpSampling1D)      │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_match_0     │ (None, 200, 64)   │          0 │ decoder_up_0[0][… │
+    │ (Lambda)            │                   │            │ encoder_0_bn_b[0… │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_concat_0    │ (None, 200, 96)   │          0 │ decoder_match_0[… │
+    │ (Concatenate)       │                   │            │ encoder_0_bn_b[0… │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_0_conv_a    │ (None, 200, 32)   │      9,248 │ decoder_concat_0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_0_bn_a      │ (None, 200, 32)   │        128 │ decoder_0_conv_a… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_0_conv_b    │ (None, 200, 32)   │      3,104 │ decoder_0_bn_a[0… │
+    │ (Conv1D)            │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ decoder_0_bn_b      │ (None, 200, 32)   │        128 │ decoder_0_conv_b… │
+    │ (BatchNormalizatio… │                   │            │                   │
+    ├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+    │ reconstruction      │ (None, 200, 1)    │         33 │ decoder_0_bn_b[0… │
+    │ (Conv1D)            │                   │            │                   │
+    └─────────────────────┴───────────────────┴────────────┴───────────────────┘
+     Total params: 655,361 (2.50 MB)
+     Trainable params: 652,545 (2.49 MB)
+     Non-trainable params: 2,816 (11.00 KB)
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 76-78
+.. GENERATED FROM PYTHON SOURCE LINES 71-73
 
-Train the classifier
+Train against clean pulse traces
 --------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 78-86
+.. GENERATED FROM PYTHON SOURCE LINES 73-81
 
 .. code-block:: Python
 
-    history = dense_net.fit(
+    history = unet.fit(
         dataset.signals,
-        roi,
+        dataset.clean_signals[..., None],
         validation_split=0.2,
         epochs=20,
         batch_size=64,
@@ -218,59 +310,59 @@ Train the classifier
  .. code-block:: none
 
     Epoch 1/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0199 - loss: 0.6955    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 333ms/step - BinaryIoU: 0.0198 - loss: 0.6931 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6742
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 6s 7s/step - loss: 0.6644 - mae: 1.0607    2/2 ━━━━━━━━━━━━━━━━━━━━ 8s 621ms/step - loss: 0.6278 - mae: 1.0200 - val_loss: 0.0040 - val_mae: 0.0280
     Epoch 2/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6701    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6668 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6444
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 134ms/step - loss: 0.2962 - mae: 0.6333    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - loss: 0.2975 - mae: 0.6355 - val_loss: 0.0046 - val_mae: 0.0468
     Epoch 3/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6326    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6270 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5921
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 211ms/step - loss: 0.1908 - mae: 0.4920    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.1924 - mae: 0.4935 - val_loss: 0.0052 - val_mae: 0.0594
     Epoch 4/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5693    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5604 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5046
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.1308 - mae: 0.4007    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.1309 - mae: 0.4006 - val_loss: 0.0055 - val_mae: 0.0652
     Epoch 5/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4675    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4539 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.3751
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.0973 - mae: 0.3428    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.1104 - mae: 0.3630 - val_loss: 0.0055 - val_mae: 0.0637
     Epoch 6/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 46ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3215    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3062 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.2215
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 134ms/step - loss: 0.0749 - mae: 0.2995    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0737 - mae: 0.2969 - val_loss: 0.0052 - val_mae: 0.0573
     Epoch 7/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1731    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1617 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.1052
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 127ms/step - loss: 0.0618 - mae: 0.2732    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 94ms/step - loss: 0.0624 - mae: 0.2741 - val_loss: 0.0048 - val_mae: 0.0491
     Epoch 8/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0910    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0865 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0685
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0455 - mae: 0.2344    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0452 - mae: 0.2328 - val_loss: 0.0045 - val_mae: 0.0401
     Epoch 9/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0866    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0869 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0735
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 128ms/step - loss: 0.0379 - mae: 0.2118    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0377 - mae: 0.2116 - val_loss: 0.0043 - val_mae: 0.0324
     Epoch 10/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1042    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1075 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0835
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0294 - mae: 0.1874    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0323 - mae: 0.1943 - val_loss: 0.0042 - val_mae: 0.0273
     Epoch 11/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1228    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1243 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0881
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 130ms/step - loss: 0.0244 - mae: 0.1716    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0246 - mae: 0.1715 - val_loss: 0.0042 - val_mae: 0.0235
     Epoch 12/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1276    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1317 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0864
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0232 - mae: 0.1657    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0235 - mae: 0.1664 - val_loss: 0.0041 - val_mae: 0.0209
     Epoch 13/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1265    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 64ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1260 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0800
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 133ms/step - loss: 0.0174 - mae: 0.1440    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - loss: 0.0176 - mae: 0.1447 - val_loss: 0.0041 - val_mae: 0.0207
     Epoch 14/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1110    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1123 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0716
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0150 - mae: 0.1334    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0164 - mae: 0.1379 - val_loss: 0.0041 - val_mae: 0.0220
     Epoch 15/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1018    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1007 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0633
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0131 - mae: 0.1248    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0133 - mae: 0.1252 - val_loss: 0.0041 - val_mae: 0.0233
     Epoch 16/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0869    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0859 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0573
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0111 - mae: 0.1154    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0117 - mae: 0.1172 - val_loss: 0.0041 - val_mae: 0.0250
     Epoch 17/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0734    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0734 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0553
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.0096 - mae: 0.1066    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0119 - mae: 0.1155 - val_loss: 0.0042 - val_mae: 0.0273
     Epoch 18/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0660    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0641 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0583
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 127ms/step - loss: 0.0089 - mae: 0.1015    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0091 - mae: 0.1032 - val_loss: 0.0042 - val_mae: 0.0306
     Epoch 19/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0564    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0572 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0656
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 130ms/step - loss: 0.0078 - mae: 0.0963    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0084 - mae: 0.0991 - val_loss: 0.0043 - val_mae: 0.0337
     Epoch 20/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0577    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0570 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0738
+    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 131ms/step - loss: 0.0082 - mae: 0.0965    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0087 - mae: 0.0987 - val_loss: 0.0043 - val_mae: 0.0338
 
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-89
+.. GENERATED FROM PYTHON SOURCE LINES 82-84
 
 Plot training history
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-90
+.. GENERATED FROM PYTHON SOURCE LINES 84-85
 
 .. code-block:: Python
 
-    dense_net.plot_model_history()
+    unet.plot_model_history()
 
 
 
@@ -292,7 +384,7 @@ Plot training history
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 7.528 seconds)
+   **Total running time of the script:** (0 minutes 15.211 seconds)
 
 
 .. _sphx_glr_download_gallery_classifier_autoencoder.py:

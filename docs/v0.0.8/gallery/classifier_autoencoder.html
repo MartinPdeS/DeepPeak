@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals &#8212; DeepPeak  documentation</title>
+    <title>U-Net Deconvolver: Reconstructing Clean Pulse Traces &#8212; DeepPeak  documentation</title>
   
   
   
@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/thumbnail.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals" href="classifier_dense.html" />
-    <link rel="prev" title="Non-Maximum Suppression for Gaussian Pulse Detection" href="amplitude_retrieval.html" />
+    <link rel="next" title="DenseNet Deconvolver: Reconstructing Clean Pulse Traces" href="classifier_dense.html" />
+    <link rel="prev" title="Classical Detection Pipeline with Stable Results" href="classical_detection_pipeline.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.8" />
@@ -147,8 +147,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -159,20 +180,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../theory.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../theory.html">
     Theory
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../references.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../references.html">
     References
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -299,8 +330,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -405,13 +457,15 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="amplitude_retrieval.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amplitude_retrieval.html">Amplitude Retrieval for Overlapping Pulses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classical_detection_pipeline.html">Classical Detection Pipeline with Stable Results</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">U-Net Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core_result_objects.html">Core Result Objects: Trace, DetectionResult, and MetricResult</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_generation_1.html">Reference pulse trace labels</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation_custom_kernel.html">Generating data With a Custom Kernel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="noise_and_pulse_analysis.html">Noise and Pulse-Shape Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
 </ul>
 </div>
@@ -456,7 +510,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">U-Net Deconvolver: Reconstructing Clean Pulse Traces</span></li>
   </ul>
 </nav>
 </div>
@@ -478,14 +532,13 @@
 <p><a class="reference internal" href="#sphx-glr-download-gallery-classifier-autoencoder-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
-<section class="sphx-glr-example-title" id="densenet-classifier-detecting-regions-of-interest-in-synthetic-signals">
-<span id="sphx-glr-gallery-classifier-autoencoder-py"></span><h1>DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals<a class="headerlink" href="#densenet-classifier-detecting-regions-of-interest-in-synthetic-signals" title="Link to this heading">#</a></h1>
-<p>This example demonstrates how to use DeepPeak’s DenseNet classifier to identify
-regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p>
+<section class="sphx-glr-example-title" id="u-net-deconvolver-reconstructing-clean-pulse-traces">
+<span id="sphx-glr-gallery-classifier-autoencoder-py"></span><h1>U-Net Deconvolver: Reconstructing Clean Pulse Traces<a class="headerlink" href="#u-net-deconvolver-reconstructing-clean-pulse-traces" title="Link to this heading">#</a></h1>
+<p>This example demonstrates how to train DeepPeak’s U-Net as a deconvolver.</p>
 <p>We will:
 - Generate a dataset of noisy signals with random Gaussian peaks
-- Build and train a DenseNet classifier to detect ROIs
-- Visualize the training process and model predictions</p>
+- Build and train a U-Net reconstruction model
+- Visualize the training process and reconstructed signals</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This example is fully reproducible and suitable for Sphinx-Gallery documentation.</p>
@@ -494,8 +547,8 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <h2>Imports and reproducibility<a class="headerlink" href="#imports-and-reproducibility" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.machine_learning.classifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">Autoencoder</span><span class="p">,</span> <span class="n">BinaryIoU</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signal_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNet1D</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lorentzian</span><span class="p">,</span> <span class="n">UniformCount</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
@@ -522,80 +575,173 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-
-<span class="n">roi</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_region_of_interest</span><span class="p">(</span><span class="n">width_in_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="visualize-a-few-example-signals-and-their-regions-of-interest">
-<h2>Visualize a few example signals and their regions of interest<a class="headerlink" href="#visualize-a-few-example-signals-and-their-regions-of-interest" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
+<section id="visualize-observed-and-clean-example-signals">
+<h2>Visualize observed and clean example signals<a class="headerlink" href="#visualize-observed-and-clean-example-signals" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">reference_pulse_trace</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">clean_signals</span><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_classifier_autoencoder_001.png" srcset="../_images/sphx_glr_classifier_autoencoder_001.png" alt="Sample 0, Sample 1, Sample 2" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
 </pre></div>
 </div>
 </section>
-<section id="build-and-summarize-the-wavenet-classifier">
-<h2>Build and summarize the WaveNet classifier<a class="headerlink" href="#build-and-summarize-the-wavenet-classifier" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span> <span class="o">=</span> <span class="n">Autoencoder</span><span class="p">(</span>
+<section id="build-and-summarize-the-u-net-deconvolver">
+<h2>Build and summarize the U-Net deconvolver<a class="headerlink" href="#build-and-summarize-the-u-net-deconvolver" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">unet</span> <span class="o">=</span> <span class="n">UNet1D</span><span class="p">(</span>
     <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">,</span>
-    <span class="n">dropout_rate</span><span class="o">=</span><span class="mf">0.30</span><span class="p">,</span>
-    <span class="n">filters</span><span class="o">=</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+    <span class="n">num_filters</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">num_levels</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">upsample_size</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span>
-    <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;binary_crossentropy&quot;</span><span class="p">,</span>
-    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="n">BinaryIoU</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)],</span>
+    <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;huber&quot;</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mae&quot;</span><span class="p">],</span>
 <span class="p">)</span>
-<span class="n">dense_net</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
-<span class="n">dense_net</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">unet</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">unet</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model: &quot;AutoencoderROILocator&quot;
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
-┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
-│ input (InputLayer)              │ (None, 200, 1)         │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ enc_conv0 (Conv1D)              │ (None, 200, 32)        │           128 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ enc_drop0 (Dropout)             │ (None, 200, 32)        │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ enc_pool0 (MaxPooling1D)        │ (None, 100, 32)        │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ enc_conv1 (Conv1D)              │ (None, 100, 64)        │         6,208 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ enc_drop1 (Dropout)             │ (None, 100, 64)        │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ enc_pool1 (MaxPooling1D)        │ (None, 50, 64)         │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ bottleneck_conv (Conv1D)        │ (None, 50, 128)        │        24,704 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ bottleneck_drop (Dropout)       │ (None, 50, 128)        │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dec_up0 (UpSampling1D)          │ (None, 100, 128)       │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dec_conv0 (Conv1D)              │ (None, 100, 64)        │        24,640 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dec_up1 (UpSampling1D)          │ (None, 200, 64)        │             0 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ dec_conv1 (Conv1D)              │ (None, 200, 32)        │         6,176 │
-├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ ROI (Conv1D)                    │ (None, 200, 1)         │            33 │
-└─────────────────────────────────┴────────────────────────┴───────────────┘
- Total params: 61,889 (241.75 KB)
- Trainable params: 61,889 (241.75 KB)
- Non-trainable params: 0 (0.00 B)
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model: &quot;UNet1DDeconvolver&quot;
+┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━┓
+┃ Layer (type)        ┃ Output Shape      ┃    Param # ┃ Connected to      ┃
+┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━┩
+│ input (InputLayer)  │ (None, 200, 1)    │          0 │ -                 │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_0_conv_a    │ (None, 200, 32)   │        128 │ input[0][0]       │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_0_bn_a      │ (None, 200, 32)   │        128 │ encoder_0_conv_a… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_0_conv_b    │ (None, 200, 32)   │      3,104 │ encoder_0_bn_a[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_0_bn_b      │ (None, 200, 32)   │        128 │ encoder_0_conv_b… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_pool_0      │ (None, 100, 32)   │          0 │ encoder_0_bn_b[0… │
+│ (MaxPooling1D)      │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_1_conv_a    │ (None, 100, 64)   │      6,208 │ encoder_pool_0[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_1_bn_a      │ (None, 100, 64)   │        256 │ encoder_1_conv_a… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_1_conv_b    │ (None, 100, 64)   │     12,352 │ encoder_1_bn_a[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_1_bn_b      │ (None, 100, 64)   │        256 │ encoder_1_conv_b… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_pool_1      │ (None, 50, 64)    │          0 │ encoder_1_bn_b[0… │
+│ (MaxPooling1D)      │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_2_conv_a    │ (None, 50, 128)   │     24,704 │ encoder_pool_1[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_2_bn_a      │ (None, 50, 128)   │        512 │ encoder_2_conv_a… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_2_conv_b    │ (None, 50, 128)   │     49,280 │ encoder_2_bn_a[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_2_bn_b      │ (None, 50, 128)   │        512 │ encoder_2_conv_b… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ encoder_pool_2      │ (None, 25, 128)   │          0 │ encoder_2_bn_b[0… │
+│ (MaxPooling1D)      │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bottleneck_conv_a   │ (None, 25, 256)   │     98,560 │ encoder_pool_2[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bottleneck_bn_a     │ (None, 25, 256)   │      1,024 │ bottleneck_conv_… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bottleneck_conv_b   │ (None, 25, 256)   │    196,864 │ bottleneck_bn_a[… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ bottleneck_bn_b     │ (None, 25, 256)   │      1,024 │ bottleneck_conv_… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_up_2        │ (None, 50, 256)   │          0 │ bottleneck_bn_b[… │
+│ (UpSampling1D)      │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_match_2     │ (None, 50, 256)   │          0 │ decoder_up_2[0][… │
+│ (Lambda)            │                   │            │ encoder_2_bn_b[0… │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_concat_2    │ (None, 50, 384)   │          0 │ decoder_match_2[… │
+│ (Concatenate)       │                   │            │ encoder_2_bn_b[0… │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_2_conv_a    │ (None, 50, 128)   │    147,584 │ decoder_concat_2… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_2_bn_a      │ (None, 50, 128)   │        512 │ decoder_2_conv_a… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_2_conv_b    │ (None, 50, 128)   │     49,280 │ decoder_2_bn_a[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_2_bn_b      │ (None, 50, 128)   │        512 │ decoder_2_conv_b… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_up_1        │ (None, 100, 128)  │          0 │ decoder_2_bn_b[0… │
+│ (UpSampling1D)      │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_match_1     │ (None, 100, 128)  │          0 │ decoder_up_1[0][… │
+│ (Lambda)            │                   │            │ encoder_1_bn_b[0… │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_concat_1    │ (None, 100, 192)  │          0 │ decoder_match_1[… │
+│ (Concatenate)       │                   │            │ encoder_1_bn_b[0… │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_1_conv_a    │ (None, 100, 64)   │     36,928 │ decoder_concat_1… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_1_bn_a      │ (None, 100, 64)   │        256 │ decoder_1_conv_a… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_1_conv_b    │ (None, 100, 64)   │     12,352 │ decoder_1_bn_a[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_1_bn_b      │ (None, 100, 64)   │        256 │ decoder_1_conv_b… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_up_0        │ (None, 200, 64)   │          0 │ decoder_1_bn_b[0… │
+│ (UpSampling1D)      │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_match_0     │ (None, 200, 64)   │          0 │ decoder_up_0[0][… │
+│ (Lambda)            │                   │            │ encoder_0_bn_b[0… │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_concat_0    │ (None, 200, 96)   │          0 │ decoder_match_0[… │
+│ (Concatenate)       │                   │            │ encoder_0_bn_b[0… │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_0_conv_a    │ (None, 200, 32)   │      9,248 │ decoder_concat_0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_0_bn_a      │ (None, 200, 32)   │        128 │ decoder_0_conv_a… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_0_conv_b    │ (None, 200, 32)   │      3,104 │ decoder_0_bn_a[0… │
+│ (Conv1D)            │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ decoder_0_bn_b      │ (None, 200, 32)   │        128 │ decoder_0_conv_b… │
+│ (BatchNormalizatio… │                   │            │                   │
+├─────────────────────┼───────────────────┼────────────┼───────────────────┤
+│ reconstruction      │ (None, 200, 1)    │         33 │ decoder_0_bn_b[0… │
+│ (Conv1D)            │                   │            │                   │
+└─────────────────────┴───────────────────┴────────────┴───────────────────┘
+ Total params: 655,361 (2.50 MB)
+ Trainable params: 652,545 (2.49 MB)
+ Non-trainable params: 2,816 (11.00 KB)
 </pre></div>
 </div>
 </section>
-<section id="train-the-classifier">
-<h2>Train the classifier<a class="headerlink" href="#train-the-classifier" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">history</span> <span class="o">=</span> <span class="n">dense_net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+<section id="train-against-clean-pulse-traces">
+<h2>Train against clean pulse traces<a class="headerlink" href="#train-against-clean-pulse-traces" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">history</span> <span class="o">=</span> <span class="n">unet</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span>
-    <span class="n">roi</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">clean_signals</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
@@ -604,96 +750,96 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - BinaryIoU: 0.0199 - loss: 0.6955
-2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 333ms/step - BinaryIoU: 0.0198 - loss: 0.6931 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6742
+1/2 ━━━━━━━━━━━━━━━━━━━━ 6s 7s/step - loss: 0.6644 - mae: 1.0607
+2/2 ━━━━━━━━━━━━━━━━━━━━ 8s 621ms/step - loss: 0.6278 - mae: 1.0200 - val_loss: 0.0040 - val_mae: 0.0280
 Epoch 2/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 44ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6701
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6668 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.6444
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 134ms/step - loss: 0.2962 - mae: 0.6333
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - loss: 0.2975 - mae: 0.6355 - val_loss: 0.0046 - val_mae: 0.0468
 Epoch 3/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6326
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.6270 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5921
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 211ms/step - loss: 0.1908 - mae: 0.4920
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.1924 - mae: 0.4935 - val_loss: 0.0052 - val_mae: 0.0594
 Epoch 4/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5693
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.5604 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.5046
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.1308 - mae: 0.4007
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.1309 - mae: 0.4006 - val_loss: 0.0055 - val_mae: 0.0652
 Epoch 5/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4675
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 102ms/step - BinaryIoU: 0.0000e+00 - loss: 0.4539 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.3751
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.0973 - mae: 0.3428
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.1104 - mae: 0.3630 - val_loss: 0.0055 - val_mae: 0.0637
 Epoch 6/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 46ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3215
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.3062 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.2215
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 134ms/step - loss: 0.0749 - mae: 0.2995
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0737 - mae: 0.2969 - val_loss: 0.0052 - val_mae: 0.0573
 Epoch 7/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1731
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1617 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.1052
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 127ms/step - loss: 0.0618 - mae: 0.2732
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 94ms/step - loss: 0.0624 - mae: 0.2741 - val_loss: 0.0048 - val_mae: 0.0491
 Epoch 8/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0910
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0865 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0685
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0455 - mae: 0.2344
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0452 - mae: 0.2328 - val_loss: 0.0045 - val_mae: 0.0401
 Epoch 9/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0866
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0869 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0735
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 128ms/step - loss: 0.0379 - mae: 0.2118
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0377 - mae: 0.2116 - val_loss: 0.0043 - val_mae: 0.0324
 Epoch 10/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1042
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1075 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0835
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0294 - mae: 0.1874
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0323 - mae: 0.1943 - val_loss: 0.0042 - val_mae: 0.0273
 Epoch 11/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1228
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1243 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0881
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 130ms/step - loss: 0.0244 - mae: 0.1716
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0246 - mae: 0.1715 - val_loss: 0.0042 - val_mae: 0.0235
 Epoch 12/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 43ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1276
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1317 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0864
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0232 - mae: 0.1657
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0235 - mae: 0.1664 - val_loss: 0.0041 - val_mae: 0.0209
 Epoch 13/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1265
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 64ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1260 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0800
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 133ms/step - loss: 0.0174 - mae: 0.1440
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 90ms/step - loss: 0.0176 - mae: 0.1447 - val_loss: 0.0041 - val_mae: 0.0207
 Epoch 14/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1110
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1123 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0716
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0150 - mae: 0.1334
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0164 - mae: 0.1379 - val_loss: 0.0041 - val_mae: 0.0220
 Epoch 15/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1018
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.1007 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0633
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 125ms/step - loss: 0.0131 - mae: 0.1248
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 87ms/step - loss: 0.0133 - mae: 0.1252 - val_loss: 0.0041 - val_mae: 0.0233
 Epoch 16/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0869
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0859 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0573
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 126ms/step - loss: 0.0111 - mae: 0.1154
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0117 - mae: 0.1172 - val_loss: 0.0041 - val_mae: 0.0250
 Epoch 17/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0734
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0734 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0553
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 129ms/step - loss: 0.0096 - mae: 0.1066
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 89ms/step - loss: 0.0119 - mae: 0.1155 - val_loss: 0.0042 - val_mae: 0.0273
 Epoch 18/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0660
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0641 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0583
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 127ms/step - loss: 0.0089 - mae: 0.1015
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0091 - mae: 0.1032 - val_loss: 0.0042 - val_mae: 0.0306
 Epoch 19/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0564
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0572 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0656
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 130ms/step - loss: 0.0078 - mae: 0.0963
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0084 - mae: 0.0991 - val_loss: 0.0043 - val_mae: 0.0337
 Epoch 20/20
 
-1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 41ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0577
-2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 61ms/step - BinaryIoU: 0.0000e+00 - loss: 0.0570 - val_BinaryIoU: 0.0000e+00 - val_loss: 0.0738
+1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 131ms/step - loss: 0.0082 - mae: 0.0965
+2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 88ms/step - loss: 0.0087 - mae: 0.0987 - val_loss: 0.0043 - val_mae: 0.0338
 </pre></div>
 </div>
 </section>
 <section id="plot-training-history">
 <h2>Plot training history<a class="headerlink" href="#plot-training-history" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span><span class="o">.</span><span class="n">plot_model_history</span><span class="p">()</span>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">unet</span><span class="o">.</span><span class="n">plot_model_history</span><span class="p">()</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_classifier_autoencoder_002.png" srcset="../_images/sphx_glr_classifier_autoencoder_002.png" alt="Losses, Metrics" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 900x720 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 7.528 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 15.211 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-autoencoder-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/027ad6dec8c2fb9e539fbd7af3497d66/classifier_autoencoder.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_autoencoder.ipynb</span></code></a></p>
@@ -734,9 +880,9 @@ Epoch 20/20
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-and-reproducibility">Imports and reproducibility</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-synthetic-dataset">Generate synthetic dataset</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-a-few-example-signals-and-their-regions-of-interest">Visualize a few example signals and their regions of interest</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-summarize-the-wavenet-classifier">Build and summarize the WaveNet classifier</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#train-the-classifier">Train the classifier</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-observed-and-clean-example-signals">Visualize observed and clean example signals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-summarize-the-u-net-deconvolver">Build and summarize the U-Net deconvolver</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#train-against-clean-pulse-traces">Train against clean pulse traces</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-training-history">Plot training history</a></li>
 </ul>
   </nav></div>

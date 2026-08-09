@@ -144,8 +144,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -156,20 +177,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../theory.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../theory.html">
     Theory
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../references.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../references.html">
     References
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -294,8 +325,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -470,33 +522,42 @@
     <span class="n">compute_peak_amplitude_distribution_metrics</span><span class="p">,</span>
     <span class="n">compute_peak_width_distribution_metrics</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.series_calculations</span><span class="w"> </span><span class="kn">import</span> <span class="n">estimate_expected_particle_flow</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectionResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">SeriesConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisStateError</span><span class="p">,</span>
+    <span class="n">InvalidConfigurationError</span><span class="p">,</span>
+    <span class="n">InvalidDetectorError</span><span class="p">,</span>
+    <span class="n">MissingDetectorError</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EventArrivalDistribution</span><span class="p">,</span>
     <span class="n">PeakAmplitudeDistribution</span><span class="p">,</span>
     <span class="n">PeakCountSeriesResult</span><span class="p">,</span>
-    <span class="n">PeakDetectionResult</span><span class="p">,</span>
     <span class="n">PeakWidthDistribution</span><span class="p">,</span>
     <span class="n">TraceRecord</span><span class="p">,</span>
-    <span class="n">resolve_series_or_result</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.triggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePeakTrigger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..detection.triggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePeakTrigger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.wavenet_trace</span><span class="w"> </span><span class="kn">import</span> <span class="n">CNNTraceAnalyzer</span><span class="p">,</span> <span class="n">StandardTraceAnalyzer</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_iterate_explicit_trace_files</span><span class="p">(</span>
-    <span class="n">folder</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">],</span>
     <span class="n">trace_files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]],</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield explicitly provided ``(dilution, filename)`` pairs.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Yield explicitly provided ``(dilution, filename)`` pairs.</span>
 
 <span class="sd">    Relative filenames are resolved against ``folder`` so notebook code can stay</span>
 <span class="sd">    concise while avoiding brittle filename parsing.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    folder : pathlib.Path</span>
-<span class="sd">        Base folder used to resolve relative filenames.</span>
+<span class="sd">    folder : pathlib.Path or None</span>
+<span class="sd">        Base folder used to resolve relative filenames. When ``None``, relative</span>
+<span class="sd">        filenames are kept as-is.</span>
 <span class="sd">    trace_files : list of tuple</span>
 <span class="sd">        Explicit ``(filename, dilution)`` pairs.</span>
 
@@ -507,15 +568,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">dilution</span> <span class="ow">in</span> <span class="n">trace_files</span><span class="p">:</span>
         <span class="n">resolved_filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">resolved_filename</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">resolved_filename</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
             <span class="n">resolved_filename</span> <span class="o">=</span> <span class="n">folder</span> <span class="o">/</span> <span class="n">resolved_filename</span>
 
         <span class="k">yield</span> <span class="nb">float</span><span class="p">(</span><span class="n">dilution</span><span class="p">),</span> <span class="n">resolved_filename</span>
 
 
-<div class="viewcode-block" id="DilutionSeries">
-<a class="viewcode-back" href="../../../code.html#DeepPeak.analysis.DilutionSeries">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DilutionSeries</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">_BaseDilutionSeries</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute and visualize standard and WaveNet-based peak diagnostics over a dilution series.&quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
@@ -525,7 +584,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics_by_label</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                     <span class="s2">&quot;label must be provided when multiple detector entries are present.&quot;</span>
                 <span class="p">)</span>
             <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">metrics_by_label</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
@@ -534,7 +593,7 @@
             <span class="k">return</span> <span class="n">metrics_by_label</span><span class="p">[</span><span class="n">label</span><span class="p">]</span>
         <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
             <span class="n">available_labels</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">metrics_by_label</span><span class="p">))</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Unknown label </span><span class="si">{</span><span class="n">label</span><span class="si">!r}</span><span class="s2">. Available labels: </span><span class="si">{</span><span class="n">available_labels</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
 
@@ -545,7 +604,7 @@
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Namespace exposing Poisson-style plots for one dilution series.&quot;&quot;&quot;</span>
 
             <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span> <span class="n">accessor</span><span class="p">:</span> <span class="s2">&quot;DilutionSeries.PoissonAnalysisAccessor&quot;</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">accessor</span><span class="p">:</span> <span class="s2">&quot;_BaseDilutionSeries.PoissonAnalysisAccessor&quot;</span>
             <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_accessor</span> <span class="o">=</span> <span class="n">accessor</span>
 
@@ -570,7 +629,7 @@
                     <span class="n">observation_start</span><span class="o">=</span><span class="n">observation_start</span><span class="p">,</span>
                     <span class="n">observation_end</span><span class="o">=</span><span class="n">observation_end</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -600,7 +659,7 @@
                     <span class="n">observation_start</span><span class="o">=</span><span class="n">observation_start</span><span class="p">,</span>
                     <span class="n">observation_end</span><span class="o">=</span><span class="n">observation_end</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="n">expected_particle_flow</span> <span class="o">=</span> <span class="p">(</span>
@@ -645,7 +704,7 @@
                     <span class="n">observation_start</span><span class="o">=</span><span class="n">observation_start</span><span class="p">,</span>
                     <span class="n">observation_end</span><span class="o">=</span><span class="n">observation_end</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">qq</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -671,12 +730,12 @@
                     <span class="n">observation_start</span><span class="o">=</span><span class="n">observation_start</span><span class="p">,</span>
                     <span class="n">observation_end</span><span class="o">=</span><span class="n">observation_end</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">count_distribution</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;DilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;_BaseDilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_series</span> <span class="o">=</span> <span class="n">series</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PlotAccessor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -705,7 +764,7 @@
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Namespace exposing peak-amplitude plots for one dilution series.&quot;&quot;&quot;</span>
 
             <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span> <span class="n">accessor</span><span class="p">:</span> <span class="s2">&quot;DilutionSeries.AmplitudeAnalysisAccessor&quot;</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">accessor</span><span class="p">:</span> <span class="s2">&quot;_BaseDilutionSeries.AmplitudeAnalysisAccessor&quot;</span>
             <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_accessor</span> <span class="o">=</span> <span class="n">accessor</span>
 
@@ -722,7 +781,7 @@
                     <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
                     <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -740,7 +799,7 @@
                     <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
                     <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">qq</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -758,7 +817,7 @@
                     <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
                     <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -807,7 +866,9 @@
                         <span class="p">)</span>
                     <span class="n">resolved_color</span> <span class="o">=</span> <span class="n">marker_color</span> <span class="ow">or</span> <span class="s2">&quot;C1&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;detector must be either &quot;standard&quot; or &quot;cnn&quot;.&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">InvalidDetectorError</span><span class="p">(</span>
+                        <span class="s1">&#39;detector must be either &quot;standard&quot; or &quot;cnn&quot;.&#39;</span>
+                    <span class="p">)</span>
 
                 <span class="n">peak_indices</span> <span class="o">=</span> <span class="n">peak_indices</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">peak_indices</span><span class="p">)]</span>
                 <span class="n">amplitudes</span> <span class="o">=</span> <span class="n">amplitudes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">amplitudes</span><span class="p">)]</span>
@@ -842,7 +903,9 @@
                 <span class="k">elif</span> <span class="n">x_axis</span> <span class="o">==</span> <span class="s2">&quot;sample&quot;</span><span class="p">:</span>
                     <span class="n">x_label</span> <span class="o">=</span> <span class="s2">&quot;Nearest-neighbor distance [Samples]&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x_axis must be either &quot;sample&quot; or &quot;time&quot;.&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                        <span class="s1">&#39;x_axis must be either &quot;sample&quot; or &quot;time&quot;.&#39;</span>
+                    <span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">figure</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="p">,</span> <span class="n">ax</span>
@@ -887,7 +950,7 @@
                     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">figure</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;DilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;_BaseDilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_series</span> <span class="o">=</span> <span class="n">series</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PlotAccessor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -949,7 +1012,7 @@
 <span class="w">            </span><span class="sd">&quot;&quot;&quot;Namespace exposing peak-width plots for one dilution series.&quot;&quot;&quot;</span>
 
             <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-                <span class="bp">self</span><span class="p">,</span> <span class="n">accessor</span><span class="p">:</span> <span class="s2">&quot;DilutionSeries.WidthAnalysisAccessor&quot;</span>
+                <span class="bp">self</span><span class="p">,</span> <span class="n">accessor</span><span class="p">:</span> <span class="s2">&quot;_BaseDilutionSeries.WidthAnalysisAccessor&quot;</span>
             <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_accessor</span> <span class="o">=</span> <span class="n">accessor</span>
 
@@ -968,7 +1031,7 @@
                     <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
                     <span class="n">x_axis</span><span class="o">=</span><span class="n">x_axis</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -988,7 +1051,7 @@
                     <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
                     <span class="n">x_axis</span><span class="o">=</span><span class="n">x_axis</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">qq</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -1008,7 +1071,7 @@
                     <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
                     <span class="n">x_axis</span><span class="o">=</span><span class="n">x_axis</span><span class="p">,</span>
                 <span class="p">)</span>
-                <span class="n">metrics</span> <span class="o">=</span> <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">_resolve_single_label_metrics</span><span class="p">(</span>
                     <span class="n">metrics_by_label</span><span class="p">,</span> <span class="n">label</span>
                 <span class="p">)</span>
                 <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span>
@@ -1078,7 +1141,9 @@
                         <span class="o">**</span><span class="n">cnn_kwargs</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;plot must be either &quot;histogram&quot; or &quot;ecdf&quot;.&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                        <span class="s1">&#39;plot must be either &quot;histogram&quot; or &quot;ecdf&quot;.&#39;</span>
+                    <span class="p">)</span>
 
                 <span class="n">standard_axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Standard&quot;</span><span class="p">)</span>
                 <span class="n">cnn_axis</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;WaveNet&quot;</span><span class="p">)</span>
@@ -1092,7 +1157,7 @@
                     <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">figure</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">figure</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;DilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;_BaseDilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_series</span> <span class="o">=</span> <span class="n">series</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">PlotAccessor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -1111,7 +1176,7 @@
     <span class="k">class</span><span class="w"> </span><span class="nc">PlotAccessor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Namespace exposing trace-level plotting views for one dilution series.&quot;&quot;&quot;</span>
 
-        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;DilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">series</span><span class="p">:</span> <span class="s2">&quot;_BaseDilutionSeries&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_series</span> <span class="o">=</span> <span class="n">series</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">particle_flows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">plot_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">:</span>
@@ -1137,7 +1202,9 @@
                 <span class="n">x_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">dilution</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                 <span class="n">x_label</span> <span class="o">=</span> <span class="s2">&quot;Dilution&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x_axis must be either &quot;concentration&quot; or &quot;dilution&quot;.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                    <span class="s1">&#39;x_axis must be either &quot;concentration&quot; or &quot;dilution&quot;.&#39;</span>
+                <span class="p">)</span>
 
             <span class="n">figure</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
             <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
@@ -1211,7 +1278,9 @@
                 <span class="n">x_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">concentration</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                 <span class="n">x_label</span> <span class="o">=</span> <span class="s2">&quot;Concentration&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x_axis must be either &quot;dilution&quot; or &quot;concentration&quot;.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                    <span class="s1">&#39;x_axis must be either &quot;dilution&quot; or &quot;concentration&quot;.&#39;</span>
+                <span class="p">)</span>
 
             <span class="n">figure</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
             <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
@@ -1255,6 +1324,8 @@
             <span class="n">base_index</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;base_index&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">reference_indices</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;reference_indices&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">use_water_baseline</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;use_water_baseline&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="n">calibration_slope</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;calibration_slope&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="n">calibration_intercept</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;calibration_intercept&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
             <span class="n">figsize</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;figsize&quot;</span><span class="p">,</span> <span class="p">(</span><span class="mf">6.0</span><span class="p">,</span> <span class="mf">6.0</span><span class="p">))</span>
             <span class="n">marker_size</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;marker_size&quot;</span><span class="p">,</span> <span class="mf">42.0</span><span class="p">)</span>
             <span class="n">line_width</span> <span class="o">=</span> <span class="n">plot_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;line_width&quot;</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
@@ -1270,12 +1341,14 @@
 
             <span class="n">expected_flows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="n">DilutionSeries</span><span class="o">.</span><span class="n">get_expected_particle_flow_for_result</span><span class="p">(</span>
+                    <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="n">get_expected_particle_flow_for_result</span><span class="p">(</span>
                         <span class="n">result</span><span class="p">,</span>
                         <span class="n">index</span><span class="o">=</span><span class="n">record_index</span><span class="p">,</span>
                         <span class="n">base_index</span><span class="o">=</span><span class="n">base_index</span><span class="p">,</span>
                         <span class="n">reference_indices</span><span class="o">=</span><span class="n">reference_indices</span><span class="p">,</span>
                         <span class="n">use_water_baseline</span><span class="o">=</span><span class="n">use_water_baseline</span><span class="p">,</span>
+                        <span class="n">calibration_slope</span><span class="o">=</span><span class="n">calibration_slope</span><span class="p">,</span>
+                        <span class="n">calibration_intercept</span><span class="o">=</span><span class="n">calibration_intercept</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="k">for</span> <span class="n">record_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">records</span><span class="p">))</span>
                 <span class="p">],</span>
@@ -1420,7 +1493,9 @@
                 <span class="n">x_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">dilution</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                 <span class="n">x_label</span> <span class="o">=</span> <span class="s2">&quot;Dilution&quot;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;x_axis must be either &quot;concentration&quot; or &quot;dilution&quot;.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                    <span class="s1">&#39;x_axis must be either &quot;concentration&quot; or &quot;dilution&quot;.&#39;</span>
+                <span class="p">)</span>
 
             <span class="n">figure</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
             <span class="n">axis</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>
@@ -1460,40 +1535,66 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">folder</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
-        <span class="n">wavenet</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-        <span class="n">initial_concentration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">nrows</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">water_filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;_water_1.csv&quot;</span><span class="p">,</span>
+        <span class="n">folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnn_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">detector_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;flash&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">water_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">initial_concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200_000</span><span class="p">,</span>
         <span class="n">low_pass</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sequence_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">signal_normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zscore&quot;</span><span class="p">,</span>
         <span class="n">prediction_sampling_rate_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">125_000_000.0</span><span class="p">,</span>
         <span class="n">cnn_low_pass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cnn_amplitude_sigma_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span>
         <span class="n">cnn_amplitude_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">dilution_parser</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">trace_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">std_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SeriesConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">wavenet</span> <span class="o">=</span> <span class="n">wavenet</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">initial_concentration</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">initial_concentration</span>
+            <span class="n">nrows</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">nrows</span>
+            <span class="n">low_pass</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">low_pass</span>
+            <span class="n">sequence_length</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span> <span class="ow">or</span> <span class="n">sequence_length</span>
+            <span class="n">signal_normalization</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">normalization</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">sampling_rate_hz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">prediction_sampling_rate_hz</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">sampling_rate_hz</span>
+            <span class="n">cnn_low_pass</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cnn_low_pass</span>
+        <span class="k">if</span> <span class="n">files</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                <span class="s2">&quot;files must contain at least one (filename, dilution) pair.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">trigger</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cnn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingDetectorError</span><span class="p">(</span>
+                <span class="s2">&quot;At least one detector trigger or model must be provided.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">folder</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="o">=</span> <span class="n">trigger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cnn</span> <span class="o">=</span> <span class="n">cnn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span> <span class="o">=</span> <span class="n">cnn_trigger</span> <span class="ow">or</span> <span class="n">trigger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">detector_mode</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="s2">&quot;flash&quot;</span>
+            <span class="k">if</span> <span class="n">cnn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">sequence_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="p">(</span><span class="s2">&quot;both&quot;</span> <span class="k">if</span> <span class="n">cnn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_concentration</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">initial_concentration</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nrows</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nrows</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">std_trigger</span> <span class="o">=</span> <span class="n">std_trigger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span> <span class="o">=</span> <span class="n">cnn_trigger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">low_pass</span> <span class="o">=</span> <span class="n">low_pass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_signal_normalization</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">signal_normalization</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_prediction_sampling_rate_hz</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">prediction_sampling_rate_hz</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cnn_low_pass</span> <span class="o">=</span> <span class="n">cnn_low_pass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_sigma_samples</span> <span class="o">=</span> <span class="n">cnn_amplitude_sigma_samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_cluster_radius_sigma</span> <span class="o">=</span> <span class="n">cnn_amplitude_cluster_radius_sigma</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_baseline</span> <span class="o">=</span> <span class="n">cnn_amplitude_baseline</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sequence_length_override</span> <span class="o">=</span> <span class="n">sequence_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dilution_parser</span> <span class="o">=</span> <span class="n">dilution_parser</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">trace_files</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">trace_files</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">list</span><span class="p">(</span><span class="n">trace_files</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">water_filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">water_filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">water_file</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">water_file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">Path</span><span class="p">(</span><span class="n">water_file</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_sequence_length</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_analyzers</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span>
@@ -1521,7 +1622,7 @@
 
         <span class="n">analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span>
         <span class="k">if</span> <span class="n">analyzer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span>
                 <span class="s2">&quot;No analyzer is configured. Provide a detector trigger before running the series.&quot;</span>
             <span class="p">)</span>
 
@@ -1532,8 +1633,10 @@
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_sequence_length</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sequence_length_override</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nrows</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">CNNTraceAnalyzer</span><span class="o">.</span><span class="n">_infer_sequence_length</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">wavenet</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cnn</span><span class="p">,</span>
             <span class="n">sequence_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sequence_length_override</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -1542,10 +1645,10 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">StandardTraceAnalyzer</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CNNTraceAnalyzer</span><span class="p">]]:</span>
         <span class="n">standard_analyzer</span> <span class="o">=</span> <span class="p">(</span>
             <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_trigger</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">}</span>
             <span class="k">else</span> <span class="n">StandardTraceAnalyzer</span><span class="p">(</span>
-                <span class="n">std_trigger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">std_trigger</span><span class="p">,</span>
-                <span class="n">wavenet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wavenet</span><span class="p">,</span>
+                <span class="n">std_trigger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">trigger</span><span class="p">,</span>
+                <span class="n">wavenet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn</span><span class="p">,</span>
                 <span class="n">sequence_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
                 <span class="n">signal_normalization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_signal_normalization</span><span class="p">,</span>
                 <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prediction_sampling_rate_hz</span><span class="p">,</span>
@@ -1553,79 +1656,20 @@
         <span class="p">)</span>
         <span class="n">cnn_analyzer</span> <span class="o">=</span> <span class="p">(</span>
             <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;flash&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">}</span>
             <span class="k">else</span> <span class="n">CNNTraceAnalyzer</span><span class="p">(</span>
-                <span class="n">wavenet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">wavenet</span><span class="p">,</span>
+                <span class="n">wavenet</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn</span><span class="p">,</span>
                 <span class="n">cnn_trigger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span><span class="p">,</span>
                 <span class="n">sequence_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">,</span>
                 <span class="n">signal_normalization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_signal_normalization</span><span class="p">,</span>
                 <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_prediction_sampling_rate_hz</span><span class="p">,</span>
                 <span class="n">cnn_low_pass</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cnn_low_pass</span><span class="p">,</span>
                 <span class="n">cnn_amplitude_sigma_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_sigma_samples</span><span class="p">,</span>
+                <span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_cluster_radius_sigma</span><span class="p">,</span>
                 <span class="n">cnn_amplitude_baseline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_baseline</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">standard_analyzer</span><span class="p">,</span> <span class="n">cnn_analyzer</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_has_standard_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_trigger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_has_cnn_configuration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_requested_detectors</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">include_standard</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="n">include_cnn</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">include_standard</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_standard_configuration</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">include_cnn</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;run() requires both detector configurations. Provide std_trigger &quot;</span>
-                    <span class="s2">&quot;and cnn_trigger, or call run_standard(...) / run_cnn(...).&quot;</span>
-                <span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Standard detection is not configured. Provide std_trigger or &quot;</span>
-                <span class="s2">&quot;call run_standard(std_trigger=...).&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">include_cnn</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_cnn_configuration</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">include_standard</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;run() requires both detector configurations. Provide std_trigger &quot;</span>
-                    <span class="s2">&quot;and cnn_trigger, or call run_standard(...) / run_cnn(...).&quot;</span>
-                <span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;CNN detection is not configured. Provide cnn_trigger or &quot;</span>
-                <span class="s2">&quot;call run_cnn(cnn_trigger=...).&quot;</span>
-            <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_reconfigure_analyzer</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">std_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_low_pass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_amplitude_sigma_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_amplitude_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">std_trigger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">std_trigger</span> <span class="o">=</span> <span class="n">std_trigger</span>
-
-        <span class="k">if</span> <span class="n">cnn_trigger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span> <span class="o">=</span> <span class="n">cnn_trigger</span>
-
-        <span class="k">if</span> <span class="n">cnn_low_pass</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cnn_low_pass</span> <span class="o">=</span> <span class="n">cnn_low_pass</span>
-        <span class="k">if</span> <span class="n">cnn_amplitude_sigma_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_sigma_samples</span> <span class="o">=</span> <span class="n">cnn_amplitude_sigma_samples</span>
-        <span class="k">if</span> <span class="n">cnn_amplitude_baseline</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_cnn_amplitude_baseline</span> <span class="o">=</span> <span class="n">cnn_amplitude_baseline</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">sequence_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_sequence_length</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_analyzers</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_expected_particle_flow_for_result</span><span class="p">(</span>
@@ -1634,6 +1678,8 @@
         <span class="n">base_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">reference_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">use_water_baseline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">calibration_slope</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">calibration_intercept</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimate target particle flow from one or more reference traces.</span>
 
@@ -1648,93 +1694,21 @@
 
 <span class="sd">        so dilution-independent carry-over can be absorbed into the fitted</span>
 <span class="sd">        background term.</span>
+
+<span class="sd">        The final expected flow can be affine-calibrated as</span>
+
+<span class="sd">        ``expected_calibrated = calibration_slope * expected_raw + calibration_intercept``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">result</span> <span class="o">=</span> <span class="n">resolve_series_or_result</span><span class="p">(</span><span class="n">series_or_result</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">records</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
-                <span class="s2">&quot;No trace records are available. Call run() first and make sure files were found.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">base_record</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="n">base_index</span><span class="p">]</span>
-        <span class="n">current_record</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-        <span class="n">current_dilution</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">current_record</span><span class="o">.</span><span class="n">dilution</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">current_dilution</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Expected particle flow is undefined when the target dilution is zero.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="n">water_record</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="s2">&quot;water_record&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">background_flow</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="nb">float</span><span class="p">(</span><span class="n">water_record</span><span class="o">.</span><span class="n">standard_particle_flow</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">use_water_baseline</span> <span class="ow">and</span> <span class="n">water_record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="n">estimate_expected_particle_flow</span><span class="p">(</span>
+            <span class="n">series_or_result</span><span class="o">=</span><span class="n">series_or_result</span><span class="p">,</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">base_index</span><span class="o">=</span><span class="n">base_index</span><span class="p">,</span>
+            <span class="n">reference_indices</span><span class="o">=</span><span class="n">reference_indices</span><span class="p">,</span>
+            <span class="n">use_water_baseline</span><span class="o">=</span><span class="n">use_water_baseline</span><span class="p">,</span>
+            <span class="n">calibration_slope</span><span class="o">=</span><span class="n">calibration_slope</span><span class="p">,</span>
+            <span class="n">calibration_intercept</span><span class="o">=</span><span class="n">calibration_intercept</span><span class="p">,</span>
         <span class="p">)</span>
-
-        <span class="n">indices</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">[</span><span class="n">base_index</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">reference_indices</span> <span class="ow">is</span> <span class="kc">None</span>
-            <span class="k">else</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">reference_indices</span><span class="p">]</span>
-        <span class="p">)</span>
-        <span class="k">if</span> <span class="n">reference_indices</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">reference_index</span>
-                <span class="k">for</span> <span class="n">reference_index</span> <span class="ow">in</span> <span class="n">indices</span>
-                <span class="k">if</span> <span class="n">reference_index</span> <span class="o">!=</span> <span class="n">index</span>
-            <span class="p">]</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;reference_indices must contain at least one usable reference index. &quot;</span>
-                <span class="s2">&quot;When multiple indices are provided, the target index is excluded &quot;</span>
-                <span class="s2">&quot;from the fit.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
-                <span class="p">(</span><span class="n">base_record</span><span class="o">.</span><span class="n">standard_particle_flow</span> <span class="o">-</span> <span class="n">background_flow</span><span class="p">)</span>
-                <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">base_record</span><span class="o">.</span><span class="n">dilution</span><span class="p">)</span>
-                <span class="o">/</span> <span class="n">current_dilution</span>
-                <span class="o">+</span> <span class="n">background_flow</span>
-            <span class="p">)</span>
-
-        <span class="n">reference_dilutions</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">reference_flows</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">reference_index</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
-            <span class="n">reference_record</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="n">reference_index</span><span class="p">]</span>
-            <span class="n">dilution</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">reference_record</span><span class="o">.</span><span class="n">dilution</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">dilution</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;Expected particle flow is undefined when a reference dilution is zero.&quot;</span>
-                <span class="p">)</span>
-            <span class="n">reference_dilutions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dilution</span><span class="p">)</span>
-            <span class="n">reference_flows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">reference_record</span><span class="o">.</span><span class="n">standard_particle_flow</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">use_water_baseline</span> <span class="ow">and</span> <span class="n">water_record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">design_matrix</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">reference_dilutions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">throughput</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span>
-                <span class="n">design_matrix</span><span class="p">,</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">reference_flows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="o">-</span> <span class="n">background_flow</span><span class="p">,</span>
-                <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">throughput</span> <span class="o">/</span> <span class="n">current_dilution</span> <span class="o">+</span> <span class="n">background_flow</span><span class="p">)</span>
-
-        <span class="n">design_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="mf">1.0</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">reference_dilutions</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reference_dilutions</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">throughput</span><span class="p">,</span> <span class="n">background_flow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span>
-            <span class="n">design_matrix</span><span class="p">,</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">reference_flows</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span>
-            <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">throughput</span> <span class="o">/</span> <span class="n">current_dilution</span> <span class="o">+</span> <span class="n">background_flow</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TraceRecord</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_record_by_index</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
@@ -1759,8 +1733,8 @@
         <span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_detection_result</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PeakDetectionResult</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">PeakDetectionResult</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_detection_result</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">DetectionResult</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">DetectionResult</span><span class="p">(</span>
             <span class="n">peaks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
             <span class="n">properties</span><span class="o">=</span><span class="p">{},</span>
             <span class="n">peak_count</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -1781,7 +1755,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TraceRecord</span><span class="p">:</span>
         <span class="n">source_record</span> <span class="o">=</span> <span class="n">standard_record</span> <span class="k">if</span> <span class="n">standard_record</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">cnn_record</span>
         <span class="k">if</span> <span class="n">source_record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span>
                 <span class="s2">&quot;At least one detector result is required to build a trace record.&quot;</span>
             <span class="p">)</span>
 
@@ -1876,7 +1850,18 @@
 <span class="sd">            Analyzed control trace, or ``None`` if the file does not exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">water_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">water_filename</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">water_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">water_path</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">water_file</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">water_file</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">()</span>
+            <span class="k">else</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">water_file</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">water_file</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">water_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -1990,19 +1975,13 @@
         <span class="n">include_standard</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">include_cnn</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PeakCountSeriesResult</span><span class="p">:</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_requested_detectors</span><span class="p">(</span>
-            <span class="n">include_standard</span><span class="o">=</span><span class="n">include_standard</span><span class="p">,</span>
-            <span class="n">include_cnn</span><span class="o">=</span><span class="n">include_cnn</span><span class="p">,</span>
-        <span class="p">)</span>
         <span class="n">records</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TraceRecord</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">water_record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_water_record</span><span class="p">(</span>
             <span class="n">include_standard</span><span class="o">=</span><span class="n">include_standard</span><span class="p">,</span>
             <span class="n">include_cnn</span><span class="o">=</span><span class="n">include_cnn</span><span class="p">,</span>
         <span class="p">)</span>
 
-        <span class="n">trace_file_iterator</span> <span class="o">=</span> <span class="n">_iterate_explicit_trace_files</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">trace_files</span>
-        <span class="p">)</span>
+        <span class="n">trace_file_iterator</span> <span class="o">=</span> <span class="n">_iterate_explicit_trace_files</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">dilution</span><span class="p">,</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">trace_file_iterator</span><span class="p">:</span>
             <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_record</span><span class="p">(</span>
                 <span class="n">dilution</span><span class="o">=</span><span class="n">dilution</span><span class="p">,</span>
@@ -2010,13 +1989,15 @@
                 <span class="n">include_standard</span><span class="o">=</span><span class="n">include_standard</span><span class="p">,</span>
                 <span class="n">include_cnn</span><span class="o">=</span><span class="n">include_cnn</span><span class="p">,</span>
             <span class="p">)</span>
-            <span class="n">standard_flow</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">standard_particle_flow</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">include_standard</span> <span class="k">else</span> <span class="s2">&quot;disabled&quot;</span>
-            <span class="p">)</span>
-            <span class="n">cnn_flow</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">cnn_particle_flow</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">include_cnn</span> <span class="k">else</span> <span class="s2">&quot;disabled&quot;</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Standard particle flow: </span><span class="si">{</span><span class="n">standard_flow</span><span class="si">}</span><span class="se">\t</span><span class="s2">CNN particle flow: </span><span class="si">{</span><span class="n">cnn_flow</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">include_standard</span> <span class="ow">and</span> <span class="n">include_cnn</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Standard particle flow: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">standard_particle_flow</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">FLASH particle flow: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">cnn_particle_flow</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">include_standard</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Standard particle flow: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">standard_particle_flow</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">include_cnn</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;FLASH particle flow: </span><span class="si">{</span><span class="n">record</span><span class="o">.</span><span class="n">cnn_particle_flow</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_result_bundle</span><span class="p">(</span>
@@ -2036,44 +2017,21 @@
 <span class="sd">        PeakCountSeriesResult</span>
 <span class="sd">            Sorted result bundle containing arrays and per-trace records.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_selected_detectors</span><span class="p">(</span>
-            <span class="n">include_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">include_cnn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">include_standard</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">}</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">trigger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">run_standard</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">std_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PeakCountSeriesResult</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze the series with the standard detector only.&quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reconfigure_analyzer</span><span class="p">(</span><span class="n">std_trigger</span><span class="o">=</span><span class="n">std_trigger</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_selected_detectors</span><span class="p">(</span>
-            <span class="n">include_standard</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">include_cnn</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">include_cnn</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;flash&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">}</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">run_cnn</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="o">*</span><span class="p">,</span>
-        <span class="n">cnn_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_low_pass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_amplitude_sigma_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn_amplitude_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PeakCountSeriesResult</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze the series with the CNN detector only.&quot;&quot;&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reconfigure_analyzer</span><span class="p">(</span>
-            <span class="n">cnn_trigger</span><span class="o">=</span><span class="n">cnn_trigger</span><span class="p">,</span>
-            <span class="n">cnn_low_pass</span><span class="o">=</span><span class="n">cnn_low_pass</span><span class="p">,</span>
-            <span class="n">cnn_amplitude_sigma_samples</span><span class="o">=</span><span class="n">cnn_amplitude_sigma_samples</span><span class="p">,</span>
-            <span class="n">cnn_amplitude_baseline</span><span class="o">=</span><span class="n">cnn_amplitude_baseline</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">include_standard</span> <span class="ow">or</span> <span class="n">include_cnn</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">MissingDetectorError</span><span class="p">(</span>
+                <span class="s2">&quot;No detector is configured. Provide a standard or CNN trigger.&quot;</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_selected_detectors</span><span class="p">(</span>
-            <span class="n">include_standard</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">include_cnn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">include_standard</span><span class="o">=</span><span class="n">include_standard</span><span class="p">,</span>
+            <span class="n">include_cnn</span><span class="o">=</span><span class="n">include_cnn</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_last_result</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PeakCountSeriesResult</span><span class="p">:</span>
@@ -2086,7 +2044,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;No result available. Call run() first.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span><span class="s2">&quot;No result available. Call run() first.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_result</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_get_record_by_index</span><span class="p">(</span>
@@ -2123,6 +2081,8 @@
         <span class="n">base_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">reference_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">use_water_baseline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">calibration_slope</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">calibration_intercept</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Estimate standard-detector particle flow from one or more reference traces.</span>
 
@@ -2140,6 +2100,10 @@
 <span class="sd">        use_water_baseline : bool, default=True</span>
 <span class="sd">            When a water-control trace is available, use its measured standard</span>
 <span class="sd">            particle flow as the blank/background level.</span>
+<span class="sd">        calibration_slope : float, default=1.0</span>
+<span class="sd">            Multiplicative factor applied to the expected flow.</span>
+<span class="sd">        calibration_intercept : float, default=0.0</span>
+<span class="sd">            Additive offset applied after scaling the expected flow.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2153,6 +2117,32 @@
             <span class="n">base_index</span><span class="o">=</span><span class="n">base_index</span><span class="p">,</span>
             <span class="n">reference_indices</span><span class="o">=</span><span class="n">reference_indices</span><span class="p">,</span>
             <span class="n">use_water_baseline</span><span class="o">=</span><span class="n">use_water_baseline</span><span class="p">,</span>
+            <span class="n">calibration_slope</span><span class="o">=</span><span class="n">calibration_slope</span><span class="p">,</span>
+            <span class="n">calibration_intercept</span><span class="o">=</span><span class="n">calibration_intercept</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_expected_throughput</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">ref_index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">reference_indices</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">use_water_baseline</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">calibration_slope</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">calibration_intercept</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Alias for expected particle-flow estimation with workflow naming.</span>
+
+<span class="sd">        Parameters mirror :meth:`get_expected_particle_flow`, with ``ref_index``</span>
+<span class="sd">        as a convenience alias for ``base_index``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_expected_particle_flow</span><span class="p">(</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">base_index</span><span class="o">=</span><span class="n">ref_index</span><span class="p">,</span>
+            <span class="n">reference_indices</span><span class="o">=</span><span class="n">reference_indices</span><span class="p">,</span>
+            <span class="n">use_water_baseline</span><span class="o">=</span><span class="n">use_water_baseline</span><span class="p">,</span>
+            <span class="n">calibration_slope</span><span class="o">=</span><span class="n">calibration_slope</span><span class="p">,</span>
+            <span class="n">calibration_intercept</span><span class="o">=</span><span class="n">calibration_intercept</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">compute_event_arrival_distribution_metrics</span><span class="p">(</span>
@@ -2234,12 +2224,139 @@
             <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
             <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
             <span class="n">x_axis</span><span class="o">=</span><span class="n">x_axis</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="StandardDilutionSeries">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.analysis.StandardDilutionSeries">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StandardDilutionSeries</span><span class="p">(</span><span class="n">_BaseDilutionSeries</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dilution-series workflow specialized for the standard detector.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">water_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">initial_concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200_000</span><span class="p">,</span>
+        <span class="n">low_pass</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sequence_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">signal_normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zscore&quot;</span><span class="p">,</span>
+        <span class="n">prediction_sampling_rate_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">125_000_000.0</span><span class="p">,</span>
+        <span class="n">dilution_parser</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SeriesConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">trace_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">wavenet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">std_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnn_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">legacy_combined</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="p">(</span><span class="n">trace_files</span><span class="p">,</span> <span class="n">wavenet</span><span class="p">,</span> <span class="n">std_trigger</span><span class="p">,</span> <span class="n">cnn_trigger</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">files</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="n">trace_files</span>
+        <span class="k">if</span> <span class="n">trigger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">trigger</span> <span class="o">=</span> <span class="n">std_trigger</span> <span class="ow">or</span> <span class="n">cnn_trigger</span>
+
+        <span class="k">if</span> <span class="n">legacy_combined</span><span class="p">:</span>
+            <span class="n">_BaseDilutionSeries</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span>
+                <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span>
+                <span class="n">trigger</span><span class="o">=</span><span class="n">trigger</span><span class="p">,</span>
+                <span class="n">cnn</span><span class="o">=</span><span class="n">wavenet</span><span class="p">,</span>
+                <span class="n">cnn_trigger</span><span class="o">=</span><span class="n">cnn_trigger</span><span class="p">,</span>
+                <span class="n">detector_mode</span><span class="o">=</span><span class="s2">&quot;both&quot;</span> <span class="k">if</span> <span class="n">wavenet</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;standard&quot;</span><span class="p">,</span>
+                <span class="n">water_file</span><span class="o">=</span><span class="n">water_file</span><span class="p">,</span>
+                <span class="n">initial_concentration</span><span class="o">=</span><span class="n">initial_concentration</span><span class="p">,</span>
+                <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span>
+                <span class="n">low_pass</span><span class="o">=</span><span class="n">low_pass</span><span class="p">,</span>
+                <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
+                <span class="n">signal_normalization</span><span class="o">=</span><span class="n">signal_normalization</span><span class="p">,</span>
+                <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="n">prediction_sampling_rate_hz</span><span class="p">,</span>
+                <span class="n">dilution_parser</span><span class="o">=</span><span class="n">dilution_parser</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wavenet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flash_analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span>
+            <span class="k">return</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span>
+            <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span>
+            <span class="n">trigger</span><span class="o">=</span><span class="n">trigger</span><span class="p">,</span>
+            <span class="n">cnn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">water_file</span><span class="o">=</span><span class="n">water_file</span><span class="p">,</span>
+            <span class="n">initial_concentration</span><span class="o">=</span><span class="n">initial_concentration</span><span class="p">,</span>
+            <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span>
+            <span class="n">low_pass</span><span class="o">=</span><span class="n">low_pass</span><span class="p">,</span>
+            <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
+            <span class="n">signal_normalization</span><span class="o">=</span><span class="n">signal_normalization</span><span class="p">,</span>
+            <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="n">prediction_sampling_rate_hz</span><span class="p">,</span>
+            <span class="n">dilution_parser</span><span class="o">=</span><span class="n">dilution_parser</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
 
-<span class="k">class</span><span class="w"> </span><span class="nc">PeakCountSeries</span><span class="p">(</span><span class="n">DilutionSeries</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Backward-compatible alias for :class:`DilutionSeries`.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="FlashDilutionSeries">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.analysis.FlashDilutionSeries">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FlashDilutionSeries</span><span class="p">(</span><span class="n">_BaseDilutionSeries</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dilution-series workflow specialized for FLASH detection.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">files</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">trigger</span><span class="p">:</span> <span class="n">BasePeakTrigger</span><span class="p">,</span>
+        <span class="n">wavenet</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">folder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">water_file</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">initial_concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">nrows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200_000</span><span class="p">,</span>
+        <span class="n">low_pass</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sequence_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">signal_normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zscore&quot;</span><span class="p">,</span>
+        <span class="n">prediction_sampling_rate_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">125_000_000.0</span><span class="p">,</span>
+        <span class="n">prediction_low_pass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">amplitude_sigma_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">amplitude_cluster_radius_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span>
+        <span class="n">amplitude_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dilution_parser</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Path</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SeriesConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">folder</span><span class="o">=</span><span class="n">folder</span><span class="p">,</span>
+            <span class="n">files</span><span class="o">=</span><span class="n">files</span><span class="p">,</span>
+            <span class="n">trigger</span><span class="o">=</span><span class="n">trigger</span><span class="p">,</span>
+            <span class="n">cnn</span><span class="o">=</span><span class="n">wavenet</span><span class="p">,</span>
+            <span class="n">detector_mode</span><span class="o">=</span><span class="s2">&quot;flash&quot;</span><span class="p">,</span>
+            <span class="n">water_file</span><span class="o">=</span><span class="n">water_file</span><span class="p">,</span>
+            <span class="n">initial_concentration</span><span class="o">=</span><span class="n">initial_concentration</span><span class="p">,</span>
+            <span class="n">nrows</span><span class="o">=</span><span class="n">nrows</span><span class="p">,</span>
+            <span class="n">low_pass</span><span class="o">=</span><span class="n">low_pass</span><span class="p">,</span>
+            <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
+            <span class="n">signal_normalization</span><span class="o">=</span><span class="n">signal_normalization</span><span class="p">,</span>
+            <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="n">prediction_sampling_rate_hz</span><span class="p">,</span>
+            <span class="n">cnn_low_pass</span><span class="o">=</span><span class="n">prediction_low_pass</span><span class="p">,</span>
+            <span class="n">cnn_amplitude_sigma_samples</span><span class="o">=</span><span class="n">amplitude_sigma_samples</span><span class="p">,</span>
+            <span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="o">=</span><span class="n">amplitude_cluster_radius_sigma</span><span class="p">,</span>
+            <span class="n">cnn_amplitude_baseline</span><span class="o">=</span><span class="n">amplitude_baseline</span><span class="p">,</span>
+            <span class="n">dilution_parser</span><span class="o">=</span><span class="n">dilution_parser</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wavenet</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flash_analyzer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span></div>
+
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;FlashDilutionSeries&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;StandardDilutionSeries&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 </pre></div>
 
                 </article>

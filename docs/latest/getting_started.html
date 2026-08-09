@@ -1,0 +1,736 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Getting started &#8212; DeepPeak  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="/opt/hostedtoolcache/Python/3.11.15/x64/lib/python3.11/site-packages/docs/source/_static/default.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=d2d258e8" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+    <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css?v=4340df76" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'getting_started';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/MartinPdeS/DeepPeak/documentation_page/version_switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.0.8';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            true;
+        </script>
+    <link rel="icon" href="_static/thumbnail.png"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API reference" href="code.html" />
+    <link rel="prev" title="DeepPeak" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.0.8" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class=" navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/thumbnail.png" class="logo__image only-light" alt=""/>
+    <img src="_static/thumbnail.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">DeepPeak</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class=" navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="code.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="testing.html">
+    Testing and reproducibility
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="gallery/index.html">
+    Examples
+  </a>
+</li>
+
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="theory.html">
+    Theory
+  </a>
+</li>
+
+
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="references.html">
+    References
+  </a>
+</li>
+
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MartinPdeS/DeepPeak" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/DeepPeak/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://anaconda.org/MartinPdeS/DeepPeak" title="Anaconda" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Anaconda</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="code.html">
+    API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="testing.html">
+    Testing and reproducibility
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="gallery/index.html">
+    Examples
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="theory.html">
+    Theory
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="references.html">
+    References
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MartinPdeS/DeepPeak" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/DeepPeak/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-solid fa-box fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://anaconda.org/MartinPdeS/DeepPeak" title="Anaconda" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">Anaconda</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Getting started</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="getting-started">
+<h1>Getting started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
+<p>DeepPeak workflows are built from four kinds of objects:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Trace</span></code> stores one signal and its sampling information.</p></li>
+<li><p>detector analyzers produce <code class="docutils literal notranslate"><span class="pre">DetectionResult</span></code> or a <code class="docutils literal notranslate"><span class="pre">TraceRecord</span></code>;</p></li>
+<li><p>metric functions produce <code class="docutils literal notranslate"><span class="pre">MetricResult</span></code> and series summaries;</p></li>
+<li><p>plotting functions consume results and return Matplotlib figures.</p></li>
+</ul>
+<p>This separation makes it possible to run numerical pipelines on a server and
+decide later whether, where, and how to render a figure.</p>
+<section id="the-smallest-complete-workflow">
+<h2>The smallest complete workflow<a class="headerlink" href="#the-smallest-complete-workflow" title="Link to this heading">#</a></h2>
+<p>The following example generates a trace, detects peaks, and plots the result.
+The <code class="docutils literal notranslate"><span class="pre">PlotConfig</span></code> explicitly disables display, which is the recommended
+default for scripts, CI, and documentation builds.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectionConfig</span><span class="p">,</span> <span class="n">PlotConfig</span><span class="p">,</span> <span class="n">Trace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">HeightPeakTrigger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">StandardTraceAnalyzer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">standard_detection</span>
+
+<span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">500</span><span class="p">)</span>
+<span class="n">signal</span><span class="p">[[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]</span>
+<span class="n">trace</span> <span class="o">=</span> <span class="n">Trace</span><span class="p">(</span><span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">DetectionConfig</span><span class="p">(</span>
+    <span class="n">trigger</span><span class="o">=</span><span class="n">HeightPeakTrigger</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">sequence_length</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">analyzer</span> <span class="o">=</span> <span class="n">StandardTraceAnalyzer</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+<span class="n">detection</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">detect</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+<span class="n">record</span> <span class="o">=</span> <span class="n">analyzer</span><span class="o">.</span><span class="n">analyze_processed_signal</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">dx</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
+
+<span class="n">figure</span> <span class="o">=</span> <span class="n">standard_detection</span><span class="p">(</span>
+    <span class="n">record</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">PlotConfig</span><span class="p">(</span><span class="n">show</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;detection.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">detect</span></code> is the uniform detector-level API. <code class="docutils literal notranslate"><span class="pre">analyze_processed_signal</span></code> is
+useful when you also need the richer <code class="docutils literal notranslate"><span class="pre">TraceRecord</span></code> consumed by the plotting
+and metric layers.</p>
+</section>
+<section id="configuration-objects">
+<h2>Configuration objects<a class="headerlink" href="#configuration-objects" title="Link to this heading">#</a></h2>
+<p>Use frozen, validated configuration objects instead of repeating long keyword
+argument lists:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">TraceConfig</span></code></dt><dd><p>Common sequence length, normalization, and sampling-rate settings.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">DetectionConfig</span></code></dt><dd><p>Trace settings plus detector trigger and CNN amplitude-recovery settings.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SeriesConfig</span></code></dt><dd><p>Trace settings plus dilution-series concentration, row count, and filter
+settings.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">PlotConfig</span></code></dt><dd><p>Figure size, resolution, title, and non-interactive display behavior.</p>
+</dd>
+</dl>
+<p>Invalid values fail early, for example <code class="docutils literal notranslate"><span class="pre">TraceConfig(sequence_length=0)</span></code>
+raises <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>. Configuration objects are immutable, so create a new
+configuration when a workflow needs different settings.</p>
+</section>
+<section id="choosing-an-api-layer">
+<h2>Choosing an API layer<a class="headerlink" href="#choosing-an-api-layer" title="Link to this heading">#</a></h2>
+<p>For a single signal, use <code class="docutils literal notranslate"><span class="pre">Trace</span></code> and one of the trace analyzers. For repeated
+measurements, use <code class="docutils literal notranslate"><span class="pre">StandardDilutionSeries</span></code> or <code class="docutils literal notranslate"><span class="pre">FlashDilutionSeries</span></code> with a
+<code class="docutils literal notranslate"><span class="pre">SeriesConfig</span></code>. For visualization, import functions from
+<code class="docutils literal notranslate"><span class="pre">DeepPeak.plotting</span></code> rather than coupling new analysis code to plotting
+methods on legacy record objects.</p>
+<p>See the <a class="reference internal" href="gallery/index.html"><span class="doc">Examples</span></a> for runnable examples and the <a class="reference internal" href="code.html"><span class="doc">API reference</span></a> page for
+the complete API reference.</p>
+</section>
+<section id="comparing-direct-and-neural-deconvolved-detection">
+<h2>Comparing direct and neural-deconvolved detection<a class="headerlink" href="#comparing-direct-and-neural-deconvolved-detection" title="Link to this heading">#</a></h2>
+<p>The neural stage is optional. Direct detection can be used as the baseline,
+while a trained CNN, WaveNet, or U-Net can produce a reconstructed signal for
+the second branch:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">TraceComparisonAnalyzer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.detection</span><span class="w"> </span><span class="kn">import</span> <span class="n">HeightPeakTrigger</span>
+
+<span class="n">comparison_analyzer</span> <span class="o">=</span> <span class="n">TraceComparisonAnalyzer</span><span class="p">(</span>
+    <span class="n">standard_trigger</span><span class="o">=</span><span class="n">HeightPeakTrigger</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mf">0.05</span><span class="p">),</span>
+    <span class="n">deconvolver</span><span class="o">=</span><span class="n">trained_deconvolution_model</span><span class="p">,</span>  <span class="c1"># or None</span>
+    <span class="n">sequence_length</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">comparison</span> <span class="o">=</span> <span class="n">comparison_analyzer</span><span class="o">.</span><span class="n">compare</span><span class="p">(</span><span class="n">trace</span><span class="p">)</span>
+
+<span class="n">direct_arrivals</span> <span class="o">=</span> <span class="n">comparison</span><span class="o">.</span><span class="n">distribution</span><span class="p">(</span><span class="s2">&quot;arrival&quot;</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+<span class="n">deconvolved_arrivals</span> <span class="o">=</span> <span class="n">comparison</span><span class="o">.</span><span class="n">distribution</span><span class="p">(</span><span class="s2">&quot;arrival&quot;</span><span class="p">,</span> <span class="s2">&quot;deconvolved&quot;</span><span class="p">)</span>
+<span class="n">amplitude_change</span> <span class="o">=</span> <span class="n">comparison</span><span class="o">.</span><span class="n">compare_distribution</span><span class="p">(</span><span class="s2">&quot;amplitude&quot;</span><span class="p">)</span>
+<span class="n">width_change</span> <span class="o">=</span> <span class="n">comparison</span><span class="o">.</span><span class="n">compare_distribution</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The comparison object uses the same detector-result contract in both branches.
+It reports means, medians, quantiles, count differences, Wasserstein distance,
+and Kolmogorov-Smirnov statistics for arrival-time, amplitude, and width
+distributions. With <code class="docutils literal notranslate"><span class="pre">deconvolver=None</span></code>, the direct branch remains available
+without requiring a neural model.</p>
+<p>The reconstruction model should be trained against clean pulse traces. For a
+WaveNet-style model, use a linear output head and a regression loss rather than
+the sigmoid/binary-crossentropy configuration used for ROI classification:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">WaveNet</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">WaveNet</span><span class="p">(</span>
+    <span class="n">sequence_length</span><span class="o">=</span><span class="mi">1_000</span><span class="p">,</span>
+    <span class="n">output_activation</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span>
+    <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;huber&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">noisy_signals</span><span class="p">,</span> <span class="n">clean_signals</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For multiple traces, use <code class="docutils literal notranslate"><span class="pre">compare_many</span></code> and aggregate the distributions:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">series_comparison</span> <span class="o">=</span> <span class="n">comparison_analyzer</span><span class="o">.</span><span class="n">compare_many</span><span class="p">(</span><span class="n">traces</span><span class="p">)</span>
+<span class="n">arrival_summary</span> <span class="o">=</span> <span class="n">series_comparison</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="s2">&quot;deconvolved&quot;</span><span class="p">)[</span><span class="s2">&quot;arrival&quot;</span><span class="p">]</span>
+<span class="n">all_improvements</span> <span class="o">=</span> <span class="n">series_comparison</span><span class="o">.</span><span class="n">compare</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-smallest-complete-workflow">The smallest complete workflow</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#configuration-objects">Configuration objects</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#choosing-an-api-layer">Choosing an API layer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-direct-and-neural-deconvolved-detection">Comparing direct and neural-deconvolved detection</a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/getting_started.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, Martin Poinsinet de Sivry-Houle.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

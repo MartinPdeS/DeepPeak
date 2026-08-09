@@ -144,8 +144,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -156,20 +177,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../theory.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../theory.html">
     Theory
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../references.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../references.html">
     References
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -294,8 +325,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -463,12 +515,21 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">processing</span><span class="p">,</span> <span class="n">utils</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseAmplitudeSolver</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.algorithms.peak_locator</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_peaks_standard</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.analysis.trace_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">CsvTrace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.detection.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseAmplitudeSolver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.detection.peak_locator</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_peaks_prominence</span><span class="p">,</span> <span class="n">find_peaks_standard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.io.trace_io</span><span class="w"> </span><span class="kn">import</span> <span class="n">CsvTrace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectionResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetectionConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trace</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AnalysisStateError</span><span class="p">,</span>
+    <span class="n">InvalidConfigurationError</span><span class="p">,</span>
+    <span class="n">InvalidDetectorError</span><span class="p">,</span>
+    <span class="n">MissingDetectorError</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">metrics</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.triggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePeakTrigger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.detection.triggers</span><span class="w"> </span><span class="kn">import</span> <span class="n">BasePeakTrigger</span>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_BaseTraceAnalyzer</span><span class="p">:</span>
@@ -484,7 +545,9 @@
         <span class="k">if</span> <span class="n">sequence_length</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">sequence_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sequence_length</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">sequence_length</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sequence_length must be a strictly positive integer.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                    <span class="s2">&quot;sequence_length must be a strictly positive integer.&quot;</span>
+                <span class="p">)</span>
             <span class="k">return</span> <span class="n">sequence_length</span>
 
         <span class="k">if</span> <span class="n">wavenet</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -505,7 +568,7 @@
                 <span class="k">if</span> <span class="n">candidate</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">candidate</span>
 
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+        <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
             <span class="s2">&quot;Unable to infer the sequence length. Provide sequence_length explicitly &quot;</span>
             <span class="s2">&quot;or expose `wavenet.sequence_length`.&quot;</span>
         <span class="p">)</span>
@@ -523,12 +586,12 @@
             <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">segment_signal</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                 <span class="s2">&quot;signal must be either a 1D trace or a 2D batch of windows.&quot;</span>
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sequence_length</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Expected signal windows of length </span><span class="si">{</span><span class="n">sequence_length</span><span class="si">}</span><span class="s2">, got </span><span class="si">{</span><span class="n">signal</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
 
@@ -545,10 +608,21 @@
 
         <span class="n">sigma_samples</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sigma_samples</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">sigma_samples</span><span class="p">)</span> <span class="ow">or</span> <span class="n">sigma_samples</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                 <span class="s2">&quot;cnn_amplitude_sigma_samples must be a finite positive number when provided.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">sigma_samples</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_cluster_radius_sigma</span><span class="p">(</span><span class="n">cluster_radius_sigma</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate the interaction radius used to group overlapping peaks.&quot;&quot;&quot;</span>
+
+        <span class="n">cluster_radius_sigma</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">cluster_radius_sigma</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">cluster_radius_sigma</span><span class="p">)</span> <span class="ow">or</span> <span class="n">cluster_radius_sigma</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                <span class="s2">&quot;cnn_amplitude_cluster_radius_sigma must be a finite positive number.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">cluster_radius_sigma</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_optional_amplitude_baseline</span><span class="p">(</span>
@@ -562,14 +636,14 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">baseline</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">normalized</span> <span class="o">=</span> <span class="n">baseline</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">normalized</span> <span class="o">!=</span> <span class="s2">&quot;median&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                     <span class="s1">&#39;cnn_amplitude_baseline must be None, a finite float, or &quot;median&quot;.&#39;</span>
                 <span class="p">)</span>
             <span class="k">return</span> <span class="n">normalized</span>
 
         <span class="n">baseline</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">baseline</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">baseline</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                 <span class="s1">&#39;cnn_amplitude_baseline must be None, a finite float, or &quot;median&quot;.&#39;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">baseline</span>
@@ -599,7 +673,9 @@
         <span class="k">if</span> <span class="n">trigger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">trigger</span><span class="p">,</span> <span class="n">BasePeakTrigger</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a BasePeakTrigger instance or None.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> must be a BasePeakTrigger instance or None.&quot;</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">trigger</span>
 
     <span class="nd">@staticmethod</span>
@@ -659,20 +735,26 @@
             <span class="k">if</span> <span class="n">valid_cluster</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">continue</span>
 
-            <span class="n">cluster_centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">valid_cluster</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
-            <span class="n">center_samples</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">valid_cluster</span><span class="p">][</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
-            <span class="n">response_matrix</span> <span class="o">=</span> <span class="n">BaseAmplitudeSolver</span><span class="o">.</span><span class="n">_response_matrix_from_centers</span><span class="p">(</span>
-                <span class="n">cluster_centers</span><span class="p">,</span>
-                <span class="n">sigma_samples</span><span class="p">,</span>
+            <span class="n">cluster_centers</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">valid_cluster</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">fit_radius</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">cluster_radius_sigma</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma_samples</span><span class="p">))</span>
+            <span class="n">fit_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">valid_cluster</span><span class="o">.</span><span class="n">min</span><span class="p">())</span> <span class="o">-</span> <span class="n">fit_radius</span><span class="p">)</span>
+            <span class="n">fit_stop</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">valid_cluster</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">+</span> <span class="n">fit_radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">fit_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">fit_start</span><span class="p">,</span> <span class="n">fit_stop</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+            <span class="n">fit_signal</span> <span class="o">=</span> <span class="n">signal</span><span class="p">[</span><span class="n">fit_start</span><span class="p">:</span><span class="n">fit_stop</span><span class="p">]</span>
+            <span class="n">design_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span>
+                <span class="o">-</span><span class="mf">0.5</span>
+                <span class="o">*</span> <span class="p">((</span><span class="n">fit_indices</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">-</span> <span class="n">cluster_centers</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:])</span> <span class="o">/</span> <span class="n">sigma_samples</span><span class="p">)</span>
+                <span class="o">**</span> <span class="mi">2</span>
             <span class="p">)</span>
+
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">cluster_amplitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span>
-                    <span class="n">response_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">center_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">cluster_amplitudes</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span>
+                    <span class="n">design_matrix</span><span class="p">,</span>
+                    <span class="n">fit_signal</span><span class="p">,</span>
+                    <span class="n">rcond</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="k">except</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">LinAlgError</span><span class="p">:</span>
-                <span class="n">cluster_amplitudes</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">response_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">@</span> <span class="n">center_samples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="p">)</span>
+                <span class="n">cluster_amplitudes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">design_matrix</span><span class="p">)</span> <span class="o">@</span> <span class="n">fit_signal</span>
 
             <span class="k">for</span> <span class="n">peak_index</span><span class="p">,</span> <span class="n">amplitude</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">valid_cluster</span><span class="p">,</span> <span class="n">cluster_amplitudes</span><span class="p">):</span>
                 <span class="n">amplitudes</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">peak_indices</span> <span class="o">==</span> <span class="n">peak_index</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
@@ -688,8 +770,15 @@
         <span class="n">sequence_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">signal_normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zscore&quot;</span><span class="p">,</span>
         <span class="n">prediction_sampling_rate_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">125_000_000.0</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DetectionConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">sequence_length</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span> <span class="ow">or</span> <span class="n">sequence_length</span>
+            <span class="n">signal_normalization</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">normalization</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">sampling_rate_hz</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">prediction_sampling_rate_hz</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">sampling_rate_hz</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">wavenet</span> <span class="o">=</span> <span class="n">wavenet</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">detection_config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">WaveNetAnalyzerConfig</span><span class="p">(</span>
             <span class="n">sequence_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_infer_sequence_length</span><span class="p">(</span>
                 <span class="n">wavenet</span><span class="p">,</span> <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span>
@@ -710,9 +799,9 @@
         <span class="n">filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
         <span class="n">dilution</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">concentration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">standard</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">standard</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DetectionResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">prediction</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">cnn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnn</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DetectionResult</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">metrics</span><span class="o">.</span><span class="n">TraceRecord</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assemble the canonical trace record from one or both detector outputs.&quot;&quot;&quot;</span>
 
@@ -749,10 +838,10 @@
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">dx</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_detection_result</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_empty_detection_result</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">DetectionResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return an empty detection result for disabled detector paths.&quot;&quot;&quot;</span>
 
-        <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">(</span>
+        <span class="k">return</span> <span class="n">DetectionResult</span><span class="p">(</span>
             <span class="n">peaks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
             <span class="n">properties</span><span class="o">=</span><span class="p">{},</span>
             <span class="n">peak_count</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
@@ -792,7 +881,7 @@
             <span class="ow">and</span> <span class="n">hysteresis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="ow">and</span> <span class="nb">float</span><span class="p">(</span><span class="n">hysteresis</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">InvalidConfigurationError</span><span class="p">(</span>
                 <span class="s2">&quot;hysteresis must be &lt;= the resolved detection threshold (or None). &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Got hysteresis=</span><span class="si">{</span><span class="n">hysteresis</span><span class="si">}</span><span class="s2"> and threshold=</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">.&quot;</span>
             <span class="p">)</span>
@@ -800,23 +889,33 @@
         <span class="k">return</span> <span class="n">resolved_kwargs</span><span class="p">,</span> <span class="n">threshold</span>
 
 
+<div class="viewcode-block" id="StandardTraceAnalyzer">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.analysis.StandardTraceAnalyzer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">StandardTraceAnalyzer</span><span class="p">(</span><span class="n">_BaseTraceAnalyzer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Analyze one processed trace with the standard peak detector only.&quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">std_trigger</span><span class="p">:</span> <span class="n">BasePeakTrigger</span><span class="p">,</span>
+        <span class="n">std_trigger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BasePeakTrigger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sequence_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">wavenet</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">signal_normalization</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;zscore&quot;</span><span class="p">,</span>
         <span class="n">prediction_sampling_rate_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">125_000_000.0</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DetectionConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">std_trigger</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">std_trigger</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">trigger</span>
+        <span class="k">if</span> <span class="n">std_trigger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingDetectorError</span><span class="p">(</span>
+                <span class="s2">&quot;std_trigger or a DetectionConfig with trigger is required.&quot;</span>
+            <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">wavenet</span><span class="o">=</span><span class="n">wavenet</span><span class="p">,</span>
             <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
             <span class="n">signal_normalization</span><span class="o">=</span><span class="n">signal_normalization</span><span class="p">,</span>
             <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="n">prediction_sampling_rate_hz</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">std_trigger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_peak_trigger</span><span class="p">(</span>
             <span class="n">std_trigger</span><span class="p">,</span>
@@ -824,20 +923,47 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">std_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_trigger</span><span class="o">.</span><span class="n">to_kwargs</span><span class="p">()</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">detect_standard_peaks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">:</span> <span class="n">Trace</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">detector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectionResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect standard peaks from a canonical :class:`~DeepPeak.core.Trace`.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">detector</span> <span class="o">!=</span> <span class="s2">&quot;standard&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidDetectorError</span><span class="p">(</span>
+                <span class="s1">&#39;StandardTraceAnalyzer only supports detector=&quot;standard&quot;.&#39;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_standard_peaks</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">signal</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_standard_peaks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectionResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the standard peak detector on the processed signal.&quot;&quot;&quot;</span>
 
         <span class="n">flattened_signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
-        <span class="n">kwargs</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_detection_kwargs</span><span class="p">(</span>
-            <span class="n">flattened_signal</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">std_kwargs</span>
-        <span class="p">)</span>
-        <span class="n">peaks</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="n">find_peaks_standard</span><span class="p">(</span><span class="n">flattened_signal</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">working_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">std_kwargs</span><span class="p">)</span>
+        <span class="n">min_prominence</span> <span class="o">=</span> <span class="n">working_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prominence&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">(</span>
+        <span class="k">if</span> <span class="n">min_prominence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wlen</span> <span class="o">=</span> <span class="n">working_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wlen&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">peaks</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="n">find_peaks_prominence</span><span class="p">(</span>
+                <span class="n">flattened_signal</span><span class="p">,</span>
+                <span class="n">min_prominence</span><span class="o">=</span><span class="n">min_prominence</span><span class="p">,</span>
+                <span class="n">wlen</span><span class="o">=</span><span class="n">wlen</span><span class="p">,</span>
+                <span class="n">pulse_polarity</span><span class="o">=</span><span class="n">working_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pulse_polarity&quot;</span><span class="p">,</span> <span class="s2">&quot;positive&quot;</span><span class="p">),</span>
+                <span class="n">holdoff_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">working_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;holdoff_samples&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">detection_kwargs</span> <span class="o">=</span> <span class="n">working_kwargs</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">working_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wlen&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">detection_kwargs</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_detection_kwargs</span><span class="p">(</span>
+                <span class="n">flattened_signal</span><span class="p">,</span> <span class="n">working_kwargs</span>
+            <span class="p">)</span>
+            <span class="n">peaks</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="n">find_peaks_standard</span><span class="p">(</span>
+                <span class="n">flattened_signal</span><span class="p">,</span> <span class="o">**</span><span class="n">detection_kwargs</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">DetectionResult</span><span class="p">(</span>
             <span class="n">peaks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">peaks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
             <span class="n">properties</span><span class="o">=</span><span class="n">properties</span><span class="p">,</span>
             <span class="n">peak_count</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
-            <span class="n">detection_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="n">detection_kwargs</span><span class="o">=</span><span class="n">detection_kwargs</span><span class="p">,</span>
             <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
         <span class="p">)</span>
 
@@ -861,7 +987,8 @@
             <span class="n">dilution</span><span class="o">=</span><span class="n">dilution</span><span class="p">,</span>
             <span class="n">concentration</span><span class="o">=</span><span class="n">concentration</span><span class="p">,</span>
             <span class="n">standard</span><span class="o">=</span><span class="n">standard</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="p">)</span></div>
+
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">CNNTraceAnalyzer</span><span class="p">(</span><span class="n">_BaseTraceAnalyzer</span><span class="p">):</span>
@@ -877,13 +1004,32 @@
         <span class="n">prediction_sampling_rate_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">125_000_000.0</span><span class="p">,</span>
         <span class="n">cnn_low_pass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cnn_amplitude_sigma_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span>
         <span class="n">cnn_amplitude_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DetectionConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cnn_trigger</span> <span class="o">=</span> <span class="n">cnn_trigger</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">trigger</span>
+            <span class="k">if</span> <span class="n">cnn_low_pass</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cnn_low_pass</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">low_pass</span>
+            <span class="k">if</span> <span class="n">cnn_amplitude_sigma_samples</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cnn_amplitude_sigma_samples</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">amplitude_sigma_samples</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">amplitude_cluster_radius_sigma</span> <span class="o">!=</span> <span class="mf">4.0</span><span class="p">:</span>
+                <span class="n">cnn_amplitude_cluster_radius_sigma</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">amplitude_cluster_radius_sigma</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">cnn_amplitude_baseline</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cnn_amplitude_baseline</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">amplitude_baseline</span>
+        <span class="k">if</span> <span class="n">cnn_trigger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingDetectorError</span><span class="p">(</span>
+                <span class="s2">&quot;cnn_trigger or a DetectionConfig with trigger is required.&quot;</span>
+            <span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">wavenet</span><span class="o">=</span><span class="n">wavenet</span><span class="p">,</span>
             <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
             <span class="n">signal_normalization</span><span class="o">=</span><span class="n">signal_normalization</span><span class="p">,</span>
             <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="n">prediction_sampling_rate_hz</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cnn_trigger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_peak_trigger</span><span class="p">(</span>
             <span class="n">cnn_trigger</span><span class="p">,</span>
@@ -894,9 +1040,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_sigma_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_sigma_samples</span><span class="p">(</span>
             <span class="n">cnn_amplitude_sigma_samples</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_cluster_radius_sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_cluster_radius_sigma</span><span class="p">(</span>
+            <span class="n">cnn_amplitude_cluster_radius_sigma</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_baseline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_optional_amplitude_baseline</span><span class="p">(</span>
             <span class="n">cnn_amplitude_baseline</span>
         <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">:</span> <span class="n">Trace</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">detector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cnn&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectionResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect CNN peaks from a canonical :class:`~DeepPeak.core.Trace`.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">detector</span> <span class="o">!=</span> <span class="s2">&quot;cnn&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidDetectorError</span><span class="p">(</span><span class="s1">&#39;CNNTraceAnalyzer only supports detector=&quot;cnn&quot;.&#39;</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_processed_signal</span><span class="p">(</span>
+            <span class="n">trace</span><span class="o">.</span><span class="n">signal</span><span class="p">,</span>
+            <span class="n">dx</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">filename</span> <span class="ow">or</span> <span class="s2">&quot;&lt;memory&gt;&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">cnn</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">prepare_model_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize processed windows into the format expected by the WaveNet.&quot;&quot;&quot;</span>
@@ -907,6 +1068,28 @@
             <span class="n">normalization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">signal_normalization</span><span class="p">,</span>
             <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">normalize_flat_signal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flat_signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize a 1-D signal globally (over all samples at once).</span>
+
+<span class="sd">        This is the correct pre-processing for inference: the entire trace</span>
+<span class="sd">        shares one mean/std so that baseline-only windows are not artificially</span>
+<span class="sd">        amplified relative to windows that contain peaks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">signal_normalization</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">flat_signal</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;zscore&quot;</span><span class="p">}:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">flat</span> <span class="o">-</span> <span class="n">flat</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span> <span class="o">/</span> <span class="p">(</span><span class="n">flat</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;robust_zscore&quot;</span><span class="p">}:</span>
+            <span class="n">median</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span>
+            <span class="n">mad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">flat</span> <span class="o">-</span> <span class="n">median</span><span class="p">))</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">flat</span> <span class="o">-</span> <span class="n">median</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.4826</span> <span class="o">*</span> <span class="n">mad</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;minmax&quot;</span><span class="p">,</span> <span class="s2">&quot;min-max&quot;</span><span class="p">}:</span>
+            <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">flat</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">flat</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">flat</span> <span class="o">-</span> <span class="n">lo</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">hi</span> <span class="o">-</span> <span class="n">lo</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;maxabs&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">flat</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">flat</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the WaveNet model on a normalized batch and return its prediction.&quot;&quot;&quot;</span>
@@ -937,15 +1120,31 @@
         <span class="n">prediction</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">signal</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">DetectionResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Postprocess a prediction and detect peaks on the resulting 1D signal.&quot;&quot;&quot;</span>
 
         <span class="n">postprocessed_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">postprocess_prediction</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn_kwargs</span><span class="p">)</span>
-        <span class="n">kwargs</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_detection_kwargs</span><span class="p">(</span>
-            <span class="n">postprocessed_prediction</span><span class="p">,</span> <span class="n">kwargs</span>
-        <span class="p">)</span>
-        <span class="n">peaks</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="n">find_peaks_standard</span><span class="p">(</span><span class="n">postprocessed_prediction</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">working_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn_kwargs</span><span class="p">)</span>
+        <span class="n">min_prominence</span> <span class="o">=</span> <span class="n">working_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;prominence&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">min_prominence</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">wlen</span> <span class="o">=</span> <span class="n">working_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wlen&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">peaks</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="n">find_peaks_prominence</span><span class="p">(</span>
+                <span class="n">postprocessed_prediction</span><span class="p">,</span>
+                <span class="n">min_prominence</span><span class="o">=</span><span class="n">min_prominence</span><span class="p">,</span>
+                <span class="n">wlen</span><span class="o">=</span><span class="n">wlen</span><span class="p">,</span>
+                <span class="n">pulse_polarity</span><span class="o">=</span><span class="n">working_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;pulse_polarity&quot;</span><span class="p">,</span> <span class="s2">&quot;positive&quot;</span><span class="p">),</span>
+                <span class="n">holdoff_samples</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">working_kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;holdoff_samples&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)),</span>
+            <span class="p">)</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">working_kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;wlen&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">working_kwargs</span><span class="p">,</span> <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_detection_kwargs</span><span class="p">(</span>
+                <span class="n">postprocessed_prediction</span><span class="p">,</span> <span class="n">working_kwargs</span>
+            <span class="p">)</span>
+            <span class="n">peaks</span><span class="p">,</span> <span class="n">properties</span> <span class="o">=</span> <span class="n">find_peaks_standard</span><span class="p">(</span>
+                <span class="n">postprocessed_prediction</span><span class="p">,</span> <span class="o">**</span><span class="n">working_kwargs</span>
+            <span class="p">)</span>
         <span class="n">amplitudes</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">amplitude_baseline</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">if</span> <span class="n">signal</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -958,23 +1157,72 @@
                 <span class="n">signal</span><span class="o">=</span><span class="n">flattened_signal</span> <span class="o">-</span> <span class="n">amplitude_baseline</span><span class="p">,</span>
                 <span class="n">peak_indices</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">peaks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
                 <span class="n">sigma_samples</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_sigma_samples</span><span class="p">,</span>
+                <span class="n">cluster_radius_sigma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">detection_properties</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_sigma_samples</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">detection_properties</span><span class="p">[</span><span class="s2">&quot;recovered_sigma_samples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_sigma_samples</span>
             <span class="p">)</span>
+            <span class="n">detection_properties</span><span class="p">[</span><span class="s2">&quot;recovered_cluster_radius_sigma&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_cluster_radius_sigma</span>
+            <span class="p">)</span>
             <span class="n">detection_properties</span><span class="p">[</span><span class="s2">&quot;recovered_baseline&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amplitude_baseline</span><span class="p">)</span>
 
-        <span class="n">detection</span> <span class="o">=</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">(</span>
+        <span class="n">detection</span> <span class="o">=</span> <span class="n">DetectionResult</span><span class="p">(</span>
             <span class="n">peaks</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">peaks</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
             <span class="n">properties</span><span class="o">=</span><span class="n">detection_properties</span><span class="p">,</span>
             <span class="n">peak_count</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
-            <span class="n">detection_kwargs</span><span class="o">=</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="n">detection_kwargs</span><span class="o">=</span><span class="n">working_kwargs</span><span class="p">,</span>
             <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
             <span class="n">amplitudes</span><span class="o">=</span><span class="n">amplitudes</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">postprocessed_prediction</span><span class="p">,</span> <span class="n">detection</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_predict_with_stride</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">flat_signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">stride</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run prediction with overlapping windows and stitch via max-merge.</span>
+
+<span class="sd">        Each sample is covered by multiple windows when ``stride &lt; window_size``.</span>
+<span class="sd">        The final prediction at each sample is the maximum over all windows that</span>
+<span class="sd">        overlap it, which ensures that a peak clipped at one window boundary is</span>
+<span class="sd">        still captured cleanly by the adjacent window.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        flat_signal : ndarray, shape (n_samples,)</span>
+<span class="sd">            The 1-D processed signal.</span>
+<span class="sd">        stride : int</span>
+<span class="sd">            Step size between consecutive windows.  Typically</span>
+<span class="sd">            ``sequence_length // 2`` for 50 % overlap.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        ndarray, shape (n_samples,)</span>
+<span class="sd">            Per-sample prediction values on the original timeline.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">window_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span>
+        <span class="n">norm_signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_flat_signal</span><span class="p">(</span><span class="n">flat_signal</span><span class="p">)</span>
+        <span class="n">windows</span><span class="p">,</span> <span class="n">starts</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">segment_signal</span><span class="p">(</span>
+            <span class="n">norm_signal</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="n">window_size</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span>
+        <span class="p">)</span>
+
+        <span class="n">normalized</span> <span class="o">=</span> <span class="n">windows</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+        <span class="n">raw_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
+        <span class="n">flat_pred_windows</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">raw_pred</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">windows</span><span class="p">),</span> <span class="n">window_size</span>
+        <span class="p">)</span>
+
+        <span class="n">merged</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">flat_signal</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">win_pred</span><span class="p">,</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">flat_pred_windows</span><span class="p">,</span> <span class="n">starts</span><span class="p">):</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">window_size</span>
+            <span class="n">merged</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">merged</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span> <span class="n">win_pred</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">merged</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">analyze_processed_signal</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -984,13 +1232,57 @@
         <span class="n">filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;&lt;memory&gt;&quot;</span><span class="p">,</span>
         <span class="n">dilution</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
         <span class="n">concentration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+        <span class="n">stride</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">metrics</span><span class="o">.</span><span class="n">TraceRecord</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the CNN single-trace analysis pipeline and return a record.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the CNN single-trace analysis pipeline and return a record.</span>
 
-        <span class="n">signal_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_coerce_signal_batch</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span><span class="p">)</span>
-        <span class="n">normalized_signal</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_model_input</span><span class="p">(</span><span class="n">signal_batch</span><span class="p">)</span>
-        <span class="n">raw_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">normalized_signal</span><span class="p">)</span>
-        <span class="n">prediction</span><span class="p">,</span> <span class="n">cnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_cnn_peaks</span><span class="p">(</span><span class="n">raw_prediction</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">signal_batch</span><span class="p">)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        signal : array-like</span>
+<span class="sd">            Either a 1-D trace or a 2-D pre-segmented batch of windows.</span>
+<span class="sd">        dx : float</span>
+<span class="sd">            Sampling interval in seconds.</span>
+<span class="sd">        filename : str or Path, optional</span>
+<span class="sd">            Source filename stored in the returned record.</span>
+<span class="sd">        dilution : float, optional</span>
+<span class="sd">            Dilution factor stored in the returned record.</span>
+<span class="sd">        concentration : float, optional</span>
+<span class="sd">            Concentration stored in the returned record.</span>
+<span class="sd">        stride : int, optional</span>
+<span class="sd">            When set, the signal is segmented with overlapping windows of this</span>
+<span class="sd">            step size and per-sample predictions are stitched together with a</span>
+<span class="sd">            max-merge.  Use ``stride = sequence_length // 2`` for 50 % overlap,</span>
+<span class="sd">            which ensures every sample (except the very edges) is seen by at</span>
+<span class="sd">            least two windows — eliminating boundary-split artefacts.</span>
+<span class="sd">            When *None* (default) the original non-overlapping segmentation is</span>
+<span class="sd">            used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">stride</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">merged_pred</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_with_stride</span><span class="p">(</span><span class="n">flat</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">stride</span><span class="p">))</span>
+            <span class="c1"># Re-segment into non-overlapping windows so the rest of the</span>
+            <span class="c1"># pipeline (amplitude recovery, record building) is unchanged.</span>
+            <span class="n">signal_batch</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">segment_signal</span><span class="p">(</span>
+                <span class="n">flat</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span>
+            <span class="p">)</span>
+            <span class="n">padded_pred</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">segment_signal</span><span class="p">(</span>
+                <span class="n">merged_pred</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span>
+            <span class="p">)</span>
+            <span class="n">prediction</span><span class="p">,</span> <span class="n">cnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_cnn_peaks</span><span class="p">(</span><span class="n">padded_pred</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">signal_batch</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">flat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="n">norm_flat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalize_flat_signal</span><span class="p">(</span><span class="n">flat</span><span class="p">)</span>
+            <span class="n">signal_batch</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">segment_signal</span><span class="p">(</span>
+                <span class="n">flat</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span>
+            <span class="p">)</span>
+            <span class="n">norm_batch</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">segment_signal</span><span class="p">(</span>
+                <span class="n">norm_flat</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">sequence_length</span>
+            <span class="p">)</span>
+            <span class="n">norm_batch</span> <span class="o">=</span> <span class="n">norm_batch</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="n">raw_prediction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">norm_batch</span><span class="p">)</span>
+            <span class="n">prediction</span><span class="p">,</span> <span class="n">cnn</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_cnn_peaks</span><span class="p">(</span><span class="n">raw_prediction</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">signal_batch</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_trace_record</span><span class="p">(</span>
             <span class="n">signal_batch</span><span class="o">=</span><span class="n">signal_batch</span><span class="p">,</span>
             <span class="n">dx</span><span class="o">=</span><span class="n">dx</span><span class="p">,</span>
@@ -1022,13 +1314,19 @@
         <span class="n">prediction_sampling_rate_hz</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">125_000_000.0</span><span class="p">,</span>
         <span class="n">cnn_low_pass</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cnn_amplitude_sigma_samples</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">4.0</span><span class="p">,</span>
         <span class="n">cnn_amplitude_baseline</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">DetectionConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">std_trigger</span> <span class="o">=</span> <span class="n">std_trigger</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">trigger</span>
+            <span class="n">cnn_trigger</span> <span class="o">=</span> <span class="n">cnn_trigger</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">trigger</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">wavenet</span><span class="o">=</span><span class="n">wavenet</span><span class="p">,</span>
             <span class="n">sequence_length</span><span class="o">=</span><span class="n">sequence_length</span><span class="p">,</span>
             <span class="n">signal_normalization</span><span class="o">=</span><span class="n">signal_normalization</span><span class="p">,</span>
             <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="n">prediction_sampling_rate_hz</span><span class="p">,</span>
+            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span> <span class="o">=</span> <span class="p">(</span>
             <span class="kc">None</span>
@@ -1052,6 +1350,7 @@
                 <span class="n">prediction_sampling_rate_hz</span><span class="o">=</span><span class="n">prediction_sampling_rate_hz</span><span class="p">,</span>
                 <span class="n">cnn_low_pass</span><span class="o">=</span><span class="n">cnn_low_pass</span><span class="p">,</span>
                 <span class="n">cnn_amplitude_sigma_samples</span><span class="o">=</span><span class="n">cnn_amplitude_sigma_samples</span><span class="p">,</span>
+                <span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="o">=</span><span class="n">cnn_amplitude_cluster_radius_sigma</span><span class="p">,</span>
                 <span class="n">cnn_amplitude_baseline</span><span class="o">=</span><span class="n">cnn_amplitude_baseline</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
@@ -1079,17 +1378,38 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">is</span> <span class="kc">None</span>
             <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span><span class="o">.</span><span class="n">cnn_amplitude_sigma_samples</span>
         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_cluster_radius_sigma</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span><span class="o">.</span><span class="n">cnn_amplitude_cluster_radius_sigma</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cnn_amplitude_baseline</span> <span class="o">=</span> <span class="p">(</span>
             <span class="kc">None</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">is</span> <span class="kc">None</span>
             <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span><span class="o">.</span><span class="n">cnn_amplitude_baseline</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">detect_standard_peaks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trace</span><span class="p">:</span> <span class="n">Trace</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">detector</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectionResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect peaks from a canonical trace using the selected detector.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">detector</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;standard&quot;</span><span class="p">,</span> <span class="s2">&quot;cnn&quot;</span><span class="p">}:</span>
+            <span class="k">raise</span> <span class="n">InvalidDetectorError</span><span class="p">(</span><span class="s1">&#39;detector must be either &quot;standard&quot; or &quot;cnn&quot;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">detector</span> <span class="o">==</span> <span class="s2">&quot;standard&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">detect_standard_peaks</span><span class="p">(</span><span class="n">trace</span><span class="o">.</span><span class="n">signal</span><span class="p">)</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">analyze_processed_signal</span><span class="p">(</span>
+            <span class="n">trace</span><span class="o">.</span><span class="n">signal</span><span class="p">,</span>
+            <span class="n">dx</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span>
+            <span class="n">filename</span><span class="o">=</span><span class="n">trace</span><span class="o">.</span><span class="n">filename</span> <span class="ow">or</span> <span class="s2">&quot;&lt;memory&gt;&quot;</span><span class="p">,</span>
+            <span class="n">include_standard</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">include_cnn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">record</span><span class="o">.</span><span class="n">cnn</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_standard_peaks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">signal</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DetectionResult</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the standard peak detector on the processed signal.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span>
                 <span class="s2">&quot;Standard peak detection is not configured for this analyzer.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">standard_analyzer</span><span class="o">.</span><span class="n">detect_standard_peaks</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
@@ -1098,7 +1418,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize processed windows into the format expected by the WaveNet.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span>
                 <span class="s2">&quot;CNN peak detection is not configured for this analyzer.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span><span class="o">.</span><span class="n">prepare_model_input</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
@@ -1107,7 +1427,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Run the WaveNet model on a normalized batch and return its prediction.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span>
                 <span class="s2">&quot;CNN peak detection is not configured for this analyzer.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">signal</span><span class="p">)</span>
@@ -1116,7 +1436,7 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply optional low-pass filtering to the WaveNet prediction.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span>
                 <span class="s2">&quot;CNN peak detection is not configured for this analyzer.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span><span class="o">.</span><span class="n">postprocess_prediction</span><span class="p">(</span><span class="n">prediction</span><span class="p">)</span>
@@ -1126,11 +1446,11 @@
         <span class="n">prediction</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">signal</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">metrics</span><span class="o">.</span><span class="n">PeakDetectionResult</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">DetectionResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Postprocess a prediction and detect peaks on the resulting 1D signal.&quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">AnalysisStateError</span><span class="p">(</span>
                 <span class="s2">&quot;CNN peak detection is not configured for this analyzer.&quot;</span>
             <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cnn_analyzer</span><span class="o">.</span><span class="n">detect_cnn_peaks</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="n">signal</span><span class="o">=</span><span class="n">signal</span><span class="p">)</span>

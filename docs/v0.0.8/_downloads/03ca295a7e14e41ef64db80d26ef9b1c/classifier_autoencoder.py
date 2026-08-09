@@ -1,14 +1,13 @@
 """
-DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals
-=======================================================================
+U-Net Deconvolver: Reconstructing Clean Pulse Traces
+====================================================================
 
-This example demonstrates how to use DeepPeak's DenseNet classifier to identify
-regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.
+This example demonstrates how to train DeepPeak's U-Net as a deconvolver.
 
 We will:
 - Generate a dataset of noisy signals with random Gaussian peaks
-- Build and train a DenseNet classifier to detect ROIs
-- Visualize the training process and model predictions
+- Build and train a U-Net reconstruction model
+- Visualize the training process and reconstructed signals
 
 .. note::
     This example is fully reproducible and suitable for Sphinx-Gallery documentation.
@@ -17,18 +16,18 @@ We will:
 
 # %%
 # Imports and reproducibility
-# --------------------------
+# -----------------------------
 import numpy as np
 
-from DeepPeak.machine_learning.classifier import Autoencoder, BinaryIoU
-from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak.models import UNet1D
+from DeepPeak.generation import SignalGenerator
 from DeepPeak import Lorentzian, UniformCount
 
 np.random.seed(42)
 
 # %%
 # Generate synthetic dataset
-# -------------------------
+# ---------------------------
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
@@ -48,36 +47,32 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-roi = dataset.get_region_of_interest(width_in_pixels=5)
+# %%
+# Visualize observed and clean example signals
+# -------------------------------------------------------------
+dataset.plot(number_of_samples=3, reference_pulse_trace=dataset.clean_signals)
 
 # %%
-# Visualize a few example signals and their regions of interest
-# ------------------------------------------------------------
-dataset.plot(number_of_samples=3, region_of_interest=roi)
-
-# %%
-# Build and summarize the WaveNet classifier
+# Build and summarize the U-Net deconvolver
 # ------------------------------------------
-dense_net = Autoencoder(
+unet = UNet1D(
     sequence_length=SEQUENCE_LENGTH,
-    dropout_rate=0.30,
-    filters=(32, 64, 128),
+    num_filters=32,
+    num_levels=3,
     kernel_size=3,
-    pool_size=2,
-    upsample_size=2,
     optimizer="adam",
-    loss="binary_crossentropy",
-    metrics=[BinaryIoU(threshold=0.5)],
+    loss="huber",
+    metrics=["mae"],
 )
-dense_net.build()
-dense_net.summary()
+unet.build()
+unet.summary()
 
 # %%
-# Train the classifier
+# Train against clean pulse traces
 # --------------------
-history = dense_net.fit(
+history = unet.fit(
     dataset.signals,
-    roi,
+    dataset.clean_signals[..., None],
     validation_split=0.2,
     epochs=20,
     batch_size=64,
@@ -86,4 +81,4 @@ history = dense_net.fit(
 # %%
 # Plot training history
 # ---------------------
-dense_net.plot_model_history()
+unet.plot_model_history()

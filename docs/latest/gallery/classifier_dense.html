@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals &#8212; DeepPeak  documentation</title>
+    <title>DenseNet Deconvolver: Reconstructing Clean Pulse Traces &#8212; DeepPeak  documentation</title>
   
   
   
@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/thumbnail.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals" href="classifier_wavenet.html" />
-    <link rel="prev" title="DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals" href="classifier_autoencoder.html" />
+    <link rel="next" title="WaveNet Deconvolver: Reconstructing Clean Pulse Traces" href="classifier_wavenet.html" />
+    <link rel="prev" title="U-Net Deconvolver: Reconstructing Clean Pulse Traces" href="classifier_autoencoder.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.8" />
@@ -147,8 +147,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -159,20 +180,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../theory.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../theory.html">
     Theory
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../references.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../references.html">
     References
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -299,8 +330,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -405,13 +457,15 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="amplitude_retrieval.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classifier_autoencoder.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amplitude_retrieval.html">Amplitude Retrieval for Overlapping Pulses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classical_detection_pipeline.html">Classical Detection Pipeline with Stable Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_autoencoder.html">U-Net Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core_result_objects.html">Core Result Objects: Trace, DetectionResult, and MetricResult</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_generation_1.html">Reference pulse trace labels</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation_custom_kernel.html">Generating data With a Custom Kernel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="noise_and_pulse_analysis.html">Noise and Pulse-Shape Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
 </ul>
 </div>
@@ -456,7 +510,7 @@
     
     <li class="breadcrumb-item"><a href="index.html" class="nav-link">Examples</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</span></li>
   </ul>
 </nav>
 </div>
@@ -478,14 +532,13 @@
 <p><a class="reference internal" href="#sphx-glr-download-gallery-classifier-dense-py"><span class="std std-ref">Go to the end</span></a>
 to download the full example code.</p>
 </div>
-<section class="sphx-glr-example-title" id="densenet-classifier-detecting-regions-of-interest-in-synthetic-signals">
-<span id="sphx-glr-gallery-classifier-dense-py"></span><h1>DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals<a class="headerlink" href="#densenet-classifier-detecting-regions-of-interest-in-synthetic-signals" title="Link to this heading">#</a></h1>
-<p>This example demonstrates how to use DeepPeak’s DenseNet classifier to identify
-regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p>
+<section class="sphx-glr-example-title" id="densenet-deconvolver-reconstructing-clean-pulse-traces">
+<span id="sphx-glr-gallery-classifier-dense-py"></span><h1>DenseNet Deconvolver: Reconstructing Clean Pulse Traces<a class="headerlink" href="#densenet-deconvolver-reconstructing-clean-pulse-traces" title="Link to this heading">#</a></h1>
+<p>This example demonstrates how to train DeepPeak’s DenseNet as a deconvolver.</p>
 <p>We will:
 - Generate a dataset of noisy signals with random Gaussian peaks
-- Build and train a DenseNet classifier to detect ROIs
-- Visualize the training process and model predictions</p>
+- Build and train a DenseNet reconstruction model
+- Visualize the training process and reconstructed signals</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This example is fully reproducible and suitable for Sphinx-Gallery documentation.</p>
@@ -494,8 +547,8 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 <h2>Imports and reproducibility<a class="headerlink" href="#imports-and-reproducibility" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.machine_learning.classifier</span><span class="w"> </span><span class="kn">import</span> <span class="n">DenseNet</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.signal_generator</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DenseNet</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak.generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">Lorentzian</span><span class="p">,</span> <span class="n">UniformCount</span>
 
 <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
@@ -522,36 +575,34 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
     <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">categorical_peak_count</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span>
-
-<span class="n">roi</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">get_region_of_interest</span><span class="p">(</span><span class="n">width_in_pixels</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="visualize-a-few-example-signals-and-their-regions-of-interest">
-<h2>Visualize a few example signals and their regions of interest<a class="headerlink" href="#visualize-a-few-example-signals-and-their-regions-of-interest" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">region_of_interest</span><span class="o">=</span><span class="n">roi</span><span class="p">)</span>
+<section id="visualize-observed-and-clean-example-signals">
+<h2>Visualize observed and clean example signals<a class="headerlink" href="#visualize-observed-and-clean-example-signals" title="Link to this heading">#</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">number_of_samples</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">reference_pulse_trace</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">clean_signals</span><span class="p">)</span>
 </pre></div>
 </div>
 <img src="../_images/sphx_glr_classifier_dense_001.png" srcset="../_images/sphx_glr_classifier_dense_001.png" alt="Sample 0, Sample 1, Sample 2" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 800x900 with 3 Axes&gt;
 </pre></div>
 </div>
 </section>
-<section id="build-and-summarize-the-densenet-classifier">
-<h2>Build and summarize the DenseNet classifier<a class="headerlink" href="#build-and-summarize-the-densenet-classifier" title="Link to this heading">#</a></h2>
+<section id="build-and-summarize-the-densenet-deconvolver">
+<h2>Build and summarize the DenseNet deconvolver<a class="headerlink" href="#build-and-summarize-the-densenet-deconvolver" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">dense_net</span> <span class="o">=</span> <span class="n">DenseNet</span><span class="p">(</span>
     <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">,</span>
     <span class="n">filters</span><span class="o">=</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
     <span class="n">dilation_rates</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
     <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="n">optimizer</span><span class="o">=</span><span class="s2">&quot;adam&quot;</span><span class="p">,</span>
-    <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;binary_crossentropy&quot;</span><span class="p">,</span>
-    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;accuracy&quot;</span><span class="p">],</span>
+    <span class="n">loss</span><span class="o">=</span><span class="s2">&quot;huber&quot;</span><span class="p">,</span>
+    <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;mae&quot;</span><span class="p">],</span>
 <span class="p">)</span>
 <span class="n">dense_net</span><span class="o">.</span><span class="n">build</span><span class="p">()</span>
 <span class="n">dense_net</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
 </pre></div>
 </div>
-<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model: &quot;DenseNetDetector&quot;
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Model: &quot;DenseNetDeconvolver&quot;
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
 ┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
 ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
@@ -563,7 +614,7 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 ├─────────────────────────────────┼────────────────────────┼───────────────┤
 │ conv_2 (Conv1D)                 │ (None, 200, 128)       │        24,704 │
 ├─────────────────────────────────┼────────────────────────┼───────────────┤
-│ ROI (Conv1D)                    │ (None, 200, 1)         │           129 │
+│ reconstruction (Conv1D)         │ (None, 200, 1)         │           129 │
 └─────────────────────────────────┴────────────────────────┴───────────────┘
  Total params: 31,169 (121.75 KB)
  Trainable params: 31,169 (121.75 KB)
@@ -571,11 +622,11 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 </pre></div>
 </div>
 </section>
-<section id="train-the-classifier">
-<h2>Train the classifier<a class="headerlink" href="#train-the-classifier" title="Link to this heading">#</a></h2>
+<section id="train-against-clean-pulse-traces">
+<h2>Train against clean pulse traces<a class="headerlink" href="#train-against-clean-pulse-traces" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">history</span> <span class="o">=</span> <span class="n">dense_net</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
     <span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span>
-    <span class="n">roi</span><span class="p">,</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">clean_signals</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="kc">None</span><span class="p">],</span>
     <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
     <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
     <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
@@ -584,104 +635,104 @@ regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.</p
 </div>
 <div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>Epoch 1/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 3s 1s/step - accuracy: 0.6886 - loss: 0.6782
-3/4 ━━━━━━━━━━━━━━━━━━━━ 0s 25ms/step - accuracy: 0.7904 - loss: 0.6645
-4/4 ━━━━━━━━━━━━━━━━━━━━ 1s 89ms/step - accuracy: 0.8809 - loss: 0.6422 - val_accuracy: 0.9508 - val_loss: 0.5717
+1/4 ━━━━━━━━━━━━━━━━━━━━ 2s 989ms/step - loss: 2.9065 - mae: 3.2291
+3/4 ━━━━━━━━━━━━━━━━━━━━ 0s 25ms/step - loss: 2.6024 - mae: 2.9111 
+4/4 ━━━━━━━━━━━━━━━━━━━━ 1s 86ms/step - loss: 2.4781 - mae: 2.7817 - val_loss: 1.7843 - val_mae: 2.0505
 Epoch 2/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9524 - loss: 0.5765
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9666 - loss: 0.5625
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9766 - loss: 0.5513 - val_accuracy: 0.9925 - val_loss: 0.5032
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 1.6616 - mae: 1.9213
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 1.1243 - mae: 1.3472
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 1.1243 - mae: 1.3472 - val_loss: 0.4375 - val_mae: 0.6053
 Epoch 3/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9913 - loss: 0.5102
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9879 - loss: 0.4965
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9855 - loss: 0.4868 - val_accuracy: 0.9852 - val_loss: 0.4388
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - loss: 0.3935 - mae: 0.5566
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.4486 - mae: 0.6770
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.4486 - mae: 0.6770 - val_loss: 0.6797 - val_mae: 0.9646
 Epoch 4/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9841 - loss: 0.4604
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9861 - loss: 0.4393
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9880 - loss: 0.4222 - val_accuracy: 0.9941 - val_loss: 0.3710
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.5510 - mae: 0.8258
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.4995 - mae: 0.7578
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.4995 - mae: 0.7578 - val_loss: 0.3248 - val_mae: 0.5183
 Epoch 5/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9909 - loss: 0.3750
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9915 - loss: 0.3633
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9920 - loss: 0.3517 - val_accuracy: 0.9913 - val_loss: 0.2973
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - loss: 0.3146 - mae: 0.5090
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.2857 - mae: 0.4294
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.2857 - mae: 0.4294 - val_loss: 0.3729 - val_mae: 0.5037
 Epoch 6/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9906 - loss: 0.3080
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9908 - loss: 0.2925
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9913 - loss: 0.2788 - val_accuracy: 0.9930 - val_loss: 0.2241
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.3669 - mae: 0.5021
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 23ms/step - loss: 0.3000 - mae: 0.4212
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.3000 - mae: 0.4212 - val_loss: 0.2169 - val_mae: 0.3208
 Epoch 7/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9915 - loss: 0.2301
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9921 - loss: 0.2162
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9921 - loss: 0.2051 - val_accuracy: 0.9922 - val_loss: 0.1559
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.1768 - mae: 0.2730
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 23ms/step - loss: 0.1694 - mae: 0.2897
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.1694 - mae: 0.2897 - val_loss: 0.1945 - val_mae: 0.3408
 Epoch 8/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9913 - loss: 0.1533
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9912 - loss: 0.1455
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9914 - loss: 0.1375 - val_accuracy: 0.9937 - val_loss: 0.0982
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - loss: 0.1811 - mae: 0.3309
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.1392 - mae: 0.2649
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.1392 - mae: 0.2649 - val_loss: 0.0971 - val_mae: 0.2026
 Epoch 9/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9916 - loss: 0.1019
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9921 - loss: 0.0929
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9922 - loss: 0.0859 - val_accuracy: 0.9925 - val_loss: 0.0633
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - loss: 0.0865 - mae: 0.1899
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.0849 - mae: 0.1999
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0849 - mae: 0.1999 - val_loss: 0.0621 - val_mae: 0.1714
 Epoch 10/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9930 - loss: 0.0590
-3/4 ━━━━━━━━━━━━━━━━━━━━ 0s 25ms/step - accuracy: 0.9930 - loss: 0.0565
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9924 - loss: 0.0551 - val_accuracy: 0.9916 - val_loss: 0.0455
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - loss: 0.0509 - mae: 0.1584
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 23ms/step - loss: 0.0584 - mae: 0.1568
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0584 - mae: 0.1568 - val_loss: 0.0609 - val_mae: 0.1672
 Epoch 11/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9915 - loss: 0.0465
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9922 - loss: 0.0409
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9925 - loss: 0.0382 - val_accuracy: 0.9933 - val_loss: 0.0335
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.0462 - mae: 0.1437
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.0521 - mae: 0.1676
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0521 - mae: 0.1676 - val_loss: 0.0636 - val_mae: 0.1917
 Epoch 12/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9936 - loss: 0.0268
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9931 - loss: 0.0275
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9926 - loss: 0.0292 - val_accuracy: 0.9928 - val_loss: 0.0292
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 35ms/step - loss: 0.0488 - mae: 0.1706
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.0460 - mae: 0.1548
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0460 - mae: 0.1548 - val_loss: 0.0512 - val_mae: 0.1497
 Epoch 13/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9929 - loss: 0.0261
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9928 - loss: 0.0261
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9928 - loss: 0.0257 - val_accuracy: 0.9934 - val_loss: 0.0272
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0431 - mae: 0.1399
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 23ms/step - loss: 0.0358 - mae: 0.1296
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.0358 - mae: 0.1296 - val_loss: 0.0404 - val_mae: 0.1378
 Epoch 14/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9940 - loss: 0.0190
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9935 - loss: 0.0216
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9932 - loss: 0.0230 - val_accuracy: 0.9923 - val_loss: 0.0273
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0334 - mae: 0.1229
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.0274 - mae: 0.1087
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.0274 - mae: 0.1087 - val_loss: 0.0319 - val_mae: 0.1096
 Epoch 15/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9924 - loss: 0.0253
-3/4 ━━━━━━━━━━━━━━━━━━━━ 0s 25ms/step - accuracy: 0.9926 - loss: 0.0241
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9930 - loss: 0.0227 - val_accuracy: 0.9930 - val_loss: 0.0247
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0243 - mae: 0.1006
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.0235 - mae: 0.0947
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0235 - mae: 0.0947 - val_loss: 0.0283 - val_mae: 0.1003
 Epoch 16/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9941 - loss: 0.0199
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9935 - loss: 0.0205
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9930 - loss: 0.0214 - val_accuracy: 0.9928 - val_loss: 0.0229
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - loss: 0.0171 - mae: 0.0837
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 23ms/step - loss: 0.0198 - mae: 0.0852
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0198 - mae: 0.0852 - val_loss: 0.0227 - val_mae: 0.0887
 Epoch 17/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - accuracy: 0.9920 - loss: 0.0253
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9926 - loss: 0.0235
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9933 - loss: 0.0214 - val_accuracy: 0.9941 - val_loss: 0.0235
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0213 - mae: 0.0867
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.0161 - mae: 0.0768
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.0161 - mae: 0.0768 - val_loss: 0.0195 - val_mae: 0.0806
 Epoch 18/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9937 - loss: 0.0189
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 23ms/step - accuracy: 0.9933 - loss: 0.0201
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9930 - loss: 0.0211 - val_accuracy: 0.9937 - val_loss: 0.0240
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 36ms/step - loss: 0.0107 - mae: 0.0646
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - loss: 0.0133 - mae: 0.0705
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0133 - mae: 0.0705 - val_loss: 0.0172 - val_mae: 0.0770
 Epoch 19/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9944 - loss: 0.0174
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9940 - loss: 0.0191
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9938 - loss: 0.0195 - val_accuracy: 0.9942 - val_loss: 0.0225
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0168 - mae: 0.0791
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 23ms/step - loss: 0.0119 - mae: 0.0691
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - loss: 0.0119 - mae: 0.0691 - val_loss: 0.0157 - val_mae: 0.0744
 Epoch 20/20
 
-1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9947 - loss: 0.0163
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 22ms/step - accuracy: 0.9940 - loss: 0.0185
-4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - accuracy: 0.9936 - loss: 0.0193 - val_accuracy: 0.9932 - val_loss: 0.0208
+1/4 ━━━━━━━━━━━━━━━━━━━━ 0s 37ms/step - loss: 0.0098 - mae: 0.0658
+3/4 ━━━━━━━━━━━━━━━━━━━━ 0s 26ms/step - loss: 0.0102 - mae: 0.0645
+4/4 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - loss: 0.0105 - mae: 0.0642 - val_loss: 0.0139 - val_mae: 0.0655
 </pre></div>
 </div>
 </section>
@@ -693,7 +744,7 @@ Epoch 20/20
 <img src="../_images/sphx_glr_classifier_dense_002.png" srcset="../_images/sphx_glr_classifier_dense_002.png" alt="Losses, Metrics" class = "sphx-glr-single-img"/><div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>&lt;Figure size 900x720 with 2 Axes&gt;
 </pre></div>
 </div>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 5.053 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 4.939 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-gallery-classifier-dense-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/27d49e9b9c76806817934d3b62e69280/classifier_dense.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">classifier_dense.ipynb</span></code></a></p>
@@ -734,9 +785,9 @@ Epoch 20/20
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#imports-and-reproducibility">Imports and reproducibility</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-synthetic-dataset">Generate synthetic dataset</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-a-few-example-signals-and-their-regions-of-interest">Visualize a few example signals and their regions of interest</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-summarize-the-densenet-classifier">Build and summarize the DenseNet classifier</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#train-the-classifier">Train the classifier</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualize-observed-and-clean-example-signals">Visualize observed and clean example signals</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#build-and-summarize-the-densenet-deconvolver">Build and summarize the DenseNet deconvolver</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#train-against-clean-pulse-traces">Train against clean pulse traces</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plot-training-history">Plot training history</a></li>
 </ul>
   </nav></div>

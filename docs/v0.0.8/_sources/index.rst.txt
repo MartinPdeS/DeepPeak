@@ -4,10 +4,16 @@
 .. include:: ../../README.rst
     :start-line: 0
 
-.. toctree::
-    :hidden:
+Documentation map
+=================
 
-    code.rst
-    gallery/index.rst
-    theory.rst
-    references.rst
+.. toctree::
+    :maxdepth: 2
+
+    getting_started
+    code
+    migration
+    testing
+    gallery/index
+    theory
+    references

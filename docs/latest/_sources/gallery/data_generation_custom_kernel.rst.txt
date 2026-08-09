@@ -23,8 +23,8 @@ Generating data With a Custom Kernel
 
 This example demonstrates how to:
   1. Generate synthetic signals with up to 3 Gaussian pulses.
-  2. Compute a Region of Interest (ROI) mask based on pulse positions.
-  3. Visualize signals with peak positions, amplitudes, and the ROI mask.
+  2. Retain clean pulse traces as reconstruction targets.
+  3. Visualize observed and clean pulse signals.
 
 .. GENERATED FROM PYTHON SOURCE LINES 12-14
 
@@ -35,7 +35,7 @@ Imports
 
 .. code-block:: Python
 
-    from DeepPeak.signal_generator import SignalGenerator
+    from DeepPeak.generation import SignalGenerator
     from DeepPeak import CustomKernel, UniformCount
     import numpy as np
 
@@ -55,7 +55,7 @@ We generate a dataset with `NUM_PEAKS` Gaussian pulses per signal.
 The peak amplitudes, positions, and widths are randomly chosen within
 specified ranges.
 
-.. GENERATED FROM PYTHON SOURCE LINES 25-58
+.. GENERATED FROM PYTHON SOURCE LINES 25-60
 
 .. code-block:: Python
 
@@ -89,9 +89,11 @@ specified ranges.
         drift=(0, 10),
     )
 
-    roi = dataset.get_region_of_interest(width_in_pixels=5)
-
-    dataset.plot(number_of_columns=3, number_of_samples=9, region_of_interest=roi)
+    dataset.plot(
+        number_of_columns=3,
+        number_of_samples=9,
+        reference_pulse_trace=dataset.clean_signals,
+    )
 
 
 
@@ -113,7 +115,7 @@ specified ranges.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.324 seconds)
+   **Total running time of the script:** (0 minutes 1.356 seconds)
 
 
 .. _sphx_glr_download_gallery_data_generation_custom_kernel.py:

@@ -1,6 +1,6 @@
 """
-Non-Maximum Suppression for Gaussian Pulse Detection
-====================================================
+Amplitude Retrieval for Overlapping Pulses
+==========================================
 
 This example demonstrates the use of the NonMaximumSuppression class to detect
 Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset
@@ -8,9 +8,9 @@ of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.
 """
 
-from DeepPeak.algorithms import NonMaximumSuppression
-from DeepPeak.algorithms import ClosedFormSolver
-from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak.detection import NonMaximumSuppression
+from DeepPeak.detection import ClosedFormSolver
+from DeepPeak.generation import SignalGenerator
 from DeepPeak import Lorentzian, UniformCount
 
 NUM_PEAKS = 4
@@ -34,9 +34,7 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-roi = dataset.get_region_of_interest(width_in_pixels=5)
-
-dataset.plot(region_of_interest=roi)
+dataset.plot(reference_pulse_trace=dataset.clean_signals)
 
 # %%
 # Configure and run the detector

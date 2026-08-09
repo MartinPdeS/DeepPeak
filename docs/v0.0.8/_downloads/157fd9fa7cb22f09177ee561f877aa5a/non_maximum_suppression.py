@@ -8,8 +8,8 @@ of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.
 """
 
-from DeepPeak.algorithms import NonMaximumSuppression
-from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak.detection import NonMaximumSuppression
+from DeepPeak.generation import SignalGenerator
 from DeepPeak import Gaussian, UniformCount
 
 NUM_PEAKS = 3
@@ -31,9 +31,7 @@ dataset = generator.generate(
     categorical_peak_count=False,
 )
 
-roi = dataset.get_region_of_interest(width_in_pixels=5)
-
-dataset.plot(region_of_interest=roi)
+dataset.plot(reference_pulse_trace=dataset.clean_signals)
 
 # %%
 # Configure and run the detector

@@ -58,8 +58,8 @@
     <link rel="icon" href="../_static/thumbnail.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Non-Maximum Suppression for Gaussian Pulse Detection" href="amplitude_retrieval.html" />
-    <link rel="prev" title="API reference" href="../code.html" />
+    <link rel="next" title="Amplitude Retrieval for Overlapping Pulses" href="amplitude_retrieval.html" />
+    <link rel="prev" title="Testing and reproducibility" href="../testing.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.0.8" />
@@ -147,8 +147,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -159,20 +180,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../theory.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../theory.html">
     Theory
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../references.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../references.html">
     References
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -299,8 +330,29 @@
   <ul class="bd-navbar-elements navbar-nav">
     
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../getting_started.html">
+    Getting started
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../code.html">
     API reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../migration.html">
+    Migration guide
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../testing.html">
+    Testing and reproducibility
   </a>
 </li>
 
@@ -405,13 +457,15 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="amplitude_retrieval.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classifier_autoencoder.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
-<li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="amplitude_retrieval.html">Amplitude Retrieval for Overlapping Pulses</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classical_detection_pipeline.html">Classical Detection Pipeline with Stable Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_autoencoder.html">U-Net Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_dense.html">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="classifier_wavenet.html">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="core_result_objects.html">Core Result Objects: Trace, DetectionResult, and MetricResult</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation.html">Generating and Visualizing Signal Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_generation_1.html">Reference pulse trace labels</a></li>
 <li class="toctree-l1"><a class="reference internal" href="data_generation_custom_kernel.html">Generating data With a Custom Kernel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="noise_and_pulse_analysis.html">Noise and Pulse-Shape Analysis</a></li>
 <li class="toctree-l1"><a class="reference internal" href="non_maximum_suppression.html">Non-Maximum Suppression for Gaussian Pulse Detection</a></li>
 </ul>
 </div>
@@ -472,41 +526,72 @@
                   
   <section id="examples">
 <h1>Examples<a class="headerlink" href="#examples" title="Link to this heading">#</a></h1>
-<p>Welcome to the DeepPeak examples gallery! This directory contains comprehensive examples demonstrating the key capabilities of the DeepPeak library for signal processing and peak detection using deep learning.</p>
-<p>DeepPeak is a Python library designed for detecting and analyzing peaks in 1D signals using machine learning approaches. These examples showcase the library’s main features:</p>
+<p>Welcome to the DeepPeak examples gallery! This directory contains executable
+examples demonstrating the public DeepPeak API for signal processing, peak
+detection, analysis, and visualization. Examples are designed to run with a
+non-interactive Matplotlib backend and return figures instead of requiring a
+user to close plot windows.</p>
+<p>DeepPeak is a Python library designed for generating, detecting, and analyzing peaks in 1D signals. These examples showcase the library’s main features:</p>
 <ul class="simple">
 <li><p><strong>Signal Generation</strong>: Create synthetic datasets with controllable noise and peak characteristics</p></li>
-<li><p><strong>Machine Learning Classifiers</strong>: Train neural networks to detect regions of interest</p></li>
+<li><p><strong>Classical Detection</strong>: Detect peaks with trigger and suppression algorithms</p></li>
+<li><p><strong>Neural deconvolution</strong>: Train models to reconstruct clean pulse traces</p></li>
+<li><p><strong>Direct-versus-deconvolved comparison</strong>: Compare arrival, amplitude, and width distributions</p></li>
+<li><p><strong>Stable Results</strong>: Pass trace, detection, and metric objects between pipeline stages</p></li>
+<li><p><strong>Trace Analysis</strong>: Characterize noise and pulse shapes</p></li>
 <li><p><strong>Peak Detection Algorithms</strong>: Apply traditional and ML-enhanced peak detection methods</p></li>
 <li><p><strong>Visualization Tools</strong>: Plot and analyze results with built-in visualization utilities</p></li>
 </ul>
+<section id="suggested-order">
+<h2>Suggested order<a class="headerlink" href="#suggested-order" title="Link to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Start with <code class="docutils literal notranslate"><span class="pre">core_result_objects.py</span></code> to learn the stable data contracts.</p></li>
+<li><p>Continue with <code class="docutils literal notranslate"><span class="pre">classical_detection_pipeline.py</span></code> for a complete detector
+workflow.</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">data_generation.py</span></code> and <code class="docutils literal notranslate"><span class="pre">data_generation_custom_kernel.py</span></code> to
+create controlled training signals.</p></li>
+<li><p>Explore <code class="docutils literal notranslate"><span class="pre">noise_and_pulse_analysis.py</span></code> and <code class="docutils literal notranslate"><span class="pre">amplitude_retrieval.py</span></code> for
+downstream trace diagnostics.</p></li>
+<li><p>Use the classifier examples only when TensorFlow and a trained model are
+required.</p></li>
+<li><p>Read the direct-versus-deconvolved comparison section in <code class="docutils literal notranslate"><span class="pre">getting_started</span></code>
+before training a model for reconstruction. The ROI-classification gallery
+examples use binary masks and are a different objective.</p></li>
+</ol>
 <div class="sphx-glr-thumbnails"><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates the use of the NonMaximumSuppression class to detect Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset of Gaussian pulses, applies the non-maximum suppression algorithm, and plots the results."><img alt="" src="../_images/sphx_glr_amplitude_retrieval_thumb.png" />
-<p><a class="reference internal" href="amplitude_retrieval.html#sphx-glr-gallery-amplitude-retrieval-py"><span class="std std-ref">Non-Maximum Suppression for Gaussian Pulse Detection</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Non-Maximum Suppression for Gaussian Pulse Detection</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks."><img alt="" src="../_images/sphx_glr_classifier_autoencoder_thumb.png" />
-<p><a class="reference internal" href="classifier_autoencoder.html#sphx-glr-gallery-classifier-autoencoder-py"><span class="std std-ref">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</span></a></p>
-  <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks."><img alt="" src="../_images/sphx_glr_classifier_dense_thumb.png" />
-<p><a class="reference internal" href="classifier_dense.html#sphx-glr-gallery-classifier-dense-py"><span class="std std-ref">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</span></a></p>
-  <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks."><img alt="" src="../_images/sphx_glr_classifier_wavenet_thumb.png" />
-<p><a class="reference internal" href="classifier_wavenet.html#sphx-glr-gallery-classifier-wavenet-py"><span class="std std-ref">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</span></a></p>
-  <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Compute a Region of Interest (ROI) mask based on pulse positions.   3. Visualize signals with peak positions, amplitudes, and the ROI mask."><img alt="" src="../_images/sphx_glr_data_generation_thumb.png" />
+<p><a class="reference internal" href="amplitude_retrieval.html#sphx-glr-gallery-amplitude-retrieval-py"><span class="std std-ref">Amplitude Retrieval for Overlapping Pulses</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Amplitude Retrieval for Overlapping Pulses</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Generate a noisy synthetic signal, run the classical detector, wrap its raw output in a stable DetectionResult, and visualize the result."><img alt="" src="../_images/sphx_glr_classical_detection_pipeline_thumb.png" />
+<p><a class="reference internal" href="classical_detection_pipeline.html#sphx-glr-gallery-classical-detection-pipeline-py"><span class="std std-ref">Classical Detection Pipeline with Stable Results</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Classical Detection Pipeline with Stable Results</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s U-Net as a deconvolver."><img alt="" src="../_images/sphx_glr_classifier_autoencoder_thumb.png" />
+<p><a class="reference internal" href="classifier_autoencoder.html#sphx-glr-gallery-classifier-autoencoder-py"><span class="std std-ref">U-Net Deconvolver: Reconstructing Clean Pulse Traces</span></a></p>
+  <div class="sphx-glr-thumbnail-title">U-Net Deconvolver: Reconstructing Clean Pulse Traces</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s DenseNet as a deconvolver."><img alt="" src="../_images/sphx_glr_classifier_dense_thumb.png" />
+<p><a class="reference internal" href="classifier_dense.html#sphx-glr-gallery-classifier-dense-py"><span class="std std-ref">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</span></a></p>
+  <div class="sphx-glr-thumbnail-title">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s WaveNet as a deconvolver."><img alt="" src="../_images/sphx_glr_classifier_wavenet_thumb.png" />
+<p><a class="reference internal" href="classifier_wavenet.html#sphx-glr-gallery-classifier-wavenet-py"><span class="std std-ref">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</span></a></p>
+  <div class="sphx-glr-thumbnail-title">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example introduces the lightweight result objects shared by the new DeepPeak architecture. They contain numerical data and metadata, but no TensorFlow or plotting dependencies."><img alt="" src="../_images/sphx_glr_core_result_objects_thumb.png" />
+<p><a class="reference internal" href="core_result_objects.html#sphx-glr-gallery-core-result-objects-py"><span class="std std-ref">Core Result Objects: Trace, DetectionResult, and MetricResult</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Core Result Objects: Trace, DetectionResult, and MetricResult</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals."><img alt="" src="../_images/sphx_glr_data_generation_thumb.png" />
 <p><a class="reference internal" href="data_generation.html#sphx-glr-gallery-data-generation-py"><span class="std std-ref">Generating and Visualizing Signal Data</span></a></p>
   <div class="sphx-glr-thumbnail-title">Generating and Visualizing Signal Data</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example shows how to generate a smooth label trace aligned with the true pulse positions and amplitudes. This can be used as a training target to reduce class imbalance compared to a binary ROI mask."><img alt="" src="../_images/sphx_glr_data_generation_1_thumb.png" />
-<p><a class="reference internal" href="data_generation_1.html#sphx-glr-gallery-data-generation-1-py"><span class="std std-ref">Reference pulse trace labels</span></a></p>
-  <div class="sphx-glr-thumbnail-title">Reference pulse trace labels</div>
-</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Compute a Region of Interest (ROI) mask based on pulse positions.   3. Visualize signals with peak positions, amplitudes, and the ROI mask."><img alt="" src="../_images/sphx_glr_data_generation_custom_kernel_thumb.png" />
+</div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals."><img alt="" src="../_images/sphx_glr_data_generation_custom_kernel_thumb.png" />
 <p><a class="reference internal" href="data_generation_custom_kernel.html#sphx-glr-gallery-data-generation-custom-kernel-py"><span class="std std-ref">Generating data With a Custom Kernel</span></a></p>
   <div class="sphx-glr-thumbnail-title">Generating data With a Custom Kernel</div>
+</div><div class="sphx-glr-thumbcontainer" tooltip="Use the analysis layer to characterize noise regions and align detected pulses for shape statistics."><img alt="" src="../_images/sphx_glr_noise_and_pulse_analysis_thumb.png" />
+<p><a class="reference internal" href="noise_and_pulse_analysis.html#sphx-glr-gallery-noise-and-pulse-analysis-py"><span class="std std-ref">Noise and Pulse-Shape Analysis</span></a></p>
+  <div class="sphx-glr-thumbnail-title">Noise and Pulse-Shape Analysis</div>
 </div><div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates the use of the NonMaximumSuppression class to detect Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset of Gaussian pulses, applies the non-maximum suppression algorithm, and plots the results."><img alt="" src="../_images/sphx_glr_non_maximum_suppression_thumb.png" />
 <p><a class="reference internal" href="non_maximum_suppression.html#sphx-glr-gallery-non-maximum-suppression-py"><span class="std std-ref">Non-Maximum Suppression for Gaussian Pulse Detection</span></a></p>
   <div class="sphx-glr-thumbnail-title">Non-Maximum Suppression for Gaussian Pulse Detection</div>
 </div></div><div class="toctree-wrapper compound">
 </div>
 <p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
 </section>
 
 
@@ -523,6 +608,18 @@
                 <dialog id="pst-secondary-sidebar-modal"></dialog>
                 <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#suggested-order">Suggested order</a></li>
+</ul>
+  </nav></div>
 
   <div class="sidebar-secondary-item">
   <div role="note" aria-label="source link">

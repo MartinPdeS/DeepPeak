@@ -18,22 +18,22 @@
 .. _sphx_glr_gallery_amplitude_retrieval.py:
 
 
-Non-Maximum Suppression for Gaussian Pulse Detection
-====================================================
+Amplitude Retrieval for Overlapping Pulses
+==========================================
 
 This example demonstrates the use of the NonMaximumSuppression class to detect
 Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset
 of Gaussian pulses, applies the non-maximum suppression algorithm, and plots
 the results.
 
-.. GENERATED FROM PYTHON SOURCE LINES 10-41
+.. GENERATED FROM PYTHON SOURCE LINES 10-39
 
 .. code-block:: Python
 
 
-    from DeepPeak.algorithms import NonMaximumSuppression
-    from DeepPeak.algorithms import ClosedFormSolver
-    from DeepPeak.signal_generator import SignalGenerator
+    from DeepPeak.detection import NonMaximumSuppression
+    from DeepPeak.detection import ClosedFormSolver
+    from DeepPeak.generation import SignalGenerator
     from DeepPeak import Lorentzian, UniformCount
 
     NUM_PEAKS = 4
@@ -57,9 +57,7 @@ the results.
         categorical_peak_count=False,
     )
 
-    roi = dataset.get_region_of_interest(width_in_pixels=5)
-
-    dataset.plot(region_of_interest=roi)
+    dataset.plot(reference_pulse_trace=dataset.clean_signals)
 
 
 
@@ -84,11 +82,11 @@ the results.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 42-43
+.. GENERATED FROM PYTHON SOURCE LINES 40-41
 
 Configure and run the detector
 
-.. GENERATED FROM PYTHON SOURCE LINES 43-57
+.. GENERATED FROM PYTHON SOURCE LINES 41-55
 
 .. code-block:: Python
 
@@ -124,11 +122,11 @@ Configure and run the detector
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-59
+.. GENERATED FROM PYTHON SOURCE LINES 56-57
 
 Solve for amplitudes
 
-.. GENERATED FROM PYTHON SOURCE LINES 59-67
+.. GENERATED FROM PYTHON SOURCE LINES 57-65
 
 .. code-block:: Python
 
@@ -161,7 +159,7 @@ Solve for amplitudes
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.580 seconds)
+   **Total running time of the script:** (0 minutes 1.563 seconds)
 
 
 .. _sphx_glr_download_gallery_amplitude_retrieval.py:

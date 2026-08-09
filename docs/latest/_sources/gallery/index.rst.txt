@@ -4,15 +4,39 @@
 Examples
 ========
 
-Welcome to the DeepPeak examples gallery! This directory contains comprehensive examples demonstrating the key capabilities of the DeepPeak library for signal processing and peak detection using deep learning.
+Welcome to the DeepPeak examples gallery! This directory contains executable
+examples demonstrating the public DeepPeak API for signal processing, peak
+detection, analysis, and visualization. Examples are designed to run with a
+non-interactive Matplotlib backend and return figures instead of requiring a
+user to close plot windows.
 
 
-DeepPeak is a Python library designed for detecting and analyzing peaks in 1D signals using machine learning approaches. These examples showcase the library's main features:
+DeepPeak is a Python library designed for generating, detecting, and analyzing peaks in 1D signals. These examples showcase the library's main features:
 
 - **Signal Generation**: Create synthetic datasets with controllable noise and peak characteristics
-- **Machine Learning Classifiers**: Train neural networks to detect regions of interest
+- **Classical Detection**: Detect peaks with trigger and suppression algorithms
+- **Neural deconvolution**: Train models to reconstruct clean pulse traces
+- **Direct-versus-deconvolved comparison**: Compare arrival, amplitude, and width distributions
+- **Stable Results**: Pass trace, detection, and metric objects between pipeline stages
+- **Trace Analysis**: Characterize noise and pulse shapes
 - **Peak Detection Algorithms**: Apply traditional and ML-enhanced peak detection methods
 - **Visualization Tools**: Plot and analyze results with built-in visualization utilities
+
+Suggested order
+---------------
+
+#. Start with ``core_result_objects.py`` to learn the stable data contracts.
+#. Continue with ``classical_detection_pipeline.py`` for a complete detector
+   workflow.
+#. Use ``data_generation.py`` and ``data_generation_custom_kernel.py`` to
+   create controlled training signals.
+#. Explore ``noise_and_pulse_analysis.py`` and ``amplitude_retrieval.py`` for
+   downstream trace diagnostics.
+#. Use the classifier examples only when TensorFlow and a trained model are
+   required.
+#. Read the direct-versus-deconvolved comparison section in ``getting_started``
+   before training a model for reconstruction. The ROI-classification gallery
+   examples use binary masks and are a different objective.
 
 
 
@@ -35,13 +59,30 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">Non-Maximum Suppression for Gaussian Pulse Detection</div>
+      <div class="sphx-glr-thumbnail-title">Amplitude Retrieval for Overlapping Pulses</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Generate a noisy synthetic signal, run the classical detector, wrap its raw output in a stable DetectionResult, and visualize the result.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_classical_detection_pipeline_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_classical_detection_pipeline.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Classical Detection Pipeline with Stable Results</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s U-Net as a deconvolver.">
 
 .. only:: html
 
@@ -52,13 +93,13 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
+      <div class="sphx-glr-thumbnail-title">U-Net Deconvolver: Reconstructing Clean Pulse Traces</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s DenseNet as a deconvolver.">
 
 .. only:: html
 
@@ -69,13 +110,13 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
+      <div class="sphx-glr-thumbnail-title">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s WaveNet as a deconvolver.">
 
 .. only:: html
 
@@ -86,13 +127,30 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
+      <div class="sphx-glr-thumbnail-title">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Compute a Region of Interest (ROI) mask based on pulse positions.   3. Visualize signals with peak positions, amplitudes, and the ROI mask.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example introduces the lightweight result objects shared by the new DeepPeak architecture. They contain numerical data and metadata, but no TensorFlow or plotting dependencies.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_core_result_objects_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_core_result_objects.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Core Result Objects: Trace, DetectionResult, and MetricResult</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals.">
 
 .. only:: html
 
@@ -109,24 +167,7 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example shows how to generate a smooth label trace aligned with the true pulse positions and amplitudes. This can be used as a training target to reduce class imbalance compared to a binary ROI mask.">
-
-.. only:: html
-
-  .. image:: /gallery/images/thumb/sphx_glr_data_generation_1_thumb.png
-    :alt:
-
-  :ref:`sphx_glr_gallery_data_generation_1.py`
-
-.. raw:: html
-
-      <div class="sphx-glr-thumbnail-title">Reference pulse trace labels</div>
-    </div>
-
-
-.. raw:: html
-
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Compute a Region of Interest (ROI) mask based on pulse positions.   3. Visualize signals with peak positions, amplitudes, and the ROI mask.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals.">
 
 .. only:: html
 
@@ -138,6 +179,23 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Generating data With a Custom Kernel</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Use the analysis layer to characterize noise regions and align detected pulses for shape statistics.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_noise_and_pulse_analysis_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_gallery_noise_and_pulse_analysis.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Noise and Pulse-Shape Analysis</div>
     </div>
 
 
@@ -169,12 +227,14 @@ DeepPeak is a Python library designed for detecting and analyzing peaks in 1D si
    :hidden:
 
    /gallery/amplitude_retrieval
+   /gallery/classical_detection_pipeline
    /gallery/classifier_autoencoder
    /gallery/classifier_dense
    /gallery/classifier_wavenet
+   /gallery/core_result_objects
    /gallery/data_generation
-   /gallery/data_generation_1
    /gallery/data_generation_custom_kernel
+   /gallery/noise_and_pulse_analysis
    /gallery/non_maximum_suppression
 
 
