@@ -11,8 +11,12 @@ from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
 from .base import BaseDeconvolver
 from .losses import (
     ShapeAwarePulseLoss,
+    SmoothBinaryCrossentropy,
+    WeightedBinaryCrossentropy,
     WeightedHuber,
     shape_aware_pulse_loss,
+    smooth_bce,
+    weighted_bce,
     weighted_huber,
 )
 
@@ -22,8 +26,12 @@ def _build_custom_object_map(
 ) -> dict[str, Any]:
     resolved = {
         "ShapeAwarePulseLoss": ShapeAwarePulseLoss,
+        "SmoothBinaryCrossentropy": SmoothBinaryCrossentropy,
+        "WeightedBinaryCrossentropy": WeightedBinaryCrossentropy,
         "WeightedHuber": WeightedHuber,
         "shape_aware_pulse_loss": shape_aware_pulse_loss,
+        "smooth_bce": smooth_bce,
+        "weighted_bce": weighted_bce,
         "weighted_huber": weighted_huber,
     }
     if custom_objects:

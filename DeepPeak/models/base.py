@@ -51,6 +51,7 @@ class BaseDeconvolver:
         *,
         batch_size: int = 32,
         verbose: int = 0,
+        threshold: float | None = None,
     ) -> np.ndarray:
         """
         Predict a reconstructed signal for each input trace.
@@ -70,6 +71,8 @@ class BaseDeconvolver:
         """
         self._ensure_built()
         p = self.model.predict(signal, batch_size=batch_size, verbose=verbose)
+        if threshold is not None:
+            return (p >= threshold).astype(p.dtype)
         return p
 
     def evaluate(

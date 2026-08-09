@@ -84,10 +84,14 @@ __all__ = [
     "WaveNetTraceAnalyzer",
     "DenseNet",
     "ShapeAwarePulseLoss",
+    "SmoothBinaryCrossentropy",
     "UNet1D",
     "WaveNet",
     "WeightedHuber",
+    "WeightedBinaryCrossentropy",
     "shape_aware_pulse_loss",
+    "smooth_bce",
+    "weighted_bce",
     "weighted_huber",
 ]
 

@@ -9,23 +9,35 @@ from typing import Any
 
 
 __all__ = [
+    "BinaryIoU",
     "DenseNet",
     "ShapeAwarePulseLoss",
+    "SmoothBinaryCrossentropy",
     "UNet1D",
     "WaveNet",
+    "WeightedBinaryCrossentropy",
     "WeightedHuber",
+    "plot_predictions",
     "shape_aware_pulse_loss",
+    "smooth_bce",
+    "weighted_bce",
     "weighted_huber",
 ]
 
 
 _EXPORTS = {
+    "BinaryIoU": ("metrics", "BinaryIoU"),
     "DenseNet": ("dense", "DenseNet"),
     "ShapeAwarePulseLoss": ("losses", "ShapeAwarePulseLoss"),
+    "SmoothBinaryCrossentropy": ("losses", "SmoothBinaryCrossentropy"),
     "UNet1D": ("unet1d", "UNet1D"),
     "WaveNet": ("wavenet", "WaveNet"),
+    "WeightedBinaryCrossentropy": ("losses", "WeightedBinaryCrossentropy"),
     "WeightedHuber": ("losses", "WeightedHuber"),
+    "plot_predictions": ("plotting", "plot_predictions"),
     "shape_aware_pulse_loss": ("losses", "shape_aware_pulse_loss"),
+    "smooth_bce": ("losses", "smooth_bce"),
+    "weighted_bce": ("losses", "weighted_bce"),
     "weighted_huber": ("losses", "weighted_huber"),
 }
 
