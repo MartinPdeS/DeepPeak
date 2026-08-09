@@ -19,7 +19,7 @@ We will:
 # -----------------------------
 import numpy as np
 
-from DeepPeak.models import DenseNet
+from DeepPeak.models import DenseNet, TrainingConfig
 from DeepPeak.generation import SignalGenerator
 from DeepPeak import Lorentzian, UniformCount
 
@@ -73,9 +73,7 @@ dense_net.summary()
 history = dense_net.fit(
     dataset.signals,
     dataset.clean_signals[..., None],
-    validation_split=0.2,
-    epochs=20,
-    batch_size=64,
+    config=TrainingConfig(epochs=20, batch_size=64, validation_split=0.2),
 )
 
 # %%

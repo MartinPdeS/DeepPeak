@@ -33,5 +33,4 @@ Suggested order
 #. Use the classifier examples only when TensorFlow and a trained model are
    required.
 #. Read the direct-versus-deconvolved comparison section in ``getting_started``
-   before training a model for reconstruction. The ROI-classification gallery
-   examples use binary masks and are a different objective.
+   before training a model for reconstruction.

@@ -1,22 +1,30 @@
-.. list-table::
-   :widths: 10 25 25 25
-   :header-rows: 0
+|logo|
 
-   * - Meta
+.. list-table::
+   :widths: 35 65
+   :header-rows: 1
+
+   * - Badge
+     - Status
+   * - Python versions
      - |python|
+   * - Documentation
      - |docs|
-     -
-   * - Testing
+   * - Continuous integration
      - |ci/cd|
+   * - Test coverage
      - |coverage|
+   * - Google Colab
      - |colab|
-   * - PyPI
+   * - PyPI package
      - |PyPI|
+   * - PyPI downloads
      - |PyPI_download|
-     -
-   * - Anaconda
+   * - Anaconda package
      - |anaconda|
+   * - Anaconda downloads
      - |anaconda_download|
+   * - Latest Anaconda release
      - |anaconda_date|
 
 
@@ -200,11 +208,9 @@ This makes it possible to quantify changes in event counts, time-of-arrival
 distributions, retrieved amplitudes, widths, and distribution distances.
 
 For this workflow, the neural model must be trained as a reconstruction model:
-its target should be a clean or deconvolved pulse trace, not only a binary ROI
-mask. For example, a WaveNet model should use a linear output head and a
-regression loss when it is trained to predict pulse amplitudes. The existing
-ROI-classification examples demonstrate a related model use case, but are not
-deconvolution models by themselves.
+its target should be a clean or deconvolved pulse trace. For example, a
+WaveNet model should use a linear output head and a regression loss when it is
+trained to predict pulse amplitudes.
 
 Architecture
 ------------
@@ -309,3 +315,5 @@ For questions or contributions, contact `martin.poinsinet.de.sivry@gmail.com <ma
 .. |anaconda_date| image:: https://anaconda.org/martinpdes/deeppeak/badges/latest_release_relative_date.svg
     :alt: Latest release date
     :target: https://anaconda.org/martinpdes/deeppeak
+.. |logo| image:: https://github.com/MartinPdeS/DeepPeak/raw/master/docs/images/logo.svg
+    :alt: DeepPeak logo

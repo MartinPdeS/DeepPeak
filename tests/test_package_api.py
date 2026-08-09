@@ -7,6 +7,7 @@ def test_top_level_public_api_exports_core_types():
     assert DeepPeak.StandardDilutionSeries.__name__ == "StandardDilutionSeries"
     assert DeepPeak.FlashDilutionSeries.__name__ == "FlashDilutionSeries"
     assert DeepPeak.SignalGenerator.__name__ == "SignalGenerator"
+    assert DeepPeak.NonstationaryGaussianNoise.__name__ == "NonstationaryGaussianNoise"
     assert DeepPeak.Gaussian.__name__ == "Gaussian"
     assert DeepPeak.TwoLobeGaussian.__name__ == "TwoLobeGaussian"
     assert DeepPeak.WaveNetTraceAnalyzer.__name__ == "WaveNetTraceAnalyzer"
@@ -44,6 +45,7 @@ def test_neural_network_package_declares_lazy_public_api():
         "WeightedBinaryCrossentropy",
         "WeightedHuber",
         "plot_predictions",
+        "TrainingConfig",
         "shape_aware_pulse_loss",
         "smooth_bce",
         "weighted_bce",

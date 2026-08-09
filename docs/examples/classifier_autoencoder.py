@@ -19,7 +19,7 @@ We will:
 # -----------------------------
 import numpy as np
 
-from DeepPeak.models import UNet1D
+from DeepPeak.models import TrainingConfig, UNet1D
 from DeepPeak.generation import SignalGenerator
 from DeepPeak import Lorentzian, UniformCount
 
@@ -73,9 +73,7 @@ unet.summary()
 history = unet.fit(
     dataset.signals,
     dataset.clean_signals[..., None],
-    validation_split=0.2,
-    epochs=20,
-    batch_size=64,
+    config=TrainingConfig(epochs=20, batch_size=64, validation_split=0.2),
 )
 
 # %%

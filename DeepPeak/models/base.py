@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import re
-from typing import Iterable, Optional, Union
+from typing import Any, Iterable, Optional, Union
 import os
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,6 +11,7 @@ import tempfile
 
 from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
 from DeepPeak.utils import merge_and_plot_histories
+from .training import TrainingConfig
 
 HistoryLike = Union[tf.keras.callbacks.History, dict]
 
@@ -51,7 +54,6 @@ class BaseDeconvolver:
         *,
         batch_size: int = 32,
         verbose: int = 0,
-        threshold: float | None = None,
     ) -> np.ndarray:
         """
         Predict a reconstructed signal for each input trace.
@@ -71,8 +73,6 @@ class BaseDeconvolver:
         """
         self._ensure_built()
         p = self.model.predict(signal, batch_size=batch_size, verbose=verbose)
-        if threshold is not None:
-            return (p >= threshold).astype(p.dtype)
         return p
 
     def evaluate(
@@ -110,7 +110,13 @@ class BaseDeconvolver:
         )
         return rf
 
-    def fit(self, *args, **kwargs) -> tf.keras.callbacks.History:
+    def fit(
+        self,
+        *args: Any,
+        config: TrainingConfig | None = None,
+        callbacks: Iterable[tf.keras.callbacks.Callback] | None = None,
+        **kwargs: Any,
+    ) -> tf.keras.callbacks.History:
         """
         Fit the WaveNet model to training data.
 
@@ -129,6 +135,18 @@ class BaseDeconvolver:
         - The model must be built before fitting (see `build()`).
         """
         self._ensure_built()
+        configured_callbacks: list[tf.keras.callbacks.Callback] = []
+        if config is not None:
+            if not isinstance(config, TrainingConfig):
+                raise TypeError("config must be a TrainingConfig instance")
+            config_kwargs = config.fit_kwargs()
+            config_kwargs.update(kwargs)
+            kwargs = config_kwargs
+            configured_callbacks.extend(config.callbacks())
+        if callbacks is not None:
+            configured_callbacks.extend(callbacks)
+        if configured_callbacks:
+            kwargs["callbacks"] = configured_callbacks
         history = self.model.fit(*args, **kwargs)
         self.histories.append(history)
         return history

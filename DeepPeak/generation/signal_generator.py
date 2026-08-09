@@ -1,12 +1,12 @@
 """Synthetic signal dataset generation utilities."""
 
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Literal, Optional, Tuple, Union
 
 import numpy as np
 
 from .dataset import DataSet
 from .kernels import BaseKernel
-from .noises import BaseNoise, GaussianNoise
+from .noises import BaseNoise, GaussianNoise, NonstationaryGaussianNoise
 from .peak_count import PeakCount
 
 
@@ -17,6 +17,7 @@ class SignalGenerator:
     - Supports all kernel classes derived from ``BaseKernel``
     - Returns labels marking discrete peak locations
     - Optional Gaussian noise
+    - Optional instrument response, baseline offset, saturation, and quantization
     - Optional NumPy-based one-hot encoding for the number of peaks
     - Clean pulse traces are retained alongside noisy observations for
       reconstruction-model training
@@ -68,6 +69,12 @@ class SignalGenerator:
         noise_std: Optional[Union[float, Tuple[float, float]]] = None,
         noise: Optional[BaseNoise] = None,
         drift: Optional[Union[float, Tuple[float, float]]] = None,
+        baseline_level: Optional[Union[float, Tuple[float, float]]] = None,
+        instrument_response: Optional[np.ndarray] = None,
+        saturation: Optional[Union[float, Tuple[float, float]]] = None,
+        quantization_step: Optional[float] = None,
+        noise_profile: Literal["constant", "linear"] = "constant",
+        noise_end_scale: Union[float, Tuple[float, float]] = 1.0,
         categorical_peak_count: bool = False,
         shift_min_to_zero: bool = False,
         minimum_level: Optional[Union[float, Tuple[float, float]]] = None,
@@ -87,6 +94,18 @@ class SignalGenerator:
             Desired per-trace minimum after generation. A scalar applies the same
             minimum to every trace. A ``(low, high)`` tuple samples one minimum
             uniformly per trace. Cannot be combined with ``shift_min_to_zero``.
+        baseline_level : float or tuple of float, optional
+            Constant additive baseline sampled independently for each trace.
+        instrument_response : 1D array, optional
+            Finite impulse response applied to the clean signal before noise.
+        saturation : float or tuple of float, optional
+            Upper clipping limit, or explicit ``(lower, upper)`` clipping bounds.
+        quantization_step : float, optional
+            Quantization interval applied to the observed signal.
+        noise_profile : {"constant", "linear"}, default="constant"
+            Whether ``noise_std`` is stationary or changes linearly across time.
+        noise_end_scale : float or tuple of float, default=1.0
+            End-to-start standard-deviation ratio for a linear noise profile.
         """
         self.n_samples = n_samples
         n_peaks = self._ensure_tuple(peak_count.bounds)
@@ -95,6 +114,19 @@ class SignalGenerator:
         minimum_level = (
             self._ensure_tuple(minimum_level) if minimum_level is not None else None
         )
+        baseline_level = (
+            self._ensure_tuple(baseline_level) if baseline_level is not None else None
+        )
+        response = self._validate_instrument_response(instrument_response)
+        saturation_bounds = self._resolve_saturation(saturation)
+        if quantization_step is not None and quantization_step <= 0:
+            raise ValueError("quantization_step must be greater than zero.")
+        if noise_profile not in {"constant", "linear"}:
+            raise ValueError("noise_profile must be 'constant' or 'linear'.")
+        if noise is not None and noise_profile != "constant":
+            raise ValueError(
+                "noise_profile is only supported with noise_std, not a custom noise object."
+            )
 
         if shift_min_to_zero and minimum_level is not None:
             raise ValueError(
@@ -116,6 +148,12 @@ class SignalGenerator:
         clean_signals = np.nansum(peak_components, axis=1)
         signals = clean_signals.copy()
 
+        if response is not None:
+            signals = np.stack(
+                [np.convolve(signal, response, mode="same") for signal in signals],
+                axis=0,
+            )
+
         labels = np.zeros((self.n_samples, self.sequence_length))
         true_positions = kernel.positions_for_labels
         diff = np.abs(true_positions[..., None] - self.x_values[None, None, :])
@@ -127,7 +165,14 @@ class SignalGenerator:
 
         resolved_noise = noise
         if resolved_noise is None and noise_std is not None:
-            resolved_noise = GaussianNoise(std=noise_std)
+            resolved_noise = (
+                NonstationaryGaussianNoise(
+                    std=noise_std,
+                    end_scale=noise_end_scale,
+                )
+                if noise_profile == "linear"
+                else GaussianNoise(std=noise_std)
+            )
 
         if resolved_noise is not None:
             signals = signals + resolved_noise.sample(
@@ -141,6 +186,12 @@ class SignalGenerator:
             baseline = drift_levels * np.linspace(0, 1, self.sequence_length)
             signals = signals + baseline
 
+        if baseline_level is not None:
+            baseline_levels = rng.uniform(
+                baseline_level[0], baseline_level[1], size=(self.n_samples, 1)
+            )
+            signals = signals + baseline_levels
+
         if shift_min_to_zero:
             minimum_per_trace = np.min(signals, axis=1, keepdims=True)
             signals = signals - np.minimum(minimum_per_trace, 0.0)
@@ -152,6 +203,11 @@ class SignalGenerator:
             minimum_per_trace = np.min(signals, axis=1, keepdims=True)
             signals = signals + (target_minimum - minimum_per_trace)
 
+        if saturation_bounds is not None:
+            signals = np.clip(signals, *saturation_bounds)
+        if quantization_step is not None:
+            signals = np.round(signals / quantization_step) * quantization_step
+
         dataset = DataSet(
             n_samples=self.n_samples,
             sequence_length=self.sequence_length,
@@ -161,6 +217,10 @@ class SignalGenerator:
             labels=labels,
             x_values=self.x_values,
             num_peaks=kernel.num_peaks,
+            baseline_level=baseline_level,
+            instrument_response=response,
+            saturation=saturation_bounds,
+            quantization_step=quantization_step,
         )
         return dataset
 
@@ -326,3 +386,34 @@ class SignalGenerator:
         if isinstance(value, (int, float)):
             return (value, value)  # type: ignore[return-value]
         return value  # type: ignore[return-value]
+
+    @staticmethod
+    def _validate_instrument_response(
+        response: Optional[np.ndarray],
+    ) -> Optional[np.ndarray]:
+        if response is None:
+            return None
+        response = np.asarray(response, dtype=float)
+        if response.ndim != 1 or response.size == 0:
+            raise ValueError("instrument_response must be a non-empty 1D array.")
+        if not np.all(np.isfinite(response)):
+            raise ValueError("instrument_response must contain finite values.")
+        if not np.any(response):
+            raise ValueError("instrument_response must contain a non-zero value.")
+        return response.copy()
+
+    @staticmethod
+    def _resolve_saturation(
+        saturation: Optional[Union[float, Tuple[float, float]]],
+    ) -> Optional[Tuple[float, float]]:
+        if saturation is None:
+            return None
+        if isinstance(saturation, (int, float)):
+            bounds = (-np.inf, float(saturation))
+        else:
+            if len(saturation) != 2:
+                raise ValueError("saturation must be a limit or a (low, high) pair.")
+            bounds = (float(saturation[0]), float(saturation[1]))
+        if bounds[1] < bounds[0]:
+            raise ValueError("saturation must satisfy low <= high.")
+        return bounds

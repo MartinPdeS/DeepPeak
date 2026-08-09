@@ -37,11 +37,11 @@ class DenseNet(BaseDeconvolver):
 
     - Three 1D Conv layers with ReLU activations and exponentially increasing dilation
       (default: 1, 2, 4), padding='same'
-    - Final 1x1 Conv with sigmoid -> per-step probability map named 'ROI'
+    - Final 1x1 Conv with a linear head for per-step signal reconstruction
 
     Output
     ------
-    - ROI: shape (batch, sequence_length, 1) with probabilities in [0, 1]
+    - Reconstruction: shape (batch, sequence_length, 1)
     """
 
     sequence_length: int

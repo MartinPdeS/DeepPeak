@@ -56,11 +56,9 @@ def test_architecture(patch, dataset, architecture):
     model.build()
     model.summary()
 
-    roi = dataset.get_region_of_interest(width_in_pixels=5)
-
     history = model.fit(
         dataset.signals,
-        roi,
+        dataset.clean_signals[..., None],
         validation_split=0.2,
         epochs=4,
         batch_size=64,
@@ -68,7 +66,7 @@ def test_architecture(patch, dataset, architecture):
 
     model.plot_model_history()
 
-    model.predict(signal=dataset.signals[0:1, :], threshold=0.4)
+    model.predict(signal=dataset.signals[0:1, :])
 
 
 def test_wavenet_can_resume_training_with_serializable_weighted_bce(tmp_path):

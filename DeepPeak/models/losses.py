@@ -1,4 +1,6 @@
-"""Regression losses for one-dimensional pulse-trace deconvolution."""
+"""Typed losses for one-dimensional pulse-trace deconvolution."""
+
+from __future__ import annotations
 
 import tensorflow as tf
 
@@ -22,7 +24,7 @@ class WeightedHuber(tf.keras.losses.Loss):
         self.delta = float(delta)
         self.alpha = float(alpha)
 
-    def call(self, y_true, y_pred):
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         y_true, y_pred = _prepare(y_true, y_pred)
         error = y_true - y_pred
         absolute = tf.abs(error)
@@ -65,7 +67,7 @@ class ShapeAwarePulseLoss(tf.keras.losses.Loss):
             None if derivative_weight is None else float(derivative_weight)
         )
 
-    def call(self, y_true, y_pred):
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         y_true, y_pred = _prepare(y_true, y_pred)
         amplitude_loss = tf.reduce_mean(tf.square(y_true - y_pred))
         true_norm = tf.nn.l2_normalize(y_true, axis=-1)
@@ -100,7 +102,7 @@ class WeightedBinaryCrossentropy(tf.keras.losses.Loss):
         super().__init__(**kwargs)
         self.alpha = float(alpha)
 
-    def call(self, y_true, y_pred):
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         y_true, y_pred = _prepare(y_true, y_pred)
         bce = tf.keras.backend.binary_crossentropy(y_true, y_pred)
         return tf.reduce_mean((1.0 + self.alpha * y_true) * bce)
@@ -124,7 +126,7 @@ class SmoothBinaryCrossentropy(WeightedBinaryCrossentropy):
         self.smoothness_weight = float(smoothness_weight)
         self.confidence_weight = float(confidence_weight)
 
-    def call(self, y_true, y_pred):
+    def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         y_true, y_pred = _prepare(y_true, y_pred)
         bce = tf.keras.backend.binary_crossentropy(y_true, y_pred)
         weighted_bce = tf.reduce_mean((1.0 + self.alpha * y_true) * bce)

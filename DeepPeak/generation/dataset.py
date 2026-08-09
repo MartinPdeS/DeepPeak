@@ -144,34 +144,6 @@ class DataSet:
             self.signals, normalization=normalization, axis=1
         )
 
-    def get_region_of_interest(self, width_in_pixels: int = 5) -> np.ndarray:
-        """Return binary target regions centered on the generated peak labels.
-
-        ``labels`` contains one-hot peak locations.  This convenience method
-        widens each location by the requested number of samples, which is the
-        target format used by the classifier examples.
-        """
-        if width_in_pixels < 0:
-            raise ValueError("width_in_pixels must be non-negative")
-        labels = np.asarray(self.labels)
-        if labels.ndim != 2:
-            raise ValueError(
-                "labels must be a 2D array of shape (n_samples, sequence_length)"
-            )
-        if width_in_pixels == 0:
-            return labels.astype(np.float32, copy=True)
-
-        roi = np.zeros_like(labels, dtype=np.float32)
-        for offset in range(-width_in_pixels, width_in_pixels + 1):
-            source_start = max(0, -offset)
-            source_end = min(labels.shape[1], labels.shape[1] - offset)
-            target_start = source_start + offset
-            target_end = source_end + offset
-            roi[:, target_start:target_end] = np.maximum(
-                roi[:, target_start:target_end], labels[:, source_start:source_end]
-            )
-        return roi
-
     @helper.post_mpl_plot
     def plot(
         self,

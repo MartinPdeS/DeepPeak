@@ -36,7 +36,12 @@ from .generation.kernels import (
     Square,
     TwoLobeGaussian,
 )
-from .generation.noises import BaseNoise, GaussianNoise, LaplaceNoise
+from .generation.noises import (
+    BaseNoise,
+    GaussianNoise,
+    LaplaceNoise,
+    NonstationaryGaussianNoise,
+)
 from .generation.peak_count import (
     NegativeBinomialCount,
     PeakCount,
@@ -62,6 +67,7 @@ __all__ = [
     "GaussianNoise",
     "HeightPeakTrigger",
     "LaplaceNoise",
+    "NonstationaryGaussianNoise",
     "Lorentzian",
     "MetricResult",
     "NegativeBinomialCount",
@@ -80,6 +86,7 @@ __all__ = [
     "TraceComparisonResult",
     "TwoLobeGaussian",
     "Trace",
+    "TrainingConfig",
     "UniformCount",
     "WaveNetTraceAnalyzer",
     "DenseNet",
