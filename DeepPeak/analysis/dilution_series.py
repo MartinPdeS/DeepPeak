@@ -18,33 +18,42 @@ from .distributions import (
     compute_peak_amplitude_distribution_metrics,
     compute_peak_width_distribution_metrics,
 )
+from .series_calculations import estimate_expected_particle_flow
+from ..core.types import DetectionResult
+from ..core.config import SeriesConfig
+from ..core.exceptions import (
+    AnalysisStateError,
+    InvalidConfigurationError,
+    InvalidDetectorError,
+    MissingDetectorError,
+)
 from .metrics import (
     EventArrivalDistribution,
     PeakAmplitudeDistribution,
     PeakCountSeriesResult,
-    PeakDetectionResult,
     PeakWidthDistribution,
     TraceRecord,
-    resolve_series_or_result,
 )
 
-from .triggers import BasePeakTrigger
+from ..detection.triggers import BasePeakTrigger
 from .wavenet_trace import CNNTraceAnalyzer, StandardTraceAnalyzer
 
 
 def _iterate_explicit_trace_files(
-    folder: Path,
+    folder: Optional[Path],
     trace_files: List[Tuple[Union[str, Path], float]],
 ) -> Iterator[Tuple[float, Path]]:
-    """Yield explicitly provided ``(dilution, filename)`` pairs.
+    """
+    Yield explicitly provided ``(dilution, filename)`` pairs.
 
     Relative filenames are resolved against ``folder`` so notebook code can stay
     concise while avoiding brittle filename parsing.
 
     Parameters
     ----------
-    folder : pathlib.Path
-        Base folder used to resolve relative filenames.
+    folder : pathlib.Path or None
+        Base folder used to resolve relative filenames. When ``None``, relative
+        filenames are kept as-is.
     trace_files : list of tuple
         Explicit ``(filename, dilution)`` pairs.
 
@@ -55,13 +64,13 @@ def _iterate_explicit_trace_files(
     """
     for filename, dilution in trace_files:
         resolved_filename = Path(filename)
-        if not resolved_filename.is_absolute():
+        if folder is not None and not resolved_filename.is_absolute():
             resolved_filename = folder / resolved_filename
 
         yield float(dilution), resolved_filename
 
 
-class DilutionSeries:
+class _BaseDilutionSeries:
     """Compute and visualize standard and WaveNet-based peak diagnostics over a dilution series."""
 
     @staticmethod
@@ -71,7 +80,7 @@ class DilutionSeries:
     ) -> Any:
         if label is None:
             if len(metrics_by_label) != 1:
-                raise ValueError(
+                raise InvalidConfigurationError(
                     "label must be provided when multiple detector entries are present."
                 )
             return next(iter(metrics_by_label.values()))
@@ -80,7 +89,7 @@ class DilutionSeries:
             return metrics_by_label[label]
         except KeyError as error:
             available_labels = ", ".join(sorted(metrics_by_label))
-            raise ValueError(
+            raise InvalidConfigurationError(
                 f"Unknown label {label!r}. Available labels: {available_labels}."
             ) from error
 
@@ -91,7 +100,7 @@ class DilutionSeries:
             """Namespace exposing Poisson-style plots for one dilution series."""
 
             def __init__(
-                self, accessor: "DilutionSeries.PoissonAnalysisAccessor"
+                self, accessor: "_BaseDilutionSeries.PoissonAnalysisAccessor"
             ) -> None:
                 self._accessor = accessor
 
@@ -116,7 +125,7 @@ class DilutionSeries:
                     observation_start=observation_start,
                     observation_end=observation_end,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.histogram(ax=ax, **plot_kwargs)
@@ -146,7 +155,7 @@ class DilutionSeries:
                     observation_start=observation_start,
                     observation_end=observation_end,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 expected_particle_flow = (
@@ -191,7 +200,7 @@ class DilutionSeries:
                     observation_start=observation_start,
                     observation_end=observation_end,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.qq(ax=ax, **plot_kwargs)
@@ -217,12 +226,12 @@ class DilutionSeries:
                     observation_start=observation_start,
                     observation_end=observation_end,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.count_distribution(ax=ax, **plot_kwargs)
 
-        def __init__(self, series: "DilutionSeries") -> None:
+        def __init__(self, series: "_BaseDilutionSeries") -> None:
             self._series = series
             self.plot = self.PlotAccessor(self)
 
@@ -251,7 +260,7 @@ class DilutionSeries:
             """Namespace exposing peak-amplitude plots for one dilution series."""
 
             def __init__(
-                self, accessor: "DilutionSeries.AmplitudeAnalysisAccessor"
+                self, accessor: "_BaseDilutionSeries.AmplitudeAnalysisAccessor"
             ) -> None:
                 self._accessor = accessor
 
@@ -268,7 +277,7 @@ class DilutionSeries:
                     index=index,
                     detector=detector,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.histogram(ax=ax, **plot_kwargs)
@@ -286,7 +295,7 @@ class DilutionSeries:
                     index=index,
                     detector=detector,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.qq(ax=ax, **plot_kwargs)
@@ -304,7 +313,7 @@ class DilutionSeries:
                     index=index,
                     detector=detector,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.ecdf(ax=ax, **plot_kwargs)
@@ -353,7 +362,9 @@ class DilutionSeries:
                         )
                     resolved_color = marker_color or "C1"
                 else:
-                    raise ValueError('detector must be either "standard" or "cnn".')
+                    raise InvalidDetectorError(
+                        'detector must be either "standard" or "cnn".'
+                    )
 
                 peak_indices = peak_indices[np.isfinite(peak_indices)]
                 amplitudes = amplitudes[np.isfinite(amplitudes)]
@@ -388,7 +399,9 @@ class DilutionSeries:
                 elif x_axis == "sample":
                     x_label = "Nearest-neighbor distance [Samples]"
                 else:
-                    raise ValueError('x_axis must be either "sample" or "time".')
+                    raise InvalidConfigurationError(
+                        'x_axis must be either "sample" or "time".'
+                    )
 
                 if ax is not None:
                     figure, axis = ax.figure, ax
@@ -433,7 +446,7 @@ class DilutionSeries:
                     plt.close(figure)
                 return figure
 
-        def __init__(self, series: "DilutionSeries") -> None:
+        def __init__(self, series: "_BaseDilutionSeries") -> None:
             self._series = series
             self.plot = self.PlotAccessor(self)
 
@@ -495,7 +508,7 @@ class DilutionSeries:
             """Namespace exposing peak-width plots for one dilution series."""
 
             def __init__(
-                self, accessor: "DilutionSeries.WidthAnalysisAccessor"
+                self, accessor: "_BaseDilutionSeries.WidthAnalysisAccessor"
             ) -> None:
                 self._accessor = accessor
 
@@ -514,7 +527,7 @@ class DilutionSeries:
                     detector=detector,
                     x_axis=x_axis,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.histogram(ax=ax, **plot_kwargs)
@@ -534,7 +547,7 @@ class DilutionSeries:
                     detector=detector,
                     x_axis=x_axis,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.qq(ax=ax, **plot_kwargs)
@@ -554,7 +567,7 @@ class DilutionSeries:
                     detector=detector,
                     x_axis=x_axis,
                 )
-                metrics = DilutionSeries._resolve_single_label_metrics(
+                metrics = _BaseDilutionSeries._resolve_single_label_metrics(
                     metrics_by_label, label
                 )
                 return metrics.plot.ecdf(ax=ax, **plot_kwargs)
@@ -624,7 +637,9 @@ class DilutionSeries:
                         **cnn_kwargs,
                     )
                 else:
-                    raise ValueError('plot must be either "histogram" or "ecdf".')
+                    raise InvalidConfigurationError(
+                        'plot must be either "histogram" or "ecdf".'
+                    )
 
                 standard_axis.set_title("Standard")
                 cnn_axis.set_title("WaveNet")
@@ -638,7 +653,7 @@ class DilutionSeries:
                     plt.close(figure)
                 return figure
 
-        def __init__(self, series: "DilutionSeries") -> None:
+        def __init__(self, series: "_BaseDilutionSeries") -> None:
             self._series = series
             self.plot = self.PlotAccessor(self)
 
@@ -657,7 +672,7 @@ class DilutionSeries:
     class PlotAccessor:
         """Namespace exposing trace-level plotting views for one dilution series."""
 
-        def __init__(self, series: "DilutionSeries") -> None:
+        def __init__(self, series: "_BaseDilutionSeries") -> None:
             self._series = series
 
         def particle_flows(self, **plot_kwargs) -> plt.Figure:
@@ -683,7 +698,9 @@ class DilutionSeries:
                 x_values = np.asarray(result.dilution, dtype=float)
                 x_label = "Dilution"
             else:
-                raise ValueError('x_axis must be either "concentration" or "dilution".')
+                raise InvalidConfigurationError(
+                    'x_axis must be either "concentration" or "dilution".'
+                )
 
             figure, axis = plt.subplots(figsize=figsize)
             axis.plot(
@@ -757,7 +774,9 @@ class DilutionSeries:
                 x_values = np.asarray(result.concentration, dtype=float)
                 x_label = "Concentration"
             else:
-                raise ValueError('x_axis must be either "dilution" or "concentration".')
+                raise InvalidConfigurationError(
+                    'x_axis must be either "dilution" or "concentration".'
+                )
 
             figure, axis = plt.subplots(figsize=figsize)
             axis.plot(
@@ -801,6 +820,8 @@ class DilutionSeries:
             base_index = plot_kwargs.pop("base_index", 0)
             reference_indices = plot_kwargs.pop("reference_indices", None)
             use_water_baseline = plot_kwargs.pop("use_water_baseline", True)
+            calibration_slope = plot_kwargs.pop("calibration_slope", 1.0)
+            calibration_intercept = plot_kwargs.pop("calibration_intercept", 0.0)
             figsize = plot_kwargs.pop("figsize", (6.0, 6.0))
             marker_size = plot_kwargs.pop("marker_size", 42.0)
             line_width = plot_kwargs.pop("line_width", 1.2)
@@ -816,12 +837,14 @@ class DilutionSeries:
 
             expected_flows = np.asarray(
                 [
-                    DilutionSeries.get_expected_particle_flow_for_result(
+                    _BaseDilutionSeries.get_expected_particle_flow_for_result(
                         result,
                         index=record_index,
                         base_index=base_index,
                         reference_indices=reference_indices,
                         use_water_baseline=use_water_baseline,
+                        calibration_slope=calibration_slope,
+                        calibration_intercept=calibration_intercept,
                     )
                     for record_index in range(len(result.records))
                 ],
@@ -966,7 +989,9 @@ class DilutionSeries:
                 x_values = np.asarray(result.dilution, dtype=float)
                 x_label = "Dilution"
             else:
-                raise ValueError('x_axis must be either "concentration" or "dilution".')
+                raise InvalidConfigurationError(
+                    'x_axis must be either "concentration" or "dilution".'
+                )
 
             figure, axis = plt.subplots(figsize=figsize)
             axis.plot(
@@ -1006,40 +1031,66 @@ class DilutionSeries:
 
     def __init__(
         self,
-        folder: Union[str, Path],
-        wavenet: Any,
-        initial_concentration: float,
-        nrows: int,
-        water_filename: str = "_water_1.csv",
+        folder: Optional[Union[str, Path]] = None,
+        files: Optional[List[Tuple[Union[str, Path], float]]] = None,
+        trigger: Optional[BasePeakTrigger] = None,
+        cnn: Optional[Any] = None,
+        cnn_trigger: Optional[BasePeakTrigger] = None,
+        detector_mode: Optional[Literal["standard", "flash", "both"]] = None,
+        water_file: Optional[Union[str, Path]] = None,
+        initial_concentration: float = 1.0,
+        nrows: int = 200_000,
         low_pass: float = None,
         sequence_length: Optional[int] = None,
         signal_normalization: str = "zscore",
         prediction_sampling_rate_hz: float = 125_000_000.0,
         cnn_low_pass: Optional[float] = None,
         cnn_amplitude_sigma_samples: Optional[float] = None,
+        cnn_amplitude_cluster_radius_sigma: float = 4.0,
         cnn_amplitude_baseline: Optional[Union[float, str]] = None,
         dilution_parser: Optional[Callable[[Path], float]] = None,
-        trace_files: Optional[List[Tuple[Union[str, Path], float]]] = None,
-        *,
-        std_trigger: Optional[BasePeakTrigger] = None,
-        cnn_trigger: Optional[BasePeakTrigger] = None,
+        config: Optional[SeriesConfig] = None,
     ) -> None:
-        self.folder = Path(folder)
-        self.wavenet = wavenet
+        if config is not None:
+            initial_concentration = config.initial_concentration
+            nrows = config.nrows
+            low_pass = config.low_pass
+            sequence_length = config.sequence_length or sequence_length
+            signal_normalization = config.normalization
+            if config.sampling_rate_hz is not None:
+                prediction_sampling_rate_hz = config.sampling_rate_hz
+            cnn_low_pass = config.cnn_low_pass
+        if files is None or len(files) == 0:
+            raise InvalidConfigurationError(
+                "files must contain at least one (filename, dilution) pair."
+            )
+        if trigger is None and cnn is None:
+            raise MissingDetectorError(
+                "At least one detector trigger or model must be provided."
+            )
+
+        self.files = list(files)
+        self.folder = None if folder is None else Path(folder)
+        self.trigger = trigger
+        self.cnn = cnn
+        self.cnn_trigger = cnn_trigger or trigger
+        self.detector = detector_mode or (
+            "flash"
+            if cnn is not None and sequence_length is not None
+            else ("both" if cnn is not None else "standard")
+        )
         self.initial_concentration = float(initial_concentration)
         self.nrows = int(nrows)
-        self.std_trigger = std_trigger
-        self.cnn_trigger = cnn_trigger
         self.low_pass = low_pass
         self._signal_normalization = str(signal_normalization)
         self._prediction_sampling_rate_hz = float(prediction_sampling_rate_hz)
         self._cnn_low_pass = cnn_low_pass
         self._cnn_amplitude_sigma_samples = cnn_amplitude_sigma_samples
+        self._cnn_amplitude_cluster_radius_sigma = cnn_amplitude_cluster_radius_sigma
         self._cnn_amplitude_baseline = cnn_amplitude_baseline
         self._sequence_length_override = sequence_length
         self.dilution_parser = dilution_parser
-        self.trace_files = None if trace_files is None else list(trace_files)
-        self.water_filename = str(water_filename)
+        self.water_file = None if water_file is None else Path(water_file)
         self.sequence_length = self._resolve_sequence_length()
         self.standard_analyzer, self.cnn_analyzer = self._build_analyzers()
         self.analyzer = self.cnn_analyzer or self.standard_analyzer
@@ -1067,7 +1118,7 @@ class DilutionSeries:
 
         analyzer = self.standard_analyzer or self.cnn_analyzer
         if analyzer is None:
-            raise RuntimeError(
+            raise AnalysisStateError(
                 "No analyzer is configured. Provide a detector trigger before running the series."
             )
 
@@ -1078,8 +1129,10 @@ class DilutionSeries:
         )
 
     def _resolve_sequence_length(self) -> int:
+        if self._sequence_length_override is None and self.cnn is None:
+            return max(int(self.nrows), 1)
         return CNNTraceAnalyzer._infer_sequence_length(
-            self.wavenet,
+            self.cnn,
             sequence_length=self._sequence_length_override,
         )
 
@@ -1088,10 +1141,10 @@ class DilutionSeries:
     ) -> Tuple[Optional[StandardTraceAnalyzer], Optional[CNNTraceAnalyzer]]:
         standard_analyzer = (
             None
-            if self.std_trigger is None
+            if self.trigger is None or self.detector not in {"standard", "both"}
             else StandardTraceAnalyzer(
-                std_trigger=self.std_trigger,
-                wavenet=self.wavenet,
+                std_trigger=self.trigger,
+                wavenet=self.cnn,
                 sequence_length=self.sequence_length,
                 signal_normalization=self._signal_normalization,
                 prediction_sampling_rate_hz=self._prediction_sampling_rate_hz,
@@ -1099,79 +1152,20 @@ class DilutionSeries:
         )
         cnn_analyzer = (
             None
-            if self.cnn_trigger is None
+            if self.cnn is None or self.detector not in {"flash", "both"}
             else CNNTraceAnalyzer(
-                wavenet=self.wavenet,
+                wavenet=self.cnn,
                 cnn_trigger=self.cnn_trigger,
                 sequence_length=self.sequence_length,
                 signal_normalization=self._signal_normalization,
                 prediction_sampling_rate_hz=self._prediction_sampling_rate_hz,
                 cnn_low_pass=self._cnn_low_pass,
                 cnn_amplitude_sigma_samples=self._cnn_amplitude_sigma_samples,
+                cnn_amplitude_cluster_radius_sigma=self._cnn_amplitude_cluster_radius_sigma,
                 cnn_amplitude_baseline=self._cnn_amplitude_baseline,
             )
         )
         return standard_analyzer, cnn_analyzer
-
-    def _has_standard_configuration(self) -> bool:
-        return self.std_trigger is not None
-
-    def _has_cnn_configuration(self) -> bool:
-        return self.cnn_trigger is not None
-
-    def _validate_requested_detectors(
-        self,
-        *,
-        include_standard: bool,
-        include_cnn: bool,
-    ) -> None:
-        if include_standard and not self._has_standard_configuration():
-            if include_cnn:
-                raise ValueError(
-                    "run() requires both detector configurations. Provide std_trigger "
-                    "and cnn_trigger, or call run_standard(...) / run_cnn(...)."
-                )
-            raise ValueError(
-                "Standard detection is not configured. Provide std_trigger or "
-                "call run_standard(std_trigger=...)."
-            )
-
-        if include_cnn and not self._has_cnn_configuration():
-            if include_standard:
-                raise ValueError(
-                    "run() requires both detector configurations. Provide std_trigger "
-                    "and cnn_trigger, or call run_standard(...) / run_cnn(...)."
-                )
-            raise ValueError(
-                "CNN detection is not configured. Provide cnn_trigger or "
-                "call run_cnn(cnn_trigger=...)."
-            )
-
-    def _reconfigure_analyzer(
-        self,
-        *,
-        std_trigger: Optional[BasePeakTrigger] = None,
-        cnn_trigger: Optional[BasePeakTrigger] = None,
-        cnn_low_pass: Optional[float] = None,
-        cnn_amplitude_sigma_samples: Optional[float] = None,
-        cnn_amplitude_baseline: Optional[Union[float, str]] = None,
-    ) -> None:
-        if std_trigger is not None:
-            self.std_trigger = std_trigger
-
-        if cnn_trigger is not None:
-            self.cnn_trigger = cnn_trigger
-
-        if cnn_low_pass is not None:
-            self._cnn_low_pass = cnn_low_pass
-        if cnn_amplitude_sigma_samples is not None:
-            self._cnn_amplitude_sigma_samples = cnn_amplitude_sigma_samples
-        if cnn_amplitude_baseline is not None:
-            self._cnn_amplitude_baseline = cnn_amplitude_baseline
-
-        self.sequence_length = self._resolve_sequence_length()
-        self.standard_analyzer, self.cnn_analyzer = self._build_analyzers()
-        self.analyzer = self.cnn_analyzer or self.standard_analyzer
 
     @staticmethod
     def get_expected_particle_flow_for_result(
@@ -1180,6 +1174,8 @@ class DilutionSeries:
         base_index: int = 0,
         reference_indices: Optional[Sequence[int]] = None,
         use_water_baseline: bool = True,
+        calibration_slope: float = 1.0,
+        calibration_intercept: float = 0.0,
     ) -> float:
         """Estimate target particle flow from one or more reference traces.
 
@@ -1194,93 +1190,21 @@ class DilutionSeries:
 
         so dilution-independent carry-over can be absorbed into the fitted
         background term.
+
+        The final expected flow can be affine-calibrated as
+
+        ``expected_calibrated = calibration_slope * expected_raw + calibration_intercept``.
         """
 
-        result = resolve_series_or_result(series_or_result)
-        if len(result.records) == 0:
-            raise IndexError(
-                "No trace records are available. Call run() first and make sure files were found."
-            )
-
-        base_record = result.records[base_index]
-        current_record = result.records[index]
-        current_dilution = float(current_record.dilution)
-
-        if current_dilution == 0.0:
-            raise ValueError(
-                "Expected particle flow is undefined when the target dilution is zero."
-            )
-
-        water_record = getattr(result, "water_record", None)
-        background_flow = (
-            float(water_record.standard_particle_flow)
-            if use_water_baseline and water_record is not None
-            else 0.0
+        return estimate_expected_particle_flow(
+            series_or_result=series_or_result,
+            index=index,
+            base_index=base_index,
+            reference_indices=reference_indices,
+            use_water_baseline=use_water_baseline,
+            calibration_slope=calibration_slope,
+            calibration_intercept=calibration_intercept,
         )
-
-        indices = (
-            [base_index]
-            if reference_indices is None
-            else [int(value) for value in reference_indices]
-        )
-        if reference_indices is not None and len(indices) > 1:
-            indices = [
-                reference_index
-                for reference_index in indices
-                if reference_index != index
-            ]
-
-        if len(indices) == 0:
-            raise ValueError(
-                "reference_indices must contain at least one usable reference index. "
-                "When multiple indices are provided, the target index is excluded "
-                "from the fit."
-            )
-
-        if len(indices) == 1:
-            return float(
-                (base_record.standard_particle_flow - background_flow)
-                * float(base_record.dilution)
-                / current_dilution
-                + background_flow
-            )
-
-        reference_dilutions = []
-        reference_flows = []
-        for reference_index in indices:
-            reference_record = result.records[reference_index]
-            dilution = float(reference_record.dilution)
-            if dilution == 0.0:
-                raise ValueError(
-                    "Expected particle flow is undefined when a reference dilution is zero."
-                )
-            reference_dilutions.append(dilution)
-            reference_flows.append(float(reference_record.standard_particle_flow))
-
-        if use_water_baseline and water_record is not None:
-            design_matrix = (
-                1.0 / np.asarray(reference_dilutions, dtype=float)
-            ).reshape(-1, 1)
-            throughput = np.linalg.lstsq(
-                design_matrix,
-                np.asarray(reference_flows, dtype=float) - background_flow,
-                rcond=None,
-            )[0][0]
-            return float(throughput / current_dilution + background_flow)
-
-        design_matrix = np.column_stack(
-            (
-                1.0 / np.asarray(reference_dilutions, dtype=float),
-                np.ones(len(reference_dilutions), dtype=float),
-            )
-        )
-        throughput, background_flow = np.linalg.lstsq(
-            design_matrix,
-            np.asarray(reference_flows, dtype=float),
-            rcond=None,
-        )[0]
-
-        return float(throughput / current_dilution + background_flow)
 
     def get_record(self, index: int) -> TraceRecord:
         return self._get_record_by_index(index=index)
@@ -1305,8 +1229,8 @@ class DilutionSeries:
         )
 
     @staticmethod
-    def _empty_detection_result() -> PeakDetectionResult:
-        return PeakDetectionResult(
+    def _empty_detection_result() -> DetectionResult:
+        return DetectionResult(
             peaks=np.asarray([], dtype=int),
             properties={},
             peak_count=0,
@@ -1327,7 +1251,7 @@ class DilutionSeries:
     ) -> TraceRecord:
         source_record = standard_record if standard_record is not None else cnn_record
         if source_record is None:
-            raise RuntimeError(
+            raise AnalysisStateError(
                 "At least one detector result is required to build a trace record."
             )
 
@@ -1422,7 +1346,18 @@ class DilutionSeries:
             Analyzed control trace, or ``None`` if the file does not exist.
         """
 
-        water_path = self.folder / self.water_filename
+        if self.water_file is None:
+            return None
+
+        water_path = (
+            self.water_file
+            if self.water_file.is_absolute()
+            else (
+                self.folder / self.water_file
+                if self.folder is not None
+                else self.water_file
+            )
+        )
         if not water_path.exists():
             return None
 
@@ -1536,19 +1471,13 @@ class DilutionSeries:
         include_standard: bool,
         include_cnn: bool,
     ) -> PeakCountSeriesResult:
-        self._validate_requested_detectors(
-            include_standard=include_standard,
-            include_cnn=include_cnn,
-        )
         records: List[TraceRecord] = []
         water_record = self.compute_water_record(
             include_standard=include_standard,
             include_cnn=include_cnn,
         )
 
-        trace_file_iterator = _iterate_explicit_trace_files(
-            self.folder, self.trace_files
-        )
+        trace_file_iterator = _iterate_explicit_trace_files(self.folder, self.files)
         for dilution, filename in trace_file_iterator:
             record = self.compute_record(
                 dilution=dilution,
@@ -1556,13 +1485,15 @@ class DilutionSeries:
                 include_standard=include_standard,
                 include_cnn=include_cnn,
             )
-            standard_flow = (
-                f"{record.standard_particle_flow}" if include_standard else "disabled"
-            )
-            cnn_flow = f"{record.cnn_particle_flow}" if include_cnn else "disabled"
-            print(
-                f"Standard particle flow: {standard_flow}\tCNN particle flow: {cnn_flow}"
-            )
+            if include_standard and include_cnn:
+                print(
+                    f"Standard particle flow: {record.standard_particle_flow}"
+                    f"\tFLASH particle flow: {record.cnn_particle_flow}"
+                )
+            elif include_standard:
+                print(f"Standard particle flow: {record.standard_particle_flow}")
+            elif include_cnn:
+                print(f"FLASH particle flow: {record.cnn_particle_flow}")
             records.append(record)
 
         result = self._build_result_bundle(
@@ -1582,44 +1513,21 @@ class DilutionSeries:
         PeakCountSeriesResult
             Sorted result bundle containing arrays and per-trace records.
         """
-
-        return self._run_selected_detectors(
-            include_standard=True,
-            include_cnn=True,
+        include_standard = (
+            self.detector in {"standard", "both"} and self.trigger is not None
         )
-
-    def run_standard(
-        self,
-        *,
-        std_trigger: Optional[BasePeakTrigger] = None,
-    ) -> PeakCountSeriesResult:
-        """Analyze the series with the standard detector only."""
-
-        self._reconfigure_analyzer(std_trigger=std_trigger)
-        return self._run_selected_detectors(
-            include_standard=True,
-            include_cnn=False,
+        include_cnn = (
+            self.detector in {"flash", "both"}
+            and self.cnn_trigger is not None
+            and self.cnn is not None
         )
-
-    def run_cnn(
-        self,
-        *,
-        cnn_trigger: Optional[BasePeakTrigger] = None,
-        cnn_low_pass: Optional[float] = None,
-        cnn_amplitude_sigma_samples: Optional[float] = None,
-        cnn_amplitude_baseline: Optional[Union[float, str]] = None,
-    ) -> PeakCountSeriesResult:
-        """Analyze the series with the CNN detector only."""
-
-        self._reconfigure_analyzer(
-            cnn_trigger=cnn_trigger,
-            cnn_low_pass=cnn_low_pass,
-            cnn_amplitude_sigma_samples=cnn_amplitude_sigma_samples,
-            cnn_amplitude_baseline=cnn_amplitude_baseline,
-        )
+        if not (include_standard or include_cnn):
+            raise MissingDetectorError(
+                "No detector is configured. Provide a standard or CNN trigger."
+            )
         return self._run_selected_detectors(
-            include_standard=False,
-            include_cnn=True,
+            include_standard=include_standard,
+            include_cnn=include_cnn,
         )
 
     def get_last_result(self) -> PeakCountSeriesResult:
@@ -1632,7 +1540,7 @@ class DilutionSeries:
         """
 
         if self._last_result is None:
-            raise RuntimeError("No result available. Call run() first.")
+            raise AnalysisStateError("No result available. Call run() first.")
         return self._last_result
 
     def _get_record_by_index(
@@ -1669,6 +1577,8 @@ class DilutionSeries:
         base_index: int = 0,
         reference_indices: Optional[Sequence[int]] = None,
         use_water_baseline: bool = True,
+        calibration_slope: float = 1.0,
+        calibration_intercept: float = 0.0,
     ) -> float:
         """Estimate standard-detector particle flow from one or more reference traces.
 
@@ -1686,6 +1596,10 @@ class DilutionSeries:
         use_water_baseline : bool, default=True
             When a water-control trace is available, use its measured standard
             particle flow as the blank/background level.
+        calibration_slope : float, default=1.0
+            Multiplicative factor applied to the expected flow.
+        calibration_intercept : float, default=0.0
+            Additive offset applied after scaling the expected flow.
 
         Returns
         -------
@@ -1699,6 +1613,32 @@ class DilutionSeries:
             base_index=base_index,
             reference_indices=reference_indices,
             use_water_baseline=use_water_baseline,
+            calibration_slope=calibration_slope,
+            calibration_intercept=calibration_intercept,
+        )
+
+    def compute_expected_throughput(
+        self,
+        index: int,
+        ref_index: int = 0,
+        reference_indices: Optional[Sequence[int]] = None,
+        use_water_baseline: bool = True,
+        calibration_slope: float = 1.0,
+        calibration_intercept: float = 0.0,
+    ) -> float:
+        """Alias for expected particle-flow estimation with workflow naming.
+
+        Parameters mirror :meth:`get_expected_particle_flow`, with ``ref_index``
+        as a convenience alias for ``base_index``.
+        """
+
+        return self.get_expected_particle_flow(
+            index=index,
+            base_index=ref_index,
+            reference_indices=reference_indices,
+            use_water_baseline=use_water_baseline,
+            calibration_slope=calibration_slope,
+            calibration_intercept=calibration_intercept,
         )
 
     def compute_event_arrival_distribution_metrics(
@@ -1783,5 +1723,127 @@ class DilutionSeries:
         )
 
 
-class PeakCountSeries(DilutionSeries):
-    """Backward-compatible alias for :class:`DilutionSeries`."""
+class StandardDilutionSeries(_BaseDilutionSeries):
+    """Dilution-series workflow specialized for the standard detector."""
+
+    def __init__(
+        self,
+        *,
+        files: Optional[List[Tuple[Union[str, Path], float]]] = None,
+        trigger: Optional[BasePeakTrigger] = None,
+        folder: Optional[Union[str, Path]] = None,
+        water_file: Optional[Union[str, Path]] = None,
+        initial_concentration: float = 1.0,
+        nrows: int = 200_000,
+        low_pass: float = None,
+        sequence_length: Optional[int] = None,
+        signal_normalization: str = "zscore",
+        prediction_sampling_rate_hz: float = 125_000_000.0,
+        dilution_parser: Optional[Callable[[Path], float]] = None,
+        config: Optional[SeriesConfig] = None,
+        trace_files: Optional[List[Tuple[Union[str, Path], float]]] = None,
+        wavenet: Optional[Any] = None,
+        std_trigger: Optional[BasePeakTrigger] = None,
+        cnn_trigger: Optional[BasePeakTrigger] = None,
+    ) -> None:
+        legacy_combined = any(
+            value is not None
+            for value in (trace_files, wavenet, std_trigger, cnn_trigger)
+        )
+        if files is None:
+            files = trace_files
+        if trigger is None:
+            trigger = std_trigger or cnn_trigger
+
+        if legacy_combined:
+            _BaseDilutionSeries.__init__(
+                self,
+                folder=folder,
+                files=files,
+                trigger=trigger,
+                cnn=wavenet,
+                cnn_trigger=cnn_trigger,
+                detector_mode="both" if wavenet is not None else "standard",
+                water_file=water_file,
+                initial_concentration=initial_concentration,
+                nrows=nrows,
+                low_pass=low_pass,
+                sequence_length=sequence_length,
+                signal_normalization=signal_normalization,
+                prediction_sampling_rate_hz=prediction_sampling_rate_hz,
+                dilution_parser=dilution_parser,
+                config=config,
+            )
+            self.wavenet = self.cnn
+            self.flash_analyzer = self.cnn_analyzer
+            return
+
+        super().__init__(
+            folder=folder,
+            files=files,
+            trigger=trigger,
+            cnn=None,
+            water_file=water_file,
+            initial_concentration=initial_concentration,
+            nrows=nrows,
+            low_pass=low_pass,
+            sequence_length=sequence_length,
+            signal_normalization=signal_normalization,
+            prediction_sampling_rate_hz=prediction_sampling_rate_hz,
+            dilution_parser=dilution_parser,
+            config=config,
+        )
+
+
+class FlashDilutionSeries(_BaseDilutionSeries):
+    """Dilution-series workflow specialized for FLASH detection."""
+
+    def __init__(
+        self,
+        *,
+        files: List[Tuple[Union[str, Path], float]],
+        trigger: BasePeakTrigger,
+        wavenet: Any,
+        folder: Optional[Union[str, Path]] = None,
+        water_file: Optional[Union[str, Path]] = None,
+        initial_concentration: float = 1.0,
+        nrows: int = 200_000,
+        low_pass: float = None,
+        sequence_length: Optional[int] = None,
+        signal_normalization: str = "zscore",
+        prediction_sampling_rate_hz: float = 125_000_000.0,
+        prediction_low_pass: Optional[float] = None,
+        amplitude_sigma_samples: Optional[float] = None,
+        amplitude_cluster_radius_sigma: float = 4.0,
+        amplitude_baseline: Optional[Union[float, str]] = None,
+        dilution_parser: Optional[Callable[[Path], float]] = None,
+        config: Optional[SeriesConfig] = None,
+    ) -> None:
+        super().__init__(
+            folder=folder,
+            files=files,
+            trigger=trigger,
+            cnn=wavenet,
+            detector_mode="flash",
+            water_file=water_file,
+            initial_concentration=initial_concentration,
+            nrows=nrows,
+            low_pass=low_pass,
+            sequence_length=sequence_length,
+            signal_normalization=signal_normalization,
+            prediction_sampling_rate_hz=prediction_sampling_rate_hz,
+            cnn_low_pass=prediction_low_pass,
+            cnn_amplitude_sigma_samples=amplitude_sigma_samples,
+            cnn_amplitude_cluster_radius_sigma=amplitude_cluster_radius_sigma,
+            cnn_amplitude_baseline=amplitude_baseline,
+            dilution_parser=dilution_parser,
+            config=config,
+        )
+        self.wavenet = self.cnn
+        self.flash_analyzer = self.cnn_analyzer
+
+
+__all__ = [
+    "FlashDilutionSeries",
+    "StandardDilutionSeries",
+]

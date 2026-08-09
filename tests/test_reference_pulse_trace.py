@@ -3,10 +3,14 @@ from __future__ import annotations
 import matplotlib.pyplot as plt
 import numpy as np
 
-from DeepPeak.dataset import DataSet
-from DeepPeak.kernels import Gaussian, TwoLobeGaussian
-from DeepPeak.peak_count import NegativeBinomialCount, PoissonCount
-from DeepPeak.signal_generator import SignalGenerator
+from DeepPeak.generation import (
+    DataSet,
+    Gaussian,
+    NegativeBinomialCount,
+    PoissonCount,
+    TwoLobeGaussian,
+)
+from DeepPeak.generation import SignalGenerator
 
 
 def _make_dataset(

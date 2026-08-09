@@ -16,7 +16,6 @@ requirements:
     - wheel
     - setuptools-scm >=8.0
   run:
-    - tensorflow
     - numpy
     - pandas
     - matplotlib
@@ -40,6 +39,7 @@ test:
   imports:
     - DeepPeak
   requires:
+    - tensorflow
     - python {{PY_VER}}*
     - pytest >=0.6
     - pytest-cov >=2.0

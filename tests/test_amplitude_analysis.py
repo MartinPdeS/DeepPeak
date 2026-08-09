@@ -2,9 +2,10 @@ import numpy as np
 import pytest
 from matplotlib.figure import Figure
 
+from DeepPeak.core import DetectionResult
 from DeepPeak.analysis import (
-    DilutionSeries,
     HeightPeakTrigger,
+    StandardDilutionSeries,
     WaveNetTraceAnalyzer,
     compute_peak_amplitude_distribution_metrics,
     metrics as analysis_metrics,
@@ -173,9 +174,39 @@ def test_cnn_amplitude_recovery_can_subtract_constant_baseline():
     assert record.cnn.properties["recovered_baseline"] == pytest.approx(0.75)
 
 
+def test_cnn_amplitude_recovery_exposes_configured_cluster_radius():
+    class WideDummyWaveNet:
+        sequence_length = 48
+
+        def predict(self, signal):
+            prediction = np.zeros_like(np.asarray(signal, dtype=float))
+            prediction[..., 10] = 1.0
+            prediction[..., 15] = 1.0
+            return prediction
+
+    analyzer = WaveNetTraceAnalyzer(
+        wavenet=WideDummyWaveNet(),
+        std_trigger=HeightPeakTrigger(height=0.4),
+        cnn_trigger=HeightPeakTrigger(height=0.5),
+        signal_normalization="minmax",
+        cnn_amplitude_sigma_samples=2.0,
+        cnn_amplitude_cluster_radius_sigma=10.0,
+    )
+
+    x_values = np.arange(48, dtype=float)
+    signal = 2.0 * np.exp(-0.5 * ((x_values - 10.0) / 2.0) ** 2)
+    signal += 3.0 * np.exp(-0.5 * ((x_values - 15.0) / 2.0) ** 2)
+    record = analyzer.analyze_processed_signal(signal, dx=0.1)
+
+    assert analyzer.cnn_amplitude_cluster_radius_sigma == pytest.approx(10.0)
+    assert record.cnn.properties["recovered_cluster_radius_sigma"] == pytest.approx(
+        10.0
+    )
+
+
 def test_standard_amplitude_metrics_ignore_recovered_amplitudes_field():
     signal = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0], dtype=float)
-    standard_detection = analysis_metrics.PeakDetectionResult(
+    standard_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -183,7 +214,7 @@ def test_standard_amplitude_metrics_ignore_recovered_amplitudes_field():
         threshold=1.5,
         amplitudes=np.array([20.0, 30.0], dtype=float),
     )
-    cnn_detection = analysis_metrics.PeakDetectionResult(
+    cnn_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -248,7 +279,7 @@ def test_amplitude_accessor_can_compare_standard_and_cnn_sources():
             assert index == 0
             return self._record
 
-    accessor = DilutionSeries.AmplitudeAnalysisAccessor(DummySeries(record))
+    accessor = StandardDilutionSeries.AmplitudeAnalysisAccessor(DummySeries(record))
     comparison = accessor.compare_sources(index=0)
 
     assert comparison["standard_amplitudes"].tolist() == pytest.approx(
@@ -264,7 +295,7 @@ def test_amplitude_accessor_can_compare_standard_and_cnn_sources():
 
 def test_plot_standard_detection_with_histogram_uses_standard_peak_amplitudes():
     signal = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0], dtype=float)
-    standard_detection = analysis_metrics.PeakDetectionResult(
+    standard_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -272,7 +303,7 @@ def test_plot_standard_detection_with_histogram_uses_standard_peak_amplitudes():
         threshold=1.5,
         amplitudes=np.array([20.0, 30.0], dtype=float),
     )
-    cnn_detection = analysis_metrics.PeakDetectionResult(
+    cnn_detection = DetectionResult(
         peaks=np.array([1], dtype=int),
         properties={},
         peak_count=1,
@@ -308,7 +339,7 @@ def test_plot_standard_detection_with_histogram_uses_standard_peak_amplitudes():
 
 def test_plot_standard_detection_with_histogram_accepts_bins_alias():
     signal = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0], dtype=float)
-    standard_detection = analysis_metrics.PeakDetectionResult(
+    standard_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -316,7 +347,7 @@ def test_plot_standard_detection_with_histogram_accepts_bins_alias():
         threshold=1.5,
         amplitudes=np.array([20.0, 30.0], dtype=float),
     )
-    cnn_detection = analysis_metrics.PeakDetectionResult(
+    cnn_detection = DetectionResult(
         peaks=np.array([1], dtype=int),
         properties={},
         peak_count=1,
@@ -347,7 +378,7 @@ def test_plot_standard_detection_with_histogram_accepts_bins_alias():
 
 def test_plot_wavenet_detection_with_histogram_prefers_recovered_amplitudes():
     signal = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0], dtype=float)
-    standard_detection = analysis_metrics.PeakDetectionResult(
+    standard_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -355,7 +386,7 @@ def test_plot_wavenet_detection_with_histogram_prefers_recovered_amplitudes():
         threshold=1.5,
         amplitudes=np.array([20.0, 30.0], dtype=float),
     )
-    cnn_detection = analysis_metrics.PeakDetectionResult(
+    cnn_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -393,7 +424,7 @@ def test_plot_wavenet_detection_with_histogram_prefers_recovered_amplitudes():
 
 def test_plot_wavenet_detection_with_histogram_restores_recovered_baseline():
     signal = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0], dtype=float)
-    standard_detection = analysis_metrics.PeakDetectionResult(
+    standard_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -401,7 +432,7 @@ def test_plot_wavenet_detection_with_histogram_restores_recovered_baseline():
         threshold=1.5,
         amplitudes=np.array([20.0, 30.0], dtype=float),
     )
-    cnn_detection = analysis_metrics.PeakDetectionResult(
+    cnn_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={"recovered_baseline": 0.5},
         peak_count=2,
@@ -442,7 +473,7 @@ def test_plot_wavenet_detection_with_histogram_restores_recovered_baseline():
 
 def test_plot_wavenet_detection_with_histogram_falls_back_to_signal_amplitudes():
     signal = np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0], dtype=float)
-    standard_detection = analysis_metrics.PeakDetectionResult(
+    standard_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,
@@ -450,7 +481,7 @@ def test_plot_wavenet_detection_with_histogram_falls_back_to_signal_amplitudes()
         threshold=1.5,
         amplitudes=np.array([20.0, 30.0], dtype=float),
     )
-    cnn_detection = analysis_metrics.PeakDetectionResult(
+    cnn_detection = DetectionResult(
         peaks=np.array([2, 5], dtype=int),
         properties={},
         peak_count=2,

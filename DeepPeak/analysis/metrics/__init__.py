@@ -1,7 +1,6 @@
 """Canonical result models for DeepPeak analysis workflows."""
 
 from .config import WaveNetAnalyzerConfig
-from .detection import PeakDetectionResult
 from .distributions import (
     EventArrivalDistribution,
     PeakAmplitudeDistribution,
@@ -17,7 +16,6 @@ __all__ = [
     "PeakAmplitudeDistribution",
     "PeakWidthDistribution",
     "PeakCountSeriesResult",
-    "PeakDetectionResult",
     "PoissonSeriesDiagnostics",
     "TraceRecord",
     "WaveNetAnalyzerConfig",

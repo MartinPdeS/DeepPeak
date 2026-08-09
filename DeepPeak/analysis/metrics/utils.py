@@ -14,5 +14,5 @@ def resolve_series_or_result(series_or_result: Any) -> Any:
 
     raise TypeError(
         "series_or_result must be either a result object with `.records` "
-        "or a PeakCountSeries-like object with `.get_last_result()`."
+        "or a series-like object with `.get_last_result()`."
     )

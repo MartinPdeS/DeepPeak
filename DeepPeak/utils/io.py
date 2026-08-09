@@ -7,7 +7,7 @@ def build_trace_files_from_folder(
     filename_regex: str = r"^dilution_(\d+)x_\d+\.csv$",
 ) -> list[tuple[str, int]]:
     """
-    Find dilution trace files in a folder and build a PeakCountSeries-compatible
+    Find dilution trace files in a folder and build a dilution-series-compatible
     trace_files list.
 
     Parameters
@@ -30,8 +30,8 @@ def build_trace_files_from_folder(
         List of tuples:
 
             [
-                ("dilution_1000x_1.csv", 1000),
-                ("dilution_300x_1.csv", 300),
+                ("/absolute/path/to/dilution_1000x_1.csv", 1000),
+                ("/absolute/path/to/dilution_300x_1.csv", 300),
                 ...
             ]
 
@@ -52,7 +52,7 @@ def build_trace_files_from_folder(
             continue
 
         dilution_factor = int(match.group(1))
-        trace_files.append((file_path.name, dilution_factor))
+        trace_files.append((str(file_path.resolve()), dilution_factor))
 
     trace_files.sort(key=lambda item: item[1], reverse=True)
 

@@ -56,23 +56,68 @@ def robust_sigma_from_diff(signal: np.ndarray) -> float:
     return float(sigma_diff / np.sqrt(2.0))
 
 
-def segment_signal(signal: np.ndarray, window_size: int) -> np.ndarray:
-    """
-    Segment a 1D signal into non-overlapping windows, zero-padding the tail if needed.
+def segment_signal(
+    signal: np.ndarray,
+    window_size: int,
+    stride: int | None = None,
+) -> np.ndarray | tuple[np.ndarray, np.ndarray]:
+    """Segment a 1D signal into fixed-length windows.
+
+    When ``stride`` is ``None`` (default) the signal is split into
+    **non-overlapping** windows and the last window is zero-padded to fill
+    ``window_size``.  The return value is a 2-D array of shape
+    ``(n_windows, window_size)`` — identical to the original behaviour.
+
+    When ``stride`` is provided the windows **overlap** and no zero-padding is
+    applied; only complete windows are returned.  The return value is a tuple
+    ``(windows, start_indices)`` where ``start_indices`` is a 1-D integer array
+    containing the sample index at which each window begins.  Use
+    ``stride = window_size // 2`` for 50 % overlap, which ensures every sample
+    (except the very first and last ``window_size // 2`` samples) is covered by
+    at least two windows.
+
+    Parameters
+    ----------
+    signal : array-like
+        1-D input signal.
+    window_size : int
+        Number of samples in each window.  Must be strictly positive.
+    stride : int, optional
+        Step between consecutive window starts.  Must satisfy
+        ``1 <= stride <= window_size``.  When *None* the non-overlapping
+        (stride = window_size) mode is used and the original return type is
+        preserved.
+
+    Returns
+    -------
+    windows : ndarray, shape (n_windows, window_size)
+        Stacked windows.
+    start_indices : ndarray of int, shape (n_windows,)
+        Only returned when *stride* is not ``None``.  The sample offset of each
+        window within the original signal.
     """
     signal = np.asarray(signal)
-    if int(window_size) <= 0:
+    window_size = int(window_size)
+    if window_size <= 0:
         raise ValueError("window_size must be a strictly positive integer.")
 
-    flattened_signal = signal.reshape(-1)
-    window_size = int(window_size)
-    number_of_windows = int(np.ceil(flattened_signal.size / window_size))
-    padded_size = number_of_windows * window_size
+    flattened = signal.reshape(-1)
 
-    padded_signal = np.zeros(padded_size, dtype=flattened_signal.dtype)
-    padded_signal[: flattened_signal.size] = flattened_signal
+    if stride is None:
+        n_windows = int(np.ceil(flattened.size / window_size))
+        padded = np.zeros(n_windows * window_size, dtype=flattened.dtype)
+        padded[: flattened.size] = flattened
+        return padded.reshape(n_windows, window_size)
 
-    return padded_signal.reshape(number_of_windows, window_size)
+    stride = int(stride)
+    if not (1 <= stride <= window_size):
+        raise ValueError(
+            f"stride must satisfy 1 <= stride <= window_size, got stride={stride}."
+        )
+
+    starts = np.arange(0, flattened.size - window_size + 1, stride)
+    windows = np.stack([flattened[s : s + window_size] for s in starts])
+    return windows, starts.astype(np.intp)
 
 
 def get_normalized_signal(

@@ -11,12 +11,21 @@ from typing import Any, Dict, Optional, Tuple, Union
 import numpy as np
 
 from DeepPeak import processing, utils
-from DeepPeak.algorithms.base import BaseAmplitudeSolver
-from DeepPeak.algorithms.peak_locator import find_peaks_standard
-from DeepPeak.analysis.trace_io import CsvTrace
+from DeepPeak.detection.base import BaseAmplitudeSolver
+from DeepPeak.detection.peak_locator import find_peaks_prominence, find_peaks_standard
+from DeepPeak.io.trace_io import CsvTrace
+from DeepPeak.core.types import DetectionResult
+from DeepPeak.core.config import DetectionConfig
+from DeepPeak.core.types import Trace
+from DeepPeak.core.exceptions import (
+    AnalysisStateError,
+    InvalidConfigurationError,
+    InvalidDetectorError,
+    MissingDetectorError,
+)
 
 from . import metrics
-from .triggers import BasePeakTrigger
+from DeepPeak.detection.triggers import BasePeakTrigger
 
 
 class _BaseTraceAnalyzer:
@@ -32,7 +41,9 @@ class _BaseTraceAnalyzer:
         if sequence_length is not None:
             sequence_length = int(sequence_length)
             if sequence_length <= 0:
-                raise ValueError("sequence_length must be a strictly positive integer.")
+                raise InvalidConfigurationError(
+                    "sequence_length must be a strictly positive integer."
+                )
             return sequence_length
 
         if wavenet is not None:
@@ -53,7 +64,7 @@ class _BaseTraceAnalyzer:
                 if candidate > 0:
                     return candidate
 
-        raise ValueError(
+        raise InvalidConfigurationError(
             "Unable to infer the sequence length. Provide sequence_length explicitly "
             "or expose `wavenet.sequence_length`."
         )
@@ -71,12 +82,12 @@ class _BaseTraceAnalyzer:
             return utils.segment_signal(signal, window_size=sequence_length)
 
         if signal.ndim != 2:
-            raise ValueError(
+            raise InvalidConfigurationError(
                 "signal must be either a 1D trace or a 2D batch of windows."
             )
 
         if signal.shape[1] != int(sequence_length):
-            raise ValueError(
+            raise InvalidConfigurationError(
                 f"Expected signal windows of length {sequence_length}, got {signal.shape[1]}."
             )
 
@@ -93,10 +104,21 @@ class _BaseTraceAnalyzer:
 
         sigma_samples = float(sigma_samples)
         if not np.isfinite(sigma_samples) or sigma_samples <= 0.0:
-            raise ValueError(
+            raise InvalidConfigurationError(
                 "cnn_amplitude_sigma_samples must be a finite positive number when provided."
             )
         return sigma_samples
+
+    @staticmethod
+    def _validate_cluster_radius_sigma(cluster_radius_sigma: float) -> float:
+        """Validate the interaction radius used to group overlapping peaks."""
+
+        cluster_radius_sigma = float(cluster_radius_sigma)
+        if not np.isfinite(cluster_radius_sigma) or cluster_radius_sigma <= 0.0:
+            raise InvalidConfigurationError(
+                "cnn_amplitude_cluster_radius_sigma must be a finite positive number."
+            )
+        return cluster_radius_sigma
 
     @staticmethod
     def _validate_optional_amplitude_baseline(
@@ -110,14 +132,14 @@ class _BaseTraceAnalyzer:
         if isinstance(baseline, str):
             normalized = baseline.strip().lower()
             if normalized != "median":
-                raise ValueError(
+                raise InvalidConfigurationError(
                     'cnn_amplitude_baseline must be None, a finite float, or "median".'
                 )
             return normalized
 
         baseline = float(baseline)
         if not np.isfinite(baseline):
-            raise ValueError(
+            raise InvalidConfigurationError(
                 'cnn_amplitude_baseline must be None, a finite float, or "median".'
             )
         return baseline
@@ -147,7 +169,9 @@ class _BaseTraceAnalyzer:
         if trigger is None:
             return None
         if not isinstance(trigger, BasePeakTrigger):
-            raise TypeError(f"{name} must be a BasePeakTrigger instance or None.")
+            raise InvalidConfigurationError(
+                f"{name} must be a BasePeakTrigger instance or None."
+            )
         return trigger
 
     @staticmethod
@@ -207,20 +231,26 @@ class _BaseTraceAnalyzer:
             if valid_cluster.size == 0:
                 continue
 
-            cluster_centers = np.asarray(valid_cluster, dtype=float)[None, :]
-            center_samples = signal[valid_cluster][None, :]
-            response_matrix = BaseAmplitudeSolver._response_matrix_from_centers(
-                cluster_centers,
-                sigma_samples,
+            cluster_centers = np.asarray(valid_cluster, dtype=float)
+            fit_radius = int(np.ceil(float(cluster_radius_sigma) * sigma_samples))
+            fit_start = max(0, int(valid_cluster.min()) - fit_radius)
+            fit_stop = min(signal.size, int(valid_cluster.max()) + fit_radius + 1)
+            fit_indices = np.arange(fit_start, fit_stop, dtype=float)
+            fit_signal = signal[fit_start:fit_stop]
+            design_matrix = np.exp(
+                -0.5
+                * ((fit_indices[:, None] - cluster_centers[None, :]) / sigma_samples)
+                ** 2
             )
+
             try:
-                cluster_amplitudes = np.linalg.solve(
-                    response_matrix[0], center_samples[0]
+                cluster_amplitudes, *_ = np.linalg.lstsq(
+                    design_matrix,
+                    fit_signal,
+                    rcond=None,
                 )
             except np.linalg.LinAlgError:
-                cluster_amplitudes = (
-                    np.linalg.pinv(response_matrix[0]) @ center_samples[0]
-                )
+                cluster_amplitudes = np.linalg.pinv(design_matrix) @ fit_signal
 
             for peak_index, amplitude in zip(valid_cluster, cluster_amplitudes):
                 amplitudes[np.where(peak_indices == peak_index)[0][0]] = float(
@@ -236,8 +266,15 @@ class _BaseTraceAnalyzer:
         sequence_length: Optional[int] = None,
         signal_normalization: str = "zscore",
         prediction_sampling_rate_hz: float = 125_000_000.0,
+        config: Optional[DetectionConfig] = None,
     ) -> None:
+        if config is not None:
+            sequence_length = config.sequence_length or sequence_length
+            signal_normalization = config.normalization
+            if config.sampling_rate_hz is not None:
+                prediction_sampling_rate_hz = config.sampling_rate_hz
         self.wavenet = wavenet
+        self.detection_config = config
         self.config = metrics.WaveNetAnalyzerConfig(
             sequence_length=self._infer_sequence_length(
                 wavenet, sequence_length=sequence_length
@@ -258,9 +295,9 @@ class _BaseTraceAnalyzer:
         filename: Union[str, Path],
         dilution: float,
         concentration: float,
-        standard: Optional[metrics.PeakDetectionResult] = None,
+        standard: Optional[DetectionResult] = None,
         prediction: Optional[np.ndarray] = None,
-        cnn: Optional[metrics.PeakDetectionResult] = None,
+        cnn: Optional[DetectionResult] = None,
     ) -> metrics.TraceRecord:
         """Assemble the canonical trace record from one or both detector outputs."""
 
@@ -297,10 +334,10 @@ class _BaseTraceAnalyzer:
         return np.asarray(signal, dtype=float), float(data.dx)
 
     @staticmethod
-    def _empty_detection_result() -> metrics.PeakDetectionResult:
+    def _empty_detection_result() -> DetectionResult:
         """Return an empty detection result for disabled detector paths."""
 
-        return metrics.PeakDetectionResult(
+        return DetectionResult(
             peaks=np.asarray([], dtype=int),
             properties={},
             peak_count=0,
@@ -340,7 +377,7 @@ class _BaseTraceAnalyzer:
             and hysteresis is not None
             and float(hysteresis) > float(threshold)
         ):
-            raise ValueError(
+            raise InvalidConfigurationError(
                 "hysteresis must be <= the resolved detection threshold (or None). "
                 f"Got hysteresis={hysteresis} and threshold={threshold}."
             )
@@ -354,17 +391,25 @@ class StandardTraceAnalyzer(_BaseTraceAnalyzer):
     def __init__(
         self,
         *,
-        std_trigger: BasePeakTrigger,
+        std_trigger: Optional[BasePeakTrigger] = None,
         sequence_length: Optional[int] = None,
         wavenet: Optional[Any] = None,
         signal_normalization: str = "zscore",
         prediction_sampling_rate_hz: float = 125_000_000.0,
+        config: Optional[DetectionConfig] = None,
     ) -> None:
+        if std_trigger is None and config is not None:
+            std_trigger = config.trigger
+        if std_trigger is None:
+            raise MissingDetectorError(
+                "std_trigger or a DetectionConfig with trigger is required."
+            )
         super().__init__(
             wavenet=wavenet,
             sequence_length=sequence_length,
             signal_normalization=signal_normalization,
             prediction_sampling_rate_hz=prediction_sampling_rate_hz,
+            config=config,
         )
         self.std_trigger = self._validate_peak_trigger(
             std_trigger,
@@ -372,20 +417,47 @@ class StandardTraceAnalyzer(_BaseTraceAnalyzer):
         )
         self.std_kwargs = self.std_trigger.to_kwargs()
 
-    def detect_standard_peaks(self, signal: np.ndarray) -> metrics.PeakDetectionResult:
+    def detect(self, trace: Trace, *, detector: str = "standard") -> DetectionResult:
+        """Detect standard peaks from a canonical :class:`~DeepPeak.core.Trace`."""
+
+        if detector != "standard":
+            raise InvalidDetectorError(
+                'StandardTraceAnalyzer only supports detector="standard".'
+            )
+        return self.detect_standard_peaks(trace.signal)
+
+    def detect_standard_peaks(self, signal: np.ndarray) -> DetectionResult:
         """Run the standard peak detector on the processed signal."""
 
         flattened_signal = np.asarray(signal, dtype=float).ravel()
-        kwargs, threshold = self._resolve_detection_kwargs(
-            flattened_signal, self.std_kwargs
-        )
-        peaks, properties = find_peaks_standard(flattened_signal, **kwargs)
+        working_kwargs = dict(self.std_kwargs)
+        min_prominence = working_kwargs.pop("prominence", None)
 
-        return metrics.PeakDetectionResult(
+        if min_prominence is not None:
+            wlen = working_kwargs.pop("wlen", None)
+            peaks, properties = find_peaks_prominence(
+                flattened_signal,
+                min_prominence=min_prominence,
+                wlen=wlen,
+                pulse_polarity=working_kwargs.get("pulse_polarity", "positive"),
+                holdoff_samples=int(working_kwargs.get("holdoff_samples", 0)),
+            )
+            threshold = None
+            detection_kwargs = working_kwargs
+        else:
+            working_kwargs.pop("wlen", None)
+            detection_kwargs, threshold = self._resolve_detection_kwargs(
+                flattened_signal, working_kwargs
+            )
+            peaks, properties = find_peaks_standard(
+                flattened_signal, **detection_kwargs
+            )
+
+        return DetectionResult(
             peaks=np.asarray(peaks, dtype=int),
             properties=properties,
             peak_count=int(np.asarray(peaks).size),
-            detection_kwargs=kwargs,
+            detection_kwargs=detection_kwargs,
             threshold=threshold,
         )
 
@@ -425,13 +497,32 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
         prediction_sampling_rate_hz: float = 125_000_000.0,
         cnn_low_pass: Optional[float] = None,
         cnn_amplitude_sigma_samples: Optional[float] = None,
+        cnn_amplitude_cluster_radius_sigma: float = 4.0,
         cnn_amplitude_baseline: Optional[Union[float, str]] = None,
+        config: Optional[DetectionConfig] = None,
     ) -> None:
+        if config is not None:
+            cnn_trigger = cnn_trigger or config.trigger
+            if cnn_low_pass is None:
+                cnn_low_pass = config.low_pass
+            if cnn_amplitude_sigma_samples is None:
+                cnn_amplitude_sigma_samples = config.amplitude_sigma_samples
+            if config.amplitude_cluster_radius_sigma != 4.0:
+                cnn_amplitude_cluster_radius_sigma = (
+                    config.amplitude_cluster_radius_sigma
+                )
+            if cnn_amplitude_baseline is None:
+                cnn_amplitude_baseline = config.amplitude_baseline
+        if cnn_trigger is None:
+            raise MissingDetectorError(
+                "cnn_trigger or a DetectionConfig with trigger is required."
+            )
         super().__init__(
             wavenet=wavenet,
             sequence_length=sequence_length,
             signal_normalization=signal_normalization,
             prediction_sampling_rate_hz=prediction_sampling_rate_hz,
+            config=config,
         )
         self.cnn_trigger = self._validate_peak_trigger(
             cnn_trigger,
@@ -442,9 +533,24 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
         self.cnn_amplitude_sigma_samples = self._validate_optional_sigma_samples(
             cnn_amplitude_sigma_samples
         )
+        self.cnn_amplitude_cluster_radius_sigma = self._validate_cluster_radius_sigma(
+            cnn_amplitude_cluster_radius_sigma
+        )
         self.cnn_amplitude_baseline = self._validate_optional_amplitude_baseline(
             cnn_amplitude_baseline
         )
+
+    def detect(self, trace: Trace, *, detector: str = "cnn") -> DetectionResult:
+        """Detect CNN peaks from a canonical :class:`~DeepPeak.core.Trace`."""
+
+        if detector != "cnn":
+            raise InvalidDetectorError('CNNTraceAnalyzer only supports detector="cnn".')
+        record = self.analyze_processed_signal(
+            trace.signal,
+            dx=trace.dx,
+            filename=trace.filename or "<memory>",
+        )
+        return record.cnn
 
     def prepare_model_input(self, signal: np.ndarray) -> np.ndarray:
         """Normalize processed windows into the format expected by the WaveNet."""
@@ -455,6 +561,28 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
             normalization=self.config.signal_normalization,
             axis=1,
         )
+
+    def normalize_flat_signal(self, flat_signal: np.ndarray) -> np.ndarray:
+        """Normalize a 1-D signal globally (over all samples at once).
+
+        This is the correct pre-processing for inference: the entire trace
+        shares one mean/std so that baseline-only windows are not artificially
+        amplified relative to windows that contain peaks.
+        """
+        mode = self.config.signal_normalization.lower().strip()
+        flat = np.asarray(flat_signal, dtype=np.float32)
+        if mode in {"zscore"}:
+            return (flat - flat.mean()) / (flat.std() + 1e-8)
+        if mode in {"robust_zscore"}:
+            median = np.median(flat)
+            mad = np.median(np.abs(flat - median))
+            return (flat - median) / (1.4826 * mad + 1e-8)
+        if mode in {"minmax", "min-max"}:
+            lo, hi = flat.min(), flat.max()
+            return (flat - lo) / (hi - lo + 1e-8)
+        if mode == "maxabs":
+            return flat / (np.abs(flat).max() + 1e-8)
+        return flat
 
     def predict(self, signal: np.ndarray) -> np.ndarray:
         """Run the WaveNet model on a normalized batch and return its prediction."""
@@ -485,15 +613,31 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
         prediction: np.ndarray,
         *,
         signal: Optional[np.ndarray] = None,
-    ) -> Tuple[np.ndarray, metrics.PeakDetectionResult]:
+    ) -> Tuple[np.ndarray, DetectionResult]:
         """Postprocess a prediction and detect peaks on the resulting 1D signal."""
 
         postprocessed_prediction = self.postprocess_prediction(prediction)
-        kwargs = dict(self.cnn_kwargs)
-        kwargs, threshold = self._resolve_detection_kwargs(
-            postprocessed_prediction, kwargs
-        )
-        peaks, properties = find_peaks_standard(postprocessed_prediction, **kwargs)
+        working_kwargs = dict(self.cnn_kwargs)
+        min_prominence = working_kwargs.pop("prominence", None)
+
+        if min_prominence is not None:
+            wlen = working_kwargs.pop("wlen", None)
+            peaks, properties = find_peaks_prominence(
+                postprocessed_prediction,
+                min_prominence=min_prominence,
+                wlen=wlen,
+                pulse_polarity=working_kwargs.get("pulse_polarity", "positive"),
+                holdoff_samples=int(working_kwargs.get("holdoff_samples", 0)),
+            )
+            threshold = None
+        else:
+            working_kwargs.pop("wlen", None)
+            working_kwargs, threshold = self._resolve_detection_kwargs(
+                postprocessed_prediction, working_kwargs
+            )
+            peaks, properties = find_peaks_standard(
+                postprocessed_prediction, **working_kwargs
+            )
         amplitudes = None
         amplitude_baseline = 0.0
         if signal is not None:
@@ -506,23 +650,72 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
                 signal=flattened_signal - amplitude_baseline,
                 peak_indices=np.asarray(peaks, dtype=int),
                 sigma_samples=self.cnn_amplitude_sigma_samples,
+                cluster_radius_sigma=self.cnn_amplitude_cluster_radius_sigma,
             )
         detection_properties = dict(properties)
         if self.cnn_amplitude_sigma_samples is not None:
             detection_properties["recovered_sigma_samples"] = float(
                 self.cnn_amplitude_sigma_samples
             )
+            detection_properties["recovered_cluster_radius_sigma"] = float(
+                self.cnn_amplitude_cluster_radius_sigma
+            )
             detection_properties["recovered_baseline"] = float(amplitude_baseline)
 
-        detection = metrics.PeakDetectionResult(
+        detection = DetectionResult(
             peaks=np.asarray(peaks, dtype=int),
             properties=detection_properties,
             peak_count=int(np.asarray(peaks).size),
-            detection_kwargs=kwargs,
+            detection_kwargs=working_kwargs,
             threshold=threshold,
             amplitudes=amplitudes,
         )
         return postprocessed_prediction, detection
+
+    def _predict_with_stride(
+        self,
+        flat_signal: np.ndarray,
+        stride: int,
+    ) -> np.ndarray:
+        """Run prediction with overlapping windows and stitch via max-merge.
+
+        Each sample is covered by multiple windows when ``stride < window_size``.
+        The final prediction at each sample is the maximum over all windows that
+        overlap it, which ensures that a peak clipped at one window boundary is
+        still captured cleanly by the adjacent window.
+
+        Parameters
+        ----------
+        flat_signal : ndarray, shape (n_samples,)
+            The 1-D processed signal.
+        stride : int
+            Step size between consecutive windows.  Typically
+            ``sequence_length // 2`` for 50 % overlap.
+
+        Returns
+        -------
+        ndarray, shape (n_samples,)
+            Per-sample prediction values on the original timeline.
+        """
+
+        window_size = self.config.sequence_length
+        norm_signal = self.normalize_flat_signal(flat_signal)
+        windows, starts = utils.segment_signal(
+            norm_signal, window_size=window_size, stride=stride
+        )
+
+        normalized = windows[..., np.newaxis].astype(np.float32)
+        raw_pred = self.predict(normalized)
+        flat_pred_windows = np.asarray(raw_pred, dtype=float).reshape(
+            len(windows), window_size
+        )
+
+        merged = np.zeros(flat_signal.size, dtype=float)
+        for win_pred, start in zip(flat_pred_windows, starts):
+            end = start + window_size
+            merged[start:end] = np.maximum(merged[start:end], win_pred)
+
+        return merged
 
     def analyze_processed_signal(
         self,
@@ -532,13 +725,57 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
         filename: Union[str, Path] = "<memory>",
         dilution: float = np.nan,
         concentration: float = np.nan,
+        stride: Optional[int] = None,
     ) -> metrics.TraceRecord:
-        """Run the CNN single-trace analysis pipeline and return a record."""
+        """Run the CNN single-trace analysis pipeline and return a record.
 
-        signal_batch = self._coerce_signal_batch(signal, self.config.sequence_length)
-        normalized_signal = self.prepare_model_input(signal_batch)
-        raw_prediction = self.predict(normalized_signal)
-        prediction, cnn = self.detect_cnn_peaks(raw_prediction, signal=signal_batch)
+        Parameters
+        ----------
+        signal : array-like
+            Either a 1-D trace or a 2-D pre-segmented batch of windows.
+        dx : float
+            Sampling interval in seconds.
+        filename : str or Path, optional
+            Source filename stored in the returned record.
+        dilution : float, optional
+            Dilution factor stored in the returned record.
+        concentration : float, optional
+            Concentration stored in the returned record.
+        stride : int, optional
+            When set, the signal is segmented with overlapping windows of this
+            step size and per-sample predictions are stitched together with a
+            max-merge.  Use ``stride = sequence_length // 2`` for 50 % overlap,
+            which ensures every sample (except the very edges) is seen by at
+            least two windows — eliminating boundary-split artefacts.
+            When *None* (default) the original non-overlapping segmentation is
+            used.
+        """
+
+        if stride is not None:
+            flat = np.asarray(signal, dtype=float).ravel()
+            merged_pred = self._predict_with_stride(flat, stride=int(stride))
+            # Re-segment into non-overlapping windows so the rest of the
+            # pipeline (amplitude recovery, record building) is unchanged.
+            signal_batch = utils.segment_signal(
+                flat, window_size=self.config.sequence_length
+            )
+            padded_pred = utils.segment_signal(
+                merged_pred, window_size=self.config.sequence_length
+            )
+            prediction, cnn = self.detect_cnn_peaks(padded_pred, signal=signal_batch)
+        else:
+            flat = np.asarray(signal, dtype=float).ravel()
+            norm_flat = self.normalize_flat_signal(flat)
+            signal_batch = utils.segment_signal(
+                flat, window_size=self.config.sequence_length
+            )
+            norm_batch = utils.segment_signal(
+                norm_flat, window_size=self.config.sequence_length
+            )
+            norm_batch = norm_batch[..., np.newaxis].astype(np.float32)
+            raw_prediction = self.predict(norm_batch)
+            prediction, cnn = self.detect_cnn_peaks(raw_prediction, signal=signal_batch)
+
         return self._build_trace_record(
             signal_batch=signal_batch,
             dx=dx,
@@ -568,13 +805,19 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
         prediction_sampling_rate_hz: float = 125_000_000.0,
         cnn_low_pass: Optional[float] = None,
         cnn_amplitude_sigma_samples: Optional[float] = None,
+        cnn_amplitude_cluster_radius_sigma: float = 4.0,
         cnn_amplitude_baseline: Optional[Union[float, str]] = None,
+        config: Optional[DetectionConfig] = None,
     ) -> None:
+        if config is not None:
+            std_trigger = std_trigger or config.trigger
+            cnn_trigger = cnn_trigger or config.trigger
         super().__init__(
             wavenet=wavenet,
             sequence_length=sequence_length,
             signal_normalization=signal_normalization,
             prediction_sampling_rate_hz=prediction_sampling_rate_hz,
+            config=config,
         )
         self.standard_analyzer = (
             None
@@ -598,6 +841,7 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
                 prediction_sampling_rate_hz=prediction_sampling_rate_hz,
                 cnn_low_pass=cnn_low_pass,
                 cnn_amplitude_sigma_samples=cnn_amplitude_sigma_samples,
+                cnn_amplitude_cluster_radius_sigma=cnn_amplitude_cluster_radius_sigma,
                 cnn_amplitude_baseline=cnn_amplitude_baseline,
             )
         )
@@ -625,17 +869,38 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
             if self.cnn_analyzer is None
             else self.cnn_analyzer.cnn_amplitude_sigma_samples
         )
+        self.cnn_amplitude_cluster_radius_sigma = (
+            None
+            if self.cnn_analyzer is None
+            else self.cnn_analyzer.cnn_amplitude_cluster_radius_sigma
+        )
         self.cnn_amplitude_baseline = (
             None
             if self.cnn_analyzer is None
             else self.cnn_analyzer.cnn_amplitude_baseline
         )
 
-    def detect_standard_peaks(self, signal: np.ndarray) -> metrics.PeakDetectionResult:
+    def detect(self, trace: Trace, *, detector: str = "standard") -> DetectionResult:
+        """Detect peaks from a canonical trace using the selected detector."""
+
+        if detector not in {"standard", "cnn"}:
+            raise InvalidDetectorError('detector must be either "standard" or "cnn".')
+        if detector == "standard":
+            return self.detect_standard_peaks(trace.signal)
+        record = self.analyze_processed_signal(
+            trace.signal,
+            dx=trace.dx,
+            filename=trace.filename or "<memory>",
+            include_standard=False,
+            include_cnn=True,
+        )
+        return record.cnn
+
+    def detect_standard_peaks(self, signal: np.ndarray) -> DetectionResult:
         """Run the standard peak detector on the processed signal."""
 
         if self.standard_analyzer is None:
-            raise RuntimeError(
+            raise AnalysisStateError(
                 "Standard peak detection is not configured for this analyzer."
             )
         return self.standard_analyzer.detect_standard_peaks(signal)
@@ -644,7 +909,7 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
         """Normalize processed windows into the format expected by the WaveNet."""
 
         if self.cnn_analyzer is None:
-            raise RuntimeError(
+            raise AnalysisStateError(
                 "CNN peak detection is not configured for this analyzer."
             )
         return self.cnn_analyzer.prepare_model_input(signal)
@@ -653,7 +918,7 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
         """Run the WaveNet model on a normalized batch and return its prediction."""
 
         if self.cnn_analyzer is None:
-            raise RuntimeError(
+            raise AnalysisStateError(
                 "CNN peak detection is not configured for this analyzer."
             )
         return self.cnn_analyzer.predict(signal)
@@ -662,7 +927,7 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
         """Apply optional low-pass filtering to the WaveNet prediction."""
 
         if self.cnn_analyzer is None:
-            raise RuntimeError(
+            raise AnalysisStateError(
                 "CNN peak detection is not configured for this analyzer."
             )
         return self.cnn_analyzer.postprocess_prediction(prediction)
@@ -672,11 +937,11 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
         prediction: np.ndarray,
         *,
         signal: Optional[np.ndarray] = None,
-    ) -> Tuple[np.ndarray, metrics.PeakDetectionResult]:
+    ) -> Tuple[np.ndarray, DetectionResult]:
         """Postprocess a prediction and detect peaks on the resulting 1D signal."""
 
         if self.cnn_analyzer is None:
-            raise RuntimeError(
+            raise AnalysisStateError(
                 "CNN peak detection is not configured for this analyzer."
             )
         return self.cnn_analyzer.detect_cnn_peaks(prediction, signal=signal)

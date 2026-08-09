@@ -4,21 +4,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
+from DeepPeak.core import DetectionResult
 from DeepPeak.analysis import (
     BasePeakTrigger,
     CNNTraceAnalyzer,
     CsvTrace,
-    DilutionSeries,
+    FlashDilutionSeries,
     HeightPeakTrigger,
-    PeakCountSeries,
     PeakCountSeriesResult,
     SigmaPeakTrigger,
+    StandardDilutionSeries,
     StandardTraceAnalyzer,
     WaveNetTraceAnalyzer,
     compute_peak_amplitude_distribution_metrics,
     compute_peak_width_distribution_metrics,
     metrics as analysis_metrics,
 )
+from DeepPeak.analysis.dilution_series import _BaseDilutionSeries
+
+PeakCountSeries = StandardDilutionSeries
 
 
 class DummyWaveNet:
@@ -111,14 +115,17 @@ def test_analysis_package_exports_renamed_loader_and_specific_plotters():
     assert CsvTrace.__name__ == "CsvTrace"
     assert StandardTraceAnalyzer.__name__ == "StandardTraceAnalyzer"
     assert CNNTraceAnalyzer.__name__ == "CNNTraceAnalyzer"
-    assert DilutionSeries.__name__ == "DilutionSeries"
-    assert callable(DilutionSeries.get_expected_particle_flow_for_result)
-    assert callable(DilutionSeries.PlotAccessor.peak_counts)
-    assert callable(DilutionSeries.PlotAccessor.particle_flows)
-    assert callable(DilutionSeries.PlotAccessor.measured_particle_flows)
-    assert callable(DilutionSeries.PlotAccessor.measured_vs_expected_particle_flows)
+    assert StandardDilutionSeries.__name__ == "StandardDilutionSeries"
+    assert FlashDilutionSeries.__name__ == "FlashDilutionSeries"
+    assert callable(StandardDilutionSeries.get_expected_particle_flow_for_result)
+    assert callable(StandardDilutionSeries.PlotAccessor.peak_counts)
+    assert callable(StandardDilutionSeries.PlotAccessor.particle_flows)
+    assert callable(StandardDilutionSeries.PlotAccessor.measured_particle_flows)
     assert callable(
-        DilutionSeries.PlotAccessor.detected_peaks_per_second_vs_expected_throughput
+        StandardDilutionSeries.PlotAccessor.measured_vs_expected_particle_flows
+    )
+    assert callable(
+        StandardDilutionSeries.PlotAccessor.detected_peaks_per_second_vs_expected_throughput
     )
     assert callable(analysis_metrics.TraceRecord.plot_standard_detection)
     assert callable(analysis_metrics.TraceRecord.plot_wavenet_detection)
@@ -126,31 +133,35 @@ def test_analysis_package_exports_renamed_loader_and_specific_plotters():
     assert callable(analysis_metrics.TraceRecord.plot_wavenet_detection_with_histogram)
     assert callable(compute_peak_amplitude_distribution_metrics)
     assert callable(compute_peak_width_distribution_metrics)
-    assert callable(DilutionSeries.PoissonAnalysisAccessor.PlotAccessor.histogram)
     assert callable(
-        DilutionSeries.PoissonAnalysisAccessor.PlotAccessor.expected_histogram
+        StandardDilutionSeries.PoissonAnalysisAccessor.PlotAccessor.histogram
     )
-    assert callable(DilutionSeries.PoissonAnalysisAccessor.PlotAccessor.qq)
     assert callable(
-        DilutionSeries.PoissonAnalysisAccessor.PlotAccessor.count_distribution
+        StandardDilutionSeries.PoissonAnalysisAccessor.PlotAccessor.expected_histogram
     )
-    assert callable(DilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.histogram)
-    assert callable(DilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.qq)
-    assert callable(DilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.ecdf)
+    assert callable(StandardDilutionSeries.PoissonAnalysisAccessor.PlotAccessor.qq)
     assert callable(
-        DilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.local_crowding
+        StandardDilutionSeries.PoissonAnalysisAccessor.PlotAccessor.count_distribution
     )
-    assert callable(DilutionSeries.WidthAnalysisAccessor.PlotAccessor.histogram)
-    assert callable(DilutionSeries.WidthAnalysisAccessor.PlotAccessor.qq)
-    assert callable(DilutionSeries.WidthAnalysisAccessor.PlotAccessor.ecdf)
-    assert callable(DilutionSeries.WidthAnalysisAccessor.PlotAccessor.compare)
+    assert callable(
+        StandardDilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.histogram
+    )
+    assert callable(StandardDilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.qq)
+    assert callable(StandardDilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.ecdf)
+    assert callable(
+        StandardDilutionSeries.AmplitudeAnalysisAccessor.PlotAccessor.local_crowding
+    )
+    assert callable(StandardDilutionSeries.WidthAnalysisAccessor.PlotAccessor.histogram)
+    assert callable(StandardDilutionSeries.WidthAnalysisAccessor.PlotAccessor.qq)
+    assert callable(StandardDilutionSeries.WidthAnalysisAccessor.PlotAccessor.ecdf)
+    assert callable(StandardDilutionSeries.WidthAnalysisAccessor.PlotAccessor.compare)
 
 
 def test_series_plot_accessors_support_width_comparison_and_local_crowding():
     def make_detection(peaks, amplitudes, widths_pixels):
         peaks = np.asarray(peaks, dtype=int)
         amplitudes = np.asarray(amplitudes, dtype=float)
-        return analysis_metrics.PeakDetectionResult(
+        return DetectionResult(
             peaks=peaks,
             properties={"widths_pixels": np.asarray(widths_pixels, dtype=float)},
             peak_count=int(peaks.size),
@@ -186,22 +197,22 @@ def test_series_plot_accessors_support_width_comparison_and_local_crowding():
         records=[record],
     )
 
-    series = object.__new__(DilutionSeries)
+    series = object.__new__(StandardDilutionSeries)
     series._last_result = result
 
-    width_figure = DilutionSeries.WidthAnalysisAccessor(series).plot.compare(
+    width_figure = StandardDilutionSeries.WidthAnalysisAccessor(series).plot.compare(
         index=0,
         x_axis="time",
         plot="histogram",
     )
-    crowding_figure = DilutionSeries.AmplitudeAnalysisAccessor(
+    crowding_figure = StandardDilutionSeries.AmplitudeAnalysisAccessor(
         series
     ).plot.local_crowding(
         index=0,
         detector="cnn",
         x_axis="time",
     )
-    throughput_figure = DilutionSeries.PlotAccessor(
+    throughput_figure = StandardDilutionSeries.PlotAccessor(
         series
     ).detected_peaks_per_second_vs_expected_throughput(
         show_ideal_line=False,
@@ -434,7 +445,7 @@ def test_expected_particle_flow_scales_from_reference_trace(monkeypatch, tmp_pat
 
     series.run()
 
-    expected_flow = DilutionSeries.get_expected_particle_flow_for_result(
+    expected_flow = _BaseDilutionSeries.get_expected_particle_flow_for_result(
         series, index=1, base_index=0
     )
 
@@ -442,9 +453,56 @@ def test_expected_particle_flow_scales_from_reference_trace(monkeypatch, tmp_pat
     assert series.get_expected_particle_flow(index=1, base_index=0) == expected_flow
 
 
+def test_expected_particle_flow_applies_affine_calibration():
+    def make_detection(count):
+        return DetectionResult(
+            peaks=np.arange(count, dtype=int),
+            properties={},
+            peak_count=count,
+            detection_kwargs={},
+            amplitudes=np.arange(count, dtype=float),
+        )
+
+    def make_record(name, dilution, flow):
+        return analysis_metrics.TraceRecord(
+            filename=Path(name),
+            dilution=float(dilution),
+            concentration=0.0,
+            dx=1.0,
+            signal=np.zeros(1, dtype=float),
+            standard=make_detection(flow),
+            prediction=np.zeros(1, dtype=float),
+            cnn=make_detection(0),
+        )
+
+    result = PeakCountSeriesResult(
+        dilution=np.array([10.0, 20.0]),
+        concentration=np.zeros(2, dtype=float),
+        standard_particle_count=np.array([12.0, 7.0]),
+        standard_particle_flow=np.array([12.0, 7.0]),
+        cnn_particle_count=np.zeros(2, dtype=float),
+        cnn_particle_flow=np.zeros(2, dtype=float),
+        water_record=make_record("water.csv", float("nan"), 2),
+        records=[
+            make_record("trace_10.csv", 10.0, 12),
+            make_record("trace_20.csv", 20.0, 7),
+        ],
+    )
+
+    expected_flow = _BaseDilutionSeries.get_expected_particle_flow_for_result(
+        result,
+        index=1,
+        base_index=0,
+        calibration_slope=1.1,
+        calibration_intercept=0.2,
+    )
+
+    assert expected_flow == pytest.approx(7.9)
+
+
 def test_expected_particle_flow_can_fit_background_from_multiple_references():
     def make_detection(count):
-        return analysis_metrics.PeakDetectionResult(
+        return DetectionResult(
             peaks=np.arange(count, dtype=int),
             properties={},
             peak_count=count,
@@ -475,7 +533,7 @@ def test_expected_particle_flow_can_fit_background_from_multiple_references():
         records=[make_record(10.0, 9), make_record(20.0, 5), make_record(40.0, 3)],
     )
 
-    expected_flow = DilutionSeries.get_expected_particle_flow_for_result(
+    expected_flow = _BaseDilutionSeries.get_expected_particle_flow_for_result(
         result,
         index=1,
         reference_indices=[0, 2],
@@ -486,7 +544,7 @@ def test_expected_particle_flow_can_fit_background_from_multiple_references():
 
 def test_expected_particle_flow_uses_water_record_as_blank_baseline():
     def make_detection(count):
-        return analysis_metrics.PeakDetectionResult(
+        return DetectionResult(
             peaks=np.arange(count, dtype=int),
             properties={},
             peak_count=count,
@@ -520,7 +578,7 @@ def test_expected_particle_flow_uses_water_record_as_blank_baseline():
         ],
     )
 
-    expected_flow = DilutionSeries.get_expected_particle_flow_for_result(
+    expected_flow = _BaseDilutionSeries.get_expected_particle_flow_for_result(
         result,
         index=1,
         base_index=0,
@@ -531,7 +589,7 @@ def test_expected_particle_flow_uses_water_record_as_blank_baseline():
 
 def test_expected_particle_flow_can_ignore_water_record_when_requested():
     def make_detection(count):
-        return analysis_metrics.PeakDetectionResult(
+        return DetectionResult(
             peaks=np.arange(count, dtype=int),
             properties={},
             peak_count=count,
@@ -565,7 +623,7 @@ def test_expected_particle_flow_can_ignore_water_record_when_requested():
         ],
     )
 
-    expected_flow = DilutionSeries.get_expected_particle_flow_for_result(
+    expected_flow = _BaseDilutionSeries.get_expected_particle_flow_for_result(
         result,
         index=1,
         base_index=0,
@@ -577,7 +635,7 @@ def test_expected_particle_flow_can_ignore_water_record_when_requested():
 
 def test_expected_particle_flow_excludes_target_from_multipoint_fit():
     def make_detection(count):
-        return analysis_metrics.PeakDetectionResult(
+        return DetectionResult(
             peaks=np.arange(count, dtype=int),
             properties={},
             peak_count=count,
@@ -608,7 +666,7 @@ def test_expected_particle_flow_excludes_target_from_multipoint_fit():
         records=[make_record(10.0, 9), make_record(20.0, 5), make_record(40.0, 6)],
     )
 
-    expected_flow = DilutionSeries.get_expected_particle_flow_for_result(
+    expected_flow = _BaseDilutionSeries.get_expected_particle_flow_for_result(
         result,
         index=2,
         reference_indices=[0, 1, 2],
@@ -633,7 +691,7 @@ def test_expected_particle_flow_requires_non_empty_reference_indices():
                 concentration=0.0,
                 dx=1.0,
                 signal=np.zeros(1, dtype=float),
-                standard=analysis_metrics.PeakDetectionResult(
+                standard=DetectionResult(
                     peaks=np.array([0, 1], dtype=int),
                     properties={},
                     peak_count=2,
@@ -641,7 +699,7 @@ def test_expected_particle_flow_requires_non_empty_reference_indices():
                     amplitudes=np.array([0.0, 1.0], dtype=float),
                 ),
                 prediction=np.zeros(1, dtype=float),
-                cnn=analysis_metrics.PeakDetectionResult(
+                cnn=DetectionResult(
                     peaks=np.asarray([], dtype=int),
                     properties={},
                     peak_count=0,
@@ -656,7 +714,7 @@ def test_expected_particle_flow_requires_non_empty_reference_indices():
         ValueError,
         match="reference_indices must contain at least one usable reference index",
     ):
-        DilutionSeries.get_expected_particle_flow_for_result(
+        _BaseDilutionSeries.get_expected_particle_flow_for_result(
             result,
             index=0,
             reference_indices=[],
@@ -679,7 +737,7 @@ def test_expected_particle_flow_requires_reference_other_than_target():
                 concentration=0.0,
                 dx=1.0,
                 signal=np.zeros(1, dtype=float),
-                standard=analysis_metrics.PeakDetectionResult(
+                standard=DetectionResult(
                     peaks=np.array([0, 1], dtype=int),
                     properties={},
                     peak_count=2,
@@ -687,7 +745,7 @@ def test_expected_particle_flow_requires_reference_other_than_target():
                     amplitudes=np.array([0.0, 1.0], dtype=float),
                 ),
                 prediction=np.zeros(1, dtype=float),
-                cnn=analysis_metrics.PeakDetectionResult(
+                cnn=DetectionResult(
                     peaks=np.asarray([], dtype=int),
                     properties={},
                     peak_count=0,
@@ -702,7 +760,7 @@ def test_expected_particle_flow_requires_reference_other_than_target():
         ValueError,
         match="reference_indices must contain at least one usable reference index",
     ):
-        DilutionSeries.get_expected_particle_flow_for_result(
+        _BaseDilutionSeries.get_expected_particle_flow_for_result(
             result,
             index=0,
             reference_indices=[0, 0],
@@ -870,6 +928,48 @@ def test_plot_measured_vs_expected_particle_flows_adds_ideal_line(
     assert ideal_line.get_xdata().tolist() == ideal_line.get_ydata().tolist()
 
 
+def test_plot_measured_vs_expected_particle_flows_applies_affine_calibration(
+    monkeypatch, tmp_path
+):
+    filenames = [tmp_path / "replicate_1.csv", tmp_path / "replicate_2.csv"]
+    for filename in filenames:
+        filename.write_text("placeholder")
+
+    series = PeakCountSeries(
+        folder=tmp_path,
+        wavenet=DummyWaveNet(),
+        initial_concentration=100.0,
+        nrows=1,
+        std_trigger=HeightPeakTrigger(height=1.5),
+        cnn_trigger=HeightPeakTrigger(height=0.6),
+        trace_files=[
+            (filenames[0], 10.0),
+            (filenames[1], 100.0),
+        ],
+    )
+
+    def fake_load_signal(self, filename):
+        if filename == filenames[0]:
+            return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
+        return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
+
+    monkeypatch.setattr(PeakCountSeries, "_load_signal", fake_load_signal)
+
+    series.run()
+
+    uncalibrated = series.plot.measured_vs_expected_particle_flows(base_index=0)
+    calibrated = series.plot.measured_vs_expected_particle_flows(
+        base_index=0,
+        calibration_slope=1.2,
+        calibration_intercept=1.0,
+    )
+
+    x_uncal = np.asarray(uncalibrated.axes[0].lines[0].get_xdata(), dtype=float)
+    x_cal = np.asarray(calibrated.axes[0].lines[0].get_xdata(), dtype=float)
+
+    assert np.allclose(x_cal, 1.2 * x_uncal + 1.0)
+
+
 def test_plot_measured_particle_flows_uses_dilution_axis(monkeypatch, tmp_path):
     filenames = [tmp_path / "replicate_1.csv", tmp_path / "replicate_2.csv"]
     for filename in filenames:
@@ -909,20 +1009,20 @@ def test_dilution_series_poisson_accessor_wraps_arrival_api(monkeypatch, tmp_pat
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 4.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -946,20 +1046,20 @@ def test_dilution_series_amplitude_and_width_accessors_wrap_distribution_api(
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 4.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -984,20 +1084,20 @@ def test_dilution_series_records_expose_trace_plot_methods(monkeypatch, tmp_path
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
     record = series.get_record(index=0)
@@ -1015,20 +1115,20 @@ def test_dilution_series_plot_accessor_exposes_series_level_plots(
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -1046,17 +1146,17 @@ def test_trace_record_wavenet_detection_histogram_adds_inset_and_throughput(
     for filename in filenames:
         filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[
+        files=[
             (filenames[0], 10.0),
             (filenames[1], 100.0),
         ],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
@@ -1064,7 +1164,7 @@ def test_trace_record_wavenet_detection_histogram_adds_inset_and_throughput(
             return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
     record = series.get_record(index=0)
@@ -1104,17 +1204,17 @@ def test_trace_record_standard_detection_histogram_adds_inset_and_throughput(
     for filename in filenames:
         filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[
+        files=[
             (filenames[0], 10.0),
             (filenames[1], 100.0),
         ],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
@@ -1122,7 +1222,7 @@ def test_trace_record_standard_detection_histogram_adds_inset_and_throughput(
             return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
     record, expected_particle_flow = series.get_record_with_expected_particle_flow(
@@ -1159,17 +1259,17 @@ def test_dilution_series_can_return_record_with_expected_particle_flow(
     for filename in filenames:
         filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[
+        files=[
             (filenames[0], 10.0),
             (filenames[1], 100.0),
         ],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
@@ -1177,7 +1277,7 @@ def test_dilution_series_can_return_record_with_expected_particle_flow(
             return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -1189,94 +1289,180 @@ def test_dilution_series_can_return_record_with_expected_particle_flow(
     assert expected_particle_flow == series.get_expected_particle_flow(index=0)
 
 
-def test_dilution_series_can_run_standard_only(monkeypatch, tmp_path):
+def test_dilution_series_run_uses_configured_detectors(tmp_path, monkeypatch):
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
+        sequence_length=8,
         initial_concentration=100.0,
         nrows=1,
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
-    result = series.run_standard(std_trigger=HeightPeakTrigger(height=1.5))
+    result = series.run()
 
     assert result.standard_particle_count.tolist() == [2.0]
     assert np.isnan(result.cnn_particle_count).all()
-    assert result.records[0].standard.peaks.tolist() == [2, 5]
-    assert result.records[0].cnn.peaks.tolist() == []
 
 
-def test_dilution_series_can_run_cnn_only(monkeypatch, tmp_path):
+def test_dilution_series_run_requires_at_least_one_detector(tmp_path):
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        water_file=None,
+    )
+
+    with pytest.raises(TypeError):
+        _BaseDilutionSeries(folder=tmp_path, files=[(filename, 10.0)])
+
+
+def test_dilution_series_simplified_workflow_api(monkeypatch, tmp_path):
+    filename = tmp_path / "replicate_1.csv"
+    filename.write_text("placeholder")
+
+    series = _BaseDilutionSeries(
+        folder=tmp_path,
+        sequence_length=8,
+        nrows=1,
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
-    result = series.run_cnn(cnn_trigger=HeightPeakTrigger(height=0.6))
+    series.run()
+    throughput = series.compute_expected_throughput(index=0, ref_index=0)
 
-    assert np.isnan(result.standard_particle_count).all()
-    assert result.cnn_particle_count.tolist() == [2.0]
-    assert result.records[0].standard.peaks.tolist() == []
-    assert result.records[0].cnn.peaks.tolist() == [2, 5]
+    assert throughput == pytest.approx(series.get_expected_particle_flow(index=0))
 
 
-def test_dilution_series_run_requires_both_detector_configurations(tmp_path):
+def test_dilution_series_enables_cnn_when_model_is_provided(monkeypatch, tmp_path):
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
-        initial_concentration=100.0,
+        sequence_length=8,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
-    with pytest.raises(
-        ValueError,
-        match=r"run\(\) requires both detector configurations",
-    ):
-        series.run()
+    def fake_load_signal(self, filename):
+        return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
+
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
+
+    result = series.run()
+
+    assert np.isnan(result.standard_particle_count[0])
+    assert result.cnn_particle_count.tolist() == [1.0]
+
+
+def test_standard_dilution_series_is_detector_specific(monkeypatch, tmp_path):
+    filename = tmp_path / "replicate_1.csv"
+    filename.write_text("placeholder")
+
+    series = StandardDilutionSeries(
+        folder=tmp_path,
+        sequence_length=8,
+        nrows=1,
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        water_file=None,
+    )
+
+    def fake_load_signal(self, filename):
+        return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
+
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
+
+    result = series.run()
+
+    assert series.detector == "standard"
+    assert series.cnn is None
+    assert series.standard_analyzer is not None
+    assert series.cnn_analyzer is None
+    assert result.standard_particle_count.tolist() == [2.0]
+    assert np.isnan(result.cnn_particle_count[0])
+
+
+def test_flash_dilution_series_uses_flash_specific_api(monkeypatch, tmp_path):
+    filename = tmp_path / "replicate_1.csv"
+    filename.write_text("placeholder")
+
+    series = FlashDilutionSeries(
+        folder=tmp_path,
+        sequence_length=8,
+        nrows=1,
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        wavenet=DummyWaveNet(),
+        amplitude_sigma_samples=2.0,
+        amplitude_cluster_radius_sigma=10.0,
+        amplitude_baseline=0.25,
+        water_file=None,
+    )
+
+    def fake_load_signal(self, filename):
+        return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
+
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
+
+    result = series.run()
+
+    assert series.detector == "flash"
+    assert series.wavenet is series.cnn
+    assert series.flash_analyzer is series.cnn_analyzer
+    assert series.flash_analyzer is not None
+    assert series.flash_analyzer.cnn_amplitude_sigma_samples == pytest.approx(2.0)
+    assert series.flash_analyzer.cnn_amplitude_cluster_radius_sigma == pytest.approx(
+        10.0
+    )
+    assert series.flash_analyzer.cnn_amplitude_baseline == pytest.approx(0.25)
+    assert np.isnan(result.standard_particle_count[0])
+    assert result.cnn_particle_count.tolist() == [1.0]
 
 
 def test_distribution_plot_accessors_expose_namespaced_plot_api(monkeypatch, tmp_path):
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 4.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -1359,6 +1545,104 @@ def test_trace_record_exposes_plot_methods():
     assert wavenet_figure.axes[0].get_xlabel() == "Sample index"
 
 
+def test_trace_record_wavenet_detection_supports_time_units_scaling():
+    record = analysis_metrics.TraceRecord(
+        filename="trace.csv",
+        dilution=np.nan,
+        concentration=np.nan,
+        dx=0.25,
+        signal=np.array([[0.0, 1.0, 0.5, 0.0]]),
+        standard=DetectionResult(
+            peaks=np.array([1]),
+            properties={},
+            peak_count=1,
+            detection_kwargs={"height": 0.8},
+            threshold=0.8,
+        ),
+        prediction=np.array([0.0, 0.2, 1.0, 0.1]),
+        cnn=DetectionResult(
+            peaks=np.array([2]),
+            properties={},
+            peak_count=1,
+            detection_kwargs={"height": 0.6},
+            threshold=0.6,
+        ),
+    )
+
+    figure = record.plot_wavenet_detection(
+        x_axis="time",
+        x_units="millisecond",
+        show_legend=False,
+    )
+
+    assert figure.axes[0].get_xlabel() == "Time (ms)"
+    signal_line = figure.axes[0].lines[0]
+    assert signal_line.get_xdata()[-1] == pytest.approx(750.0)
+
+
+def test_trace_record_wavenet_histogram_supports_time_units_scaling():
+    record = analysis_metrics.TraceRecord(
+        filename="trace.csv",
+        dilution=np.nan,
+        concentration=np.nan,
+        dx=0.25,
+        signal=np.array([[0.0, 1.0, 0.5, 0.0]]),
+        standard=DetectionResult(
+            peaks=np.array([1]),
+            properties={},
+            peak_count=1,
+            detection_kwargs={"height": 0.8},
+            threshold=0.8,
+        ),
+        prediction=np.array([0.0, 0.2, 1.0, 0.1]),
+        cnn=DetectionResult(
+            peaks=np.array([2]),
+            properties={},
+            peak_count=1,
+            detection_kwargs={"height": 0.6},
+            threshold=0.6,
+        ),
+    )
+
+    figure = record.plot_wavenet_detection_with_histogram(
+        x_axis="time",
+        x_units="microsecond",
+        show_legend=False,
+    )
+
+    assert figure.axes[0].get_xlabel() == "Time (us)"
+    signal_line = figure.axes[0].lines[0]
+    assert signal_line.get_xdata()[-1] == pytest.approx(750000.0)
+
+
+def test_trace_record_wavenet_detection_rejects_invalid_time_units():
+    record = analysis_metrics.TraceRecord(
+        filename="trace.csv",
+        dilution=np.nan,
+        concentration=np.nan,
+        dx=0.25,
+        signal=np.array([[0.0, 1.0, 0.5, 0.0]]),
+        standard=DetectionResult(
+            peaks=np.array([1]),
+            properties={},
+            peak_count=1,
+            detection_kwargs={"height": 0.8},
+            threshold=0.8,
+        ),
+        prediction=np.array([0.0, 0.2, 1.0, 0.1]),
+        cnn=DetectionResult(
+            peaks=np.array([2]),
+            properties={},
+            peak_count=1,
+            detection_kwargs={"height": 0.6},
+            threshold=0.6,
+        ),
+    )
+
+    with pytest.raises(ValueError, match="x_units must be one of"):
+        record.plot_wavenet_detection(x_axis="time", x_units="minute")
+
+
 def test_trace_record_plot_methods_raise_clear_error_when_record_is_passed_again():
     analyzer = WaveNetTraceAnalyzer(
         wavenet=DummyWaveNet(),
@@ -1437,7 +1721,7 @@ def test_trace_record_can_show_cnn_recovered_signal_peaks():
         concentration=np.nan,
         dx=0.25,
         signal=np.array([[0.0, 1.0, 0.5, 0.0]]),
-        standard=analysis_metrics.PeakDetectionResult(
+        standard=DetectionResult(
             peaks=np.array([1]),
             properties={},
             peak_count=1,
@@ -1445,7 +1729,7 @@ def test_trace_record_can_show_cnn_recovered_signal_peaks():
             threshold=0.8,
         ),
         prediction=np.array([0.0, 0.2, 1.0, 0.1]),
-        cnn=analysis_metrics.PeakDetectionResult(
+        cnn=DetectionResult(
             peaks=np.array([2]),
             properties={},
             peak_count=1,
@@ -1481,7 +1765,7 @@ def test_trace_record_can_show_cnn_reconstructed_trace():
         concentration=np.nan,
         dx=0.25,
         signal=np.array([[0.0, 1.0, 0.5, 0.0]]),
-        standard=analysis_metrics.PeakDetectionResult(
+        standard=DetectionResult(
             peaks=np.array([1]),
             properties={},
             peak_count=1,
@@ -1489,7 +1773,7 @@ def test_trace_record_can_show_cnn_reconstructed_trace():
             threshold=0.8,
         ),
         prediction=np.array([0.0, 0.2, 1.0, 0.1]),
-        cnn=analysis_metrics.PeakDetectionResult(
+        cnn=DetectionResult(
             peaks=np.array([2]),
             properties={"recovered_sigma_samples": 1.0},
             peak_count=1,
@@ -1522,7 +1806,7 @@ def test_trace_record_can_show_cnn_reconstructed_trace_with_baseline():
         concentration=np.nan,
         dx=0.25,
         signal=np.array([[0.5, 1.0, 4.0, 1.0]]),
-        standard=analysis_metrics.PeakDetectionResult(
+        standard=DetectionResult(
             peaks=np.array([2]),
             properties={},
             peak_count=1,
@@ -1530,7 +1814,7 @@ def test_trace_record_can_show_cnn_reconstructed_trace_with_baseline():
             threshold=0.8,
         ),
         prediction=np.array([0.0, 0.2, 1.0, 0.1]),
-        cnn=analysis_metrics.PeakDetectionResult(
+        cnn=DetectionResult(
             peaks=np.array([2]),
             properties={"recovered_sigma_samples": 1.0, "recovered_baseline": 0.5},
             peak_count=1,
@@ -1562,20 +1846,20 @@ def test_accessor_single_axis_plots_accept_existing_axes(monkeypatch, tmp_path):
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = DilutionSeries(
+    series = _BaseDilutionSeries(
         folder=tmp_path,
-        wavenet=DummyWaveNet(),
         initial_concentration=100.0,
         nrows=1,
-        std_trigger=HeightPeakTrigger(height=1.5),
-        cnn_trigger=HeightPeakTrigger(height=0.6),
-        trace_files=[(filename, 10.0)],
+        files=[(filename, 10.0)],
+        trigger=HeightPeakTrigger(height=1.5),
+        cnn=DummyWaveNet(),
+        water_file=None,
     )
 
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 0.0]), 0.25
 
-    monkeypatch.setattr(DilutionSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 

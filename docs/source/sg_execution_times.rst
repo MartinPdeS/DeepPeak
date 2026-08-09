@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:39.638** total execution time for 8 files **from all galleries**:
+**00:00.594** total execution time for 11 files **from all galleries**:
 
 .. container::
 
@@ -32,27 +32,36 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_classifier_autoencoder.py` (``../examples/classifier_autoencoder.py``)
-     - 00:19.845
-     - 0.0
-   * - :ref:`sphx_glr_gallery_classifier_wavenet.py` (``../examples/classifier_wavenet.py``)
-     - 00:14.422
-     - 0.0
-   * - :ref:`sphx_glr_gallery_classifier_dense.py` (``../examples/classifier_dense.py``)
-     - 00:02.685
+   * - :ref:`sphx_glr_gallery_data_generation_1.py` (``../examples/data_generation_1.py``)
+     - 00:00.594
      - 0.0
    * - :ref:`sphx_glr_gallery_amplitude_retrieval.py` (``../examples/amplitude_retrieval.py``)
-     - 00:00.704
+     - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_non_maximum_suppression.py` (``../examples/non_maximum_suppression.py``)
-     - 00:00.551
+   * - :ref:`sphx_glr_gallery_classical_detection_pipeline.py` (``../examples/classical_detection_pipeline.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_classifier_autoencoder.py` (``../examples/classifier_autoencoder.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_classifier_dense.py` (``../examples/classifier_dense.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_classifier_wavenet.py` (``../examples/classifier_wavenet.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_core_result_objects.py` (``../examples/core_result_objects.py``)
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_data_generation.py` (``../examples/data_generation.py``)
-     - 00:00.524
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_data_generation_custom_kernel.py` (``../examples/data_generation_custom_kernel.py``)
-     - 00:00.479
+     - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_data_generation_1.py` (``../examples/data_generation_1.py``)
-     - 00:00.430
+   * - :ref:`sphx_glr_gallery_noise_and_pulse_analysis.py` (``../examples/noise_and_pulse_analysis.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_non_maximum_suppression.py` (``../examples/non_maximum_suppression.py``)
+     - 00:00.000
      - 0.0

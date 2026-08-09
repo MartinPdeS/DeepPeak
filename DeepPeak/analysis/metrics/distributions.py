@@ -8,10 +8,37 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.stats as stats
 from matplotlib import colors as mcolors
+from ...core.types import MetricResult
+
+
+class _MetricResultMixin:
+    """Expose analysis-specific metrics through the stable core contract."""
+
+    def to_metric_result(self) -> MetricResult:
+        values = {
+            field.name: getattr(self, field.name)
+            for field in dataclass_fields(self)
+            if field.name != "label"
+        }
+        units = getattr(self, "width_unit_label", None)
+        return MetricResult(
+            name=f"{type(self).__name__}:{self.label}",
+            values=values,
+            units=units,
+            metadata={"label": self.label, "source": type(self).__name__},
+        )
+
+
+def dataclass_fields(instance):
+    """Return dataclass fields without exposing the dataclasses module API."""
+
+    from dataclasses import fields
+
+    return fields(instance)
 
 
 @dataclass(frozen=True)
-class PoissonSeriesDiagnostics:
+class PoissonSeriesDiagnostics(_MetricResultMixin):
     """Compact Poisson diagnostic summary for one detector."""
 
     label: str
@@ -33,7 +60,7 @@ class PoissonSeriesDiagnostics:
 
 
 @dataclass(frozen=True)
-class EventArrivalDistribution:
+class EventArrivalDistribution(_MetricResultMixin):
     """Event-arrival diagnostics for one detector on one trace."""
 
     label: str
@@ -372,7 +399,7 @@ class EventArrivalDistribution:
 
 
 @dataclass(frozen=True)
-class PeakAmplitudeDistribution:
+class PeakAmplitudeDistribution(_MetricResultMixin):
     """Peak-amplitude diagnostics for one detector on one trace."""
 
     label: str
@@ -402,6 +429,7 @@ class PeakAmplitudeDistribution:
             *,
             figsize: tuple[float, float] = (8.0, 4.0),
             bins: int = 40,
+            density: bool = False,
             xlim_quantile: Optional[float] = None,
             histogram_alpha: float = 0.75,
             histogram_color: str = "C0",
@@ -432,7 +460,7 @@ class PeakAmplitudeDistribution:
                 self._metrics.amplitudes,
                 bins=bins,
                 range=(0.0, x_limit) if x_limit is not None else None,
-                density=True,
+                density=density,
                 color=mcolors.to_rgba(histogram_color, histogram_alpha),
                 edgecolor=edge_color,
                 linewidth=edge_line_width,
@@ -445,14 +473,31 @@ class PeakAmplitudeDistribution:
                     self._metrics.maximum_amplitude,
                     400,
                 )
-                density = stats.norm.pdf(
+                normal_density = stats.norm.pdf(
                     x_values,
                     loc=self._metrics.fitted_normal_mean,
                     scale=self._metrics.fitted_normal_standard_deviation,
                 )
+                if density:
+                    fitted_values = normal_density
+                else:
+                    histogram_range = (0.0, x_limit) if x_limit is not None else None
+                    edges = np.histogram_bin_edges(
+                        self._metrics.amplitudes,
+                        bins=bins,
+                        range=histogram_range,
+                    )
+                    bin_width = (
+                        float(np.median(np.diff(edges))) if edges.size > 1 else 1.0
+                    )
+                    fitted_values = (
+                        normal_density
+                        * float(self._metrics.amplitudes.size)
+                        * bin_width
+                    )
                 axis.plot(
                     x_values,
-                    density,
+                    fitted_values,
                     color="C1",
                     linewidth=line_width,
                     label="Fitted normal",
@@ -461,7 +506,7 @@ class PeakAmplitudeDistribution:
             if x_limit is not None:
                 axis.set_xlim(0.0, x_limit)
             axis.set_xlabel("Peak amplitude")
-            axis.set_ylabel("Density")
+            axis.set_ylabel("Density" if density else "Count")
             if title is not None:
                 axis.set_title(title)
             axis.grid(True, which="both", alpha=0.2, zorder=0)
@@ -641,7 +686,7 @@ class PeakAmplitudeDistribution:
 
 
 @dataclass(frozen=True)
-class PeakWidthDistribution:
+class PeakWidthDistribution(_MetricResultMixin):
     """Peak-width diagnostics for one detector on one trace."""
 
     label: str
@@ -674,6 +719,7 @@ class PeakWidthDistribution:
             *,
             figsize: tuple[float, float] = (8.0, 4.0),
             bins: int = 40,
+            density: bool = False,
             xlim_quantile: Optional[float] = None,
             histogram_alpha: float = 0.75,
             histogram_color: str = "C0",
@@ -704,7 +750,7 @@ class PeakWidthDistribution:
                 self._metrics.widths,
                 bins=bins,
                 range=(0.0, x_limit) if x_limit is not None else None,
-                density=True,
+                density=density,
                 color=mcolors.to_rgba(histogram_color, histogram_alpha),
                 edgecolor=edge_color,
                 linewidth=edge_line_width,
@@ -720,15 +766,30 @@ class PeakWidthDistribution:
                     self._metrics.maximum_width,
                     400,
                 )
-                density = stats.lognorm.pdf(
+                lognormal_density = stats.lognorm.pdf(
                     x_values,
                     self._metrics.fitted_lognormal_shape,
                     loc=self._metrics.fitted_lognormal_loc,
                     scale=self._metrics.fitted_lognormal_scale,
                 )
+                if density:
+                    fitted_values = lognormal_density
+                else:
+                    histogram_range = (0.0, x_limit) if x_limit is not None else None
+                    edges = np.histogram_bin_edges(
+                        self._metrics.widths,
+                        bins=bins,
+                        range=histogram_range,
+                    )
+                    bin_width = (
+                        float(np.median(np.diff(edges))) if edges.size > 1 else 1.0
+                    )
+                    fitted_values = (
+                        lognormal_density * float(self._metrics.widths.size) * bin_width
+                    )
                 axis.plot(
                     x_values,
-                    density,
+                    fitted_values,
                     color="C1",
                     linewidth=line_width,
                     label="Fitted lognormal",
@@ -737,7 +798,7 @@ class PeakWidthDistribution:
             if x_limit is not None:
                 axis.set_xlim(0.0, x_limit)
             axis.set_xlabel(f"Peak width [{self._metrics.width_unit_label}]")
-            axis.set_ylabel("Density")
+            axis.set_ylabel("Density" if density else "Count")
             if title is not None:
                 axis.set_title(title)
             axis.grid(True, which="both", alpha=0.2, zorder=0)

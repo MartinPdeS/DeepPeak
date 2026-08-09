@@ -5,6 +5,10 @@ import os
 import sys
 from pathlib import Path
 
+import matplotlib
+
+matplotlib.use("Agg", force=True)
+
 from MPSPlots.styles import use_mpsplots_style
 from sphinx_gallery.sorting import FileNameSortKey
 

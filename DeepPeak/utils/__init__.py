@@ -1,4 +1,3 @@
-from .deconvolution import PulseDeconvolver
 from .datasets import dataset_split
 from .history import merge_and_plot_histories
 from .iterables import batched
@@ -13,7 +12,6 @@ from .signal_processing import (
 )
 
 __all__ = [
-    "PulseDeconvolver",
     "batched",
     "dataset_split",
     "filter_with_wavelet_transform",

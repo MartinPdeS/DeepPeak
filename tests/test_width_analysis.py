@@ -1,8 +1,8 @@
 import numpy as np
 
 from DeepPeak.analysis import (
-    DilutionSeries,
     HeightPeakTrigger,
+    StandardDilutionSeries,
     WaveNetTraceAnalyzer,
     compute_peak_width_distribution_metrics,
     metrics as analysis_metrics,

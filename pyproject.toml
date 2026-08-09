@@ -25,7 +25,6 @@ keywords = ["peak detection", "signal processing", "dilution series", "deep lear
 dependencies = [
     "numpy",
     "scipy",
-    "tensorflow",
     "pandas",
     "matplotlib",
     "MPSPlots",
@@ -48,6 +47,14 @@ local_scheme = "no-local-version"
 
 
 [project.optional-dependencies]
+ml = [
+    "tensorflow",
+]
+
+all = [
+    "tensorflow",
+]
+
 testing = [
     "pytest>=0.6",
     "pytest-cov>=2.0",

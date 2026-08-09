@@ -6,7 +6,7 @@ dilution-series orchestration, distribution diagnostics, and specific plotting
 functions.
 """
 
-from .trace_io import CsvTrace
+from ..io.trace_io import CsvTrace
 from . import metrics
 from .distributions import (
     compute_event_arrival_distribution_metrics,
@@ -15,15 +15,14 @@ from .distributions import (
 )
 
 from .dilution_series import (
-    DilutionSeries,
-    PeakCountSeries,
+    FlashDilutionSeries,
+    StandardDilutionSeries,
 )
 from .metrics import (
     EventArrivalDistribution,
     PeakAmplitudeDistribution,
     PeakWidthDistribution,
     PeakCountSeriesResult,
-    PeakDetectionResult,
     PoissonSeriesDiagnostics,
     TraceRecord,
     WaveNetAnalyzerConfig,
@@ -35,28 +34,45 @@ from .dead_time import (
     plot_dead_time_saturation,
     throughput_tick_formatter,
 )
-from .triggers import BasePeakTrigger, HeightPeakTrigger, SigmaPeakTrigger
+from .noise_analysis import NoiseAnalyzer
+from .pulse_shape import PulseShapeAnalyzer
+from ..detection.triggers import (
+    BasePeakTrigger,
+    HeightPeakTrigger,
+    ProminencePeakTrigger,
+    SigmaPeakTrigger,
+)
 from .wavenet_trace import CNNTraceAnalyzer, StandardTraceAnalyzer, WaveNetTraceAnalyzer
+from .comparison import (
+    SeriesComparisonResult,
+    TraceComparisonAnalyzer,
+    TraceComparisonResult,
+)
 
 __all__ = [
     "CsvTrace",
-    "DilutionSeries",
+    "FlashDilutionSeries",
     "metrics",
     "EventArrivalDistribution",
     "PeakAmplitudeDistribution",
     "PeakWidthDistribution",
-    "PeakCountSeries",
     "PeakCountSeriesResult",
-    "PeakDetectionResult",
+    "NoiseAnalyzer",
+    "PulseShapeAnalyzer",
     "BasePeakTrigger",
     "CNNTraceAnalyzer",
     "HeightPeakTrigger",
+    "ProminencePeakTrigger",
     "SigmaPeakTrigger",
     "PoissonSeriesDiagnostics",
     "StandardTraceAnalyzer",
+    "StandardDilutionSeries",
     "TraceRecord",
     "WaveNetAnalyzerConfig",
     "WaveNetTraceAnalyzer",
+    "SeriesComparisonResult",
+    "TraceComparisonAnalyzer",
+    "TraceComparisonResult",
     "compute_event_arrival_distribution_metrics",
     "compute_peak_amplitude_distribution_metrics",
     "compute_peak_width_distribution_metrics",

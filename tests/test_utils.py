@@ -22,6 +22,20 @@ def test_segment_signal_zero_pads_last_window():
     np.testing.assert_array_equal(segmented, np.array([[1, 2, 3], [4, 5, 0]]))
 
 
+def test_segment_signal_overlapping_returns_windows_and_starts():
+    signal = np.arange(10, dtype=float)
+    windows, starts = utils.segment_signal(signal, window_size=4, stride=2)
+    assert windows.shape == (4, 4)
+    np.testing.assert_array_equal(starts, [0, 2, 4, 6])
+    np.testing.assert_array_equal(windows[0], [0, 1, 2, 3])
+    np.testing.assert_array_equal(windows[1], [2, 3, 4, 5])
+
+
+def test_segment_signal_overlapping_rejects_bad_stride():
+    with pytest.raises(ValueError, match="stride"):
+        utils.segment_signal(np.arange(10), window_size=4, stride=5)
+
+
 def test_get_normalized_signal_min_max_scales_each_row():
     signals = np.array([[2.0, 4.0, 6.0], [3.0, 3.0, 9.0]])
     normalized = utils.get_normalized_signal(signals, normalization="min-max")

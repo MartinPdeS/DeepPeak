@@ -9,7 +9,28 @@ import numpy as np
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes, mark_inset
 
 from ...utils.helper import get_throughput_label
-from .detection import PeakDetectionResult
+from ...core.types import DetectionResult
+from ...core.config import PlotConfig
+
+_X_UNIT_CONFIG: dict[str, tuple[float, str]] = {
+    "sample": (1.0, "Sample index"),
+    "second": (1.0, "Time (s)"),
+    "millisecond": (1e3, "Time (ms)"),
+    "microsecond": (1e6, "Time (us)"),
+}
+
+
+def _apply_plot_config(kwargs: dict[str, Any], config: Optional[PlotConfig]) -> None:
+    if config is None:
+        return
+    if not isinstance(config, PlotConfig):
+        raise TypeError("config must be a PlotConfig instance.")
+    kwargs.setdefault("figsize", config.figsize)
+    kwargs.setdefault("show", config.show)
+    kwargs.setdefault("close", config.close)
+    kwargs.setdefault("dpi", config.dpi)
+    if config.title is not None:
+        kwargs.setdefault("title", config.title)
 
 
 @dataclass
@@ -21,9 +42,9 @@ class TraceRecord:
     concentration: float
     dx: float
     signal: np.ndarray
-    standard: PeakDetectionResult
+    standard: DetectionResult
     prediction: np.ndarray
-    cnn: PeakDetectionResult
+    cnn: DetectionResult
 
     @property
     def processed_signal(self) -> np.ndarray:
@@ -43,6 +64,41 @@ class TraceRecord:
 
         return float(self.dx * self.signal.size)
 
+    def to_trace(self):
+        """Return this record's signal as a lightweight core ``Trace``."""
+
+        from ...core.types import Trace
+
+        return Trace(
+            signal=self.signal,
+            dx=self.dx,
+            filename=self.filename,
+            metadata={
+                "dilution": self.dilution,
+                "concentration": self.concentration,
+            },
+        )
+
+    @property
+    def trace(self):
+        """Return the canonical :class:`DeepPeak.core.Trace` view."""
+
+        return self.to_trace()
+
+    def to_dict(self) -> dict[str, Any]:
+        """Return a serializable representation of this trace result."""
+
+        return {
+            "filename": None if self.filename is None else str(self.filename),
+            "dilution": self.dilution,
+            "concentration": self.concentration,
+            "dx": self.dx,
+            "signal": np.asarray(self.signal).tolist(),
+            "prediction": np.asarray(self.prediction).tolist(),
+            "standard": self.standard.to_dict(),
+            "cnn": self.cnn.to_dict(),
+        }
+
     @property
     def standard_particle_flow(self) -> float:
         """Return the standard detector particle flow."""
@@ -58,6 +114,7 @@ class TraceRecord:
     def plot_standard_detection(
         self,
         x_axis: str = "sample",
+        x_units: str = "second",
         xlim: Optional[tuple[float, float]] = None,
         ylim: Optional[tuple[float, float]] = None,
         figsize: tuple[float, float] = (10.0, 4.0),
@@ -79,6 +136,7 @@ class TraceRecord:
         close: bool = False,
         save_path: Optional[Path | str] = None,
         dpi: int = 300,
+        config: Optional[PlotConfig] = None,
     ) -> plt.Figure:
         """Plot the processed trace with its standard-detector annotations.
 
@@ -115,7 +173,15 @@ class TraceRecord:
             Figure containing the standard detector trace view.
         """
 
-        from ..trace_plots import get_detection_threshold
+        if config is not None:
+            figsize = config.figsize
+            show = config.show
+            close = config.close
+            dpi = config.dpi
+            if config.title is not None:
+                title = config.title
+
+        from ...plotting.trace_plots import get_detection_threshold
 
         signal = np.asarray(self.signal).ravel()
         if signal.size == 0:
@@ -125,8 +191,12 @@ class TraceRecord:
             x_values = np.arange(signal.size, dtype=float)
             x_label = "Sample index"
         elif x_axis == "time":
-            x_values = np.arange(signal.size, dtype=float) * float(self.dx)
-            x_label = "Time"
+            if x_units not in _X_UNIT_CONFIG or x_units == "sample":
+                raise ValueError(
+                    f"x_units must be one of {[k for k in _X_UNIT_CONFIG if k != 'sample']}"
+                )
+            time_scale, x_label = _X_UNIT_CONFIG[x_units]
+            x_values = np.arange(signal.size, dtype=float) * float(self.dx) * time_scale
         else:
             raise ValueError('x_axis must be either "sample" or "time".')
 
@@ -167,8 +237,8 @@ class TraceRecord:
             if x_axis == "sample":
                 standard_peak_x_values = standard_peak_indices.astype(float)
             else:
-                standard_peak_x_values = standard_peak_indices.astype(float) * float(
-                    self.dx
+                standard_peak_x_values = (
+                    standard_peak_indices.astype(float) * float(self.dx) * time_scale
                 )
             axis.scatter(
                 standard_peak_x_values,
@@ -214,7 +284,7 @@ class TraceRecord:
             plt.close(figure)
         return figure
 
-    def plot_wavenet_detection(self, **plot_kwargs) -> plt.Figure:
+    def plot_wavenet_detection(self, *args, **plot_kwargs) -> plt.Figure:
         """Plot the trace together with its WaveNet prediction and CNN peaks.
 
         Parameters
@@ -284,9 +354,18 @@ class TraceRecord:
             Figure containing the WaveNet detector trace view.
         """
 
-        from ..trace_plots import get_detection_threshold, reconstruct_gaussian_trace
+        if args:
+            plot_kwargs["x_axis"] = args[0]
+
+        _apply_plot_config(plot_kwargs, plot_kwargs.pop("config", None))
+
+        from ...plotting.trace_plots import (
+            get_detection_threshold,
+            reconstruct_gaussian_trace,
+        )
 
         x_axis = plot_kwargs.pop("x_axis", "sample")
+        x_units = plot_kwargs.pop("x_units", "second")
         xlim = plot_kwargs.pop("xlim", None)
         ylim = plot_kwargs.pop("ylim", None)
         figsize = plot_kwargs.pop("figsize", (10.0, 4.0))
@@ -306,7 +385,7 @@ class TraceRecord:
         show_cnn_threshold = plot_kwargs.pop("show_cnn_threshold", True)
         show_legend = plot_kwargs.pop("show_legend", True)
         show_grid = plot_kwargs.pop("show_grid", False)
-        show_title = plot_kwargs.pop("show_title", True)
+        show_title = plot_kwargs.pop("show_title", False)
         title = plot_kwargs.pop("title", None)
         expected_particle_flow = plot_kwargs.pop("expected_particle_flow", None)
         show_throughput = plot_kwargs.pop("show_throughput", False)
@@ -371,12 +450,17 @@ class TraceRecord:
             x_values = np.arange(signal.size, dtype=float)
             prediction_x_values = np.arange(prediction.size, dtype=float)
             x_label = "Sample index"
+            time_scale = 1.0
         elif x_axis == "time":
-            x_values = np.arange(signal.size, dtype=float) * float(self.dx)
-            prediction_x_values = np.arange(prediction.size, dtype=float) * float(
-                self.dx
+            if x_units not in _X_UNIT_CONFIG or x_units == "sample":
+                raise ValueError(
+                    f"x_units must be one of {[k for k in _X_UNIT_CONFIG if k != 'sample']}"
+                )
+            time_scale, x_label = _X_UNIT_CONFIG[x_units]
+            x_values = np.arange(signal.size, dtype=float) * float(self.dx) * time_scale
+            prediction_x_values = (
+                np.arange(prediction.size, dtype=float) * float(self.dx) * time_scale
             )
-            x_label = "Time"
         else:
             raise ValueError('x_axis must be either "sample" or "time".')
 
@@ -493,7 +577,9 @@ class TraceRecord:
             cnn_signal_peak_x_values = (
                 cnn_peak_indices_for_signal.astype(float)
                 if x_axis == "sample"
-                else cnn_peak_indices_for_signal.astype(float) * float(self.dx)
+                else cnn_peak_indices_for_signal.astype(float)
+                * float(self.dx)
+                * time_scale
             )
             axis.scatter(
                 cnn_signal_peak_x_values,
@@ -509,7 +595,9 @@ class TraceRecord:
             cnn_prediction_peak_x_values = (
                 cnn_peak_indices_for_prediction.astype(float)
                 if x_axis == "sample"
-                else cnn_peak_indices_for_prediction.astype(float) * float(self.dx)
+                else cnn_peak_indices_for_prediction.astype(float)
+                * float(self.dx)
+                * time_scale
             )
             axis.scatter(
                 cnn_prediction_peak_x_values,
@@ -553,6 +641,7 @@ class TraceRecord:
             )
             inset_call_kwargs = {
                 "x_axis": inset_plot_kwargs.pop("x_axis", x_axis),
+                "x_units": inset_plot_kwargs.pop("x_units", x_units),
                 "xlim": inset_plot_kwargs.pop("xlim", inset_xlim),
                 "ylim": inset_plot_kwargs.pop(
                     "ylim", inset_ylim if inset_ylim is not None else ylim
@@ -729,8 +818,10 @@ class TraceRecord:
         matplotlib.figure.Figure
             Figure containing the standard trace panel and amplitude histogram.
         """
+        _apply_plot_config(plot_kwargs, plot_kwargs.pop("config", None))
 
         x_axis = plot_kwargs.pop("x_axis", "sample")
+        x_units = plot_kwargs.pop("x_units", "second")
         xlim = plot_kwargs.pop("xlim", None)
         ylim = plot_kwargs.pop("ylim", None)
         figsize = plot_kwargs.pop("figsize", (12.0, 4.5))
@@ -835,6 +926,7 @@ class TraceRecord:
 
         self.plot_standard_detection(
             x_axis=x_axis,
+            x_units=x_units,
             xlim=xlim,
             ylim=ylim,
             figsize=figsize,
@@ -907,6 +999,7 @@ class TraceRecord:
             )
             inset_kwargs = {
                 "x_axis": inset_plot_kwargs.pop("x_axis", x_axis),
+                "x_units": inset_plot_kwargs.pop("x_units", x_units),
                 "xlim": inset_plot_kwargs.pop("xlim", inset_xlim),
                 "ylim": inset_plot_kwargs.pop(
                     "ylim", inset_ylim if inset_ylim is not None else ylim
@@ -1069,8 +1162,10 @@ class TraceRecord:
         matplotlib.figure.Figure
             Figure containing the CNN trace panel and amplitude histogram.
         """
+        _apply_plot_config(plot_kwargs, plot_kwargs.pop("config", None))
 
         x_axis = plot_kwargs.pop("x_axis", "sample")
+        x_units = plot_kwargs.pop("x_units", "second")
         xlim = plot_kwargs.pop("xlim", None)
         ylim = plot_kwargs.pop("ylim", None)
         figsize = plot_kwargs.pop("figsize", (12.0, 4.5))
@@ -1203,6 +1298,7 @@ class TraceRecord:
 
         self.plot_wavenet_detection(
             x_axis=x_axis,
+            x_units=x_units,
             xlim=xlim,
             ylim=ylim,
             figsize=figsize,
@@ -1282,6 +1378,7 @@ class TraceRecord:
             )
             inset_kwargs = {
                 "x_axis": inset_plot_kwargs.pop("x_axis", x_axis),
+                "x_units": inset_plot_kwargs.pop("x_units", x_units),
                 "xlim": inset_plot_kwargs.pop("xlim", inset_xlim),
                 "ylim": inset_plot_kwargs.pop(
                     "ylim", inset_ylim if inset_ylim is not None else ylim

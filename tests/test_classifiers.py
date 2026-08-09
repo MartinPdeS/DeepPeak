@@ -5,25 +5,25 @@ import numpy as np
 import pytest
 import tensorflow as tf
 
-from DeepPeak.machine_learning.classifier import (
-    Autoencoder,
+from DeepPeak.models import (
     DenseNet,
     ShapeAwarePulseLoss,
+    SmoothBinaryCrossentropy,
+    UNet1D,
     WaveNet,
     WeightedBinaryCrossentropy,
     WeightedHuber,
     shape_aware_pulse_loss,
+    smooth_bce,
     weighted_bce,
     weighted_huber,
 )
-from DeepPeak.signal_generator import SignalGenerator
-from DeepPeak.kernels import Gaussian
-from DeepPeak.peak_count import UniformCount
+from DeepPeak.generation import Gaussian, SignalGenerator, UniformCount
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-architectures = [DenseNet, WaveNet, Autoencoder]
+architectures = [DenseNet, WaveNet, UNet1D]
 
 
 @pytest.fixture
@@ -167,6 +167,41 @@ def test_wavenet_accepts_shape_aware_pulse_loss_function_style():
     assert "loss" in history.history
 
 
+def test_wavenet_accepts_smooth_bce_function_style():
+    x = np.random.rand(8, 64, 1).astype(np.float32)
+    y = np.random.randint(0, 2, size=(8, 64, 1)).astype(np.float32)
+
+    model = WaveNet(
+        sequence_length=64,
+        num_filters=4,
+        num_dilation_layers=2,
+        kernel_size=3,
+        loss=smooth_bce(alpha=0.8, smoothness_weight=0.01),
+        metrics=("accuracy",),
+    )
+    model.build()
+    history = model.fit(x, y, epochs=1, batch_size=4, verbose=0)
+
+    assert "loss" in history.history
+
+
+def test_smooth_bce_confidence_weight_penalizes_uncertain_predictions_more():
+    y_true = tf.constant([[[1.0], [0.0], [1.0], [0.0]]], dtype=tf.float32)
+    confident = tf.constant([[[0.99], [0.01], [0.99], [0.01]]], dtype=tf.float32)
+    uncertain = tf.constant([[[0.6], [0.4], [0.6], [0.4]]], dtype=tf.float32)
+
+    loss = SmoothBinaryCrossentropy(
+        alpha=1.0,
+        smoothness_weight=0.0,
+        confidence_weight=0.2,
+    )
+
+    confident_loss = float(loss(y_true, confident).numpy())
+    uncertain_loss = float(loss(y_true, uncertain).numpy())
+
+    assert uncertain_loss > confident_loss
+
+
 def test_wavenet_can_resume_training_with_serializable_weighted_huber(tmp_path):
     x = np.random.rand(16, 32, 1).astype(np.float32)
     y = np.random.rand(16, 32, 1).astype(np.float32)
@@ -212,6 +247,61 @@ def test_wavenet_can_resume_training_with_serializable_shape_aware_loss(tmp_path
     loaded = WaveNet.load(str(save_path))
     history = loaded.fit(x, y, epochs=1, batch_size=4, verbose=0)
 
+    assert "loss" in history.history
+
+
+def test_wavenet_can_resume_training_with_serializable_smooth_bce(tmp_path):
+    x = np.random.rand(16, 32, 1).astype(np.float32)
+    y = np.random.randint(0, 2, size=(16, 32, 1)).astype(np.float32)
+
+    model = WaveNet(
+        sequence_length=32,
+        num_filters=4,
+        num_dilation_layers=2,
+        kernel_size=3,
+        loss=SmoothBinaryCrossentropy(alpha=0.8, smoothness_weight=0.02),
+        metrics=("accuracy",),
+    )
+    model.build()
+    model.fit(x, y, epochs=1, batch_size=4, verbose=0)
+
+    save_path = tmp_path / "serializable-smooth-bce-wavenet"
+    model.save(str(save_path))
+
+    loaded = WaveNet.load(str(save_path))
+    history = loaded.fit(x, y, epochs=1, batch_size=4, verbose=0)
+
+    assert "loss" in history.history
+
+
+def test_wavenet_supports_linear_output_for_pulse_regression(tmp_path):
+    x = np.random.rand(16, 32, 1).astype(np.float32)
+    y = (1.5 * np.random.rand(16, 32, 1)).astype(np.float32)
+
+    model = WaveNet(
+        sequence_length=32,
+        num_filters=4,
+        num_dilation_layers=2,
+        kernel_size=3,
+        output_activation="linear",
+        loss=WeightedHuber(alpha=3.0, delta=0.25),
+        metrics=("accuracy",),
+    )
+    model.build()
+
+    assert model.model.get_layer("output").get_config()["activation"] == "linear"
+
+    model.fit(x, y, epochs=1, batch_size=4, verbose=0)
+
+    save_path = tmp_path / "linear-output-wavenet"
+    model.save(str(save_path))
+
+    loaded = WaveNet.load(str(save_path))
+
+    assert loaded.output_activation == "linear"
+    assert loaded.model.get_layer("output").get_config()["activation"] == "linear"
+
+    history = loaded.fit(x, y, epochs=1, batch_size=4, verbose=0)
     assert "loss" in history.history
 
 

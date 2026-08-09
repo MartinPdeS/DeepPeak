@@ -1,12 +1,27 @@
-"""Configuration models for analysis components."""
+"""Compatibility import for the canonical detection configuration."""
 
-from dataclasses import dataclass
+from ...core.config import TraceConfig
 
 
-@dataclass(frozen=True)
-class WaveNetAnalyzerConfig:
-    """Configuration shared by a WaveNetTraceAnalyzer instance."""
+class WaveNetAnalyzerConfig(TraceConfig):
+    """Legacy-named view of :class:`DeepPeak.core.TraceConfig`."""
 
-    sequence_length: int
-    signal_normalization: str = "zscore"
-    prediction_sampling_rate_hz: float = 125_000_000.0
+    def __init__(
+        self,
+        sequence_length: int,
+        signal_normalization: str = "zscore",
+        prediction_sampling_rate_hz: float = 125_000_000.0,
+    ) -> None:
+        super().__init__(
+            sequence_length=sequence_length,
+            normalization=signal_normalization,
+            sampling_rate_hz=prediction_sampling_rate_hz,
+        )
+
+    @property
+    def signal_normalization(self) -> str:
+        return self.normalization
+
+    @property
+    def prediction_sampling_rate_hz(self) -> float:
+        return float(self.sampling_rate_hz)
