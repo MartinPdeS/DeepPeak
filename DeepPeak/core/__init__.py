@@ -1,7 +1,16 @@
 """Lightweight domain types shared across DeepPeak workflows."""
 
 from .types import DetectionResult, MetricResult, SeriesResult, Trace
-from .config import DetectionConfig, PlotConfig, SeriesConfig, TraceConfig
+from .config import (
+    AnalysisConfig,
+    DetectionConfig,
+    GenerationConfig,
+    ModelConfig,
+    NoiseConfig,
+    PlotConfig,
+    SeriesConfig,
+    TraceConfig,
+)
 from .exceptions import (
     AnalysisInputError,
     AnalysisStateError,
@@ -15,6 +24,7 @@ from .exceptions import (
 
 __all__ = [
     "DetectionConfig",
+    "AnalysisConfig",
     "DetectionResult",
     "AnalysisInputError",
     "AnalysisStateError",
@@ -25,6 +35,9 @@ __all__ = [
     "MissingDetectorError",
     "MissingOptionalDependencyError",
     "MetricResult",
+    "GenerationConfig",
+    "ModelConfig",
+    "NoiseConfig",
     "PlotConfig",
     "SeriesConfig",
     "SeriesResult",

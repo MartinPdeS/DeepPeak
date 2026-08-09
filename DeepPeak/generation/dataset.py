@@ -118,6 +118,11 @@ class DataSet:
         """
         Normalize dataset signals.
 
+        Parameters
+        ----------
+        normalization : str, default="zscore"
+            Normalization strategy.
+
         Supported normalization modes
         -----------------------------
         "none"
@@ -139,6 +144,11 @@ class DataSet:
         -----
         - "minmax" guarantees an output in [0, 1] (per signal).
         - "zscore" and "robust_zscore" are usually better for neural network training.
+
+        Returns
+        -------
+        ndarray
+            Normalized signal array.
         """
         return processing.normalize_signal(
             self.signals, normalization=normalization, axis=1

@@ -1,7 +1,5 @@
 """Protocols defining the boundaries between DeepPeak subsystems."""
 
-from __future__ import annotations
-
 from typing import Literal, Protocol
 
 from .types import DetectionResult, MetricResult, Trace

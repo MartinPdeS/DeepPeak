@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Tuple, Union
 
@@ -10,7 +8,15 @@ from .base import BaseNoise
 
 @dataclass(repr=False)
 class LaplaceNoise(BaseNoise):
-    """Independent Laplace noise for heavier-tailed augmentation."""
+    """Independent Laplace noise for heavier-tailed augmentation.
+
+    Parameters
+    ----------
+    scale : float or tuple of float
+        Laplace scale or sampling range.
+    mean : float or tuple of float, default=0.0
+        Mean or sampling range.
+    """
 
     scale: Union[float, Tuple[float, float]]
     mean: Union[float, Tuple[float, float]] = 0.0
@@ -22,6 +28,22 @@ class LaplaceNoise(BaseNoise):
         self._mean = self._normalize_range("mean", self.mean)
 
     def sample(self, shape: tuple[int, int], *, x_values=None, rng=None) -> np.ndarray:
+        """Generate independent Laplace samples.
+
+        Parameters
+        ----------
+        shape : tuple of int
+            Requested output shape.
+        x_values : ndarray, optional
+            Unused sample coordinates.
+        rng : numpy.random.Generator, optional
+            Random number generator.
+
+        Returns
+        -------
+        ndarray
+            Laplace noise samples.
+        """
         rng = np.random.default_rng() if rng is None else rng
         n_samples, sequence_length = int(shape[0]), int(shape[1])
         means = self._sample_uniform(self._mean, size=(n_samples, 1), rng=rng)

@@ -1,7 +1,5 @@
 """Gaussian noise models whose variance changes over a trace."""
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 from typing import Tuple, Union
 
@@ -17,6 +15,15 @@ class NonstationaryGaussianNoise(BaseNoise):
     ``std`` is the standard deviation at the start of each trace and
     ``end_scale`` multiplies it at the end. For example, ``end_scale=2``
     produces noise whose standard deviation doubles across the acquisition.
+
+    Parameters
+    ----------
+    std : float or tuple of float
+        Starting standard deviation or sampling range.
+    end_scale : float or tuple of float, default=1.0
+        End-to-start standard-deviation ratio.
+    mean : float or tuple of float, default=0.0
+        Mean or sampling range.
     """
 
     std: Union[float, Tuple[float, float]]
@@ -39,7 +46,22 @@ class NonstationaryGaussianNoise(BaseNoise):
         x_values: np.ndarray | None = None,
         rng: np.random.Generator | None = None,
     ) -> np.ndarray:
-        """Return independent Gaussian samples with a linear variance trend."""
+        """Return independent Gaussian samples with a linear variance trend.
+
+        Parameters
+        ----------
+        shape : tuple of int
+            Requested output shape.
+        x_values : ndarray, optional
+            Sample coordinates retained for interface compatibility.
+        rng : numpy.random.Generator, optional
+            Random number generator.
+
+        Returns
+        -------
+        ndarray
+            Nonstationary Gaussian noise samples.
+        """
 
         rng = np.random.default_rng() if rng is None else rng
         n_samples, sequence_length = int(shape[0]), int(shape[1])

@@ -8,6 +8,7 @@ def test_top_level_public_api_exports_core_types():
     assert DeepPeak.FlashDilutionSeries.__name__ == "FlashDilutionSeries"
     assert DeepPeak.SignalGenerator.__name__ == "SignalGenerator"
     assert DeepPeak.NonstationaryGaussianNoise.__name__ == "NonstationaryGaussianNoise"
+    assert DeepPeak.Pipeline.__name__ == "Pipeline"
     assert DeepPeak.Gaussian.__name__ == "Gaussian"
     assert DeepPeak.TwoLobeGaussian.__name__ == "TwoLobeGaussian"
     assert DeepPeak.WaveNetTraceAnalyzer.__name__ == "WaveNetTraceAnalyzer"

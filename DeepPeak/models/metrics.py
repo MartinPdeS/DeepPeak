@@ -1,13 +1,19 @@
 """Typed metrics used by the optional neural-network models."""
 
-from __future__ import annotations
-
 import tensorflow as tf
 
 
 @tf.keras.utils.register_keras_serializable(package="DeepPeak")
 class BinaryIoU(tf.keras.metrics.Metric):
-    """Intersection-over-union for binary sequence predictions."""
+    """Intersection-over-union for binary sequence predictions.
+
+    Parameters
+    ----------
+    name : str, default="binary_iou"
+        Metric name used by Keras.
+    threshold : float, default=0.5
+        Threshold used to binarize predictions and targets.
+    """
 
     def __init__(self, name: str = "binary_iou", threshold: float = 0.5, **kwargs):
         super().__init__(name=name, **kwargs)

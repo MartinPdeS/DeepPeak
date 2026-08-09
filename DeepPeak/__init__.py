@@ -38,6 +38,7 @@ from .generation.kernels import (
 )
 from .generation.noises import (
     BaseNoise,
+    CorrelatedGaussianNoise,
     GaussianNoise,
     LaplaceNoise,
     NonstationaryGaussianNoise,
@@ -49,14 +50,29 @@ from .generation.peak_count import (
     UniformCount,
 )
 from .generation import SignalGenerator
-from .core import DetectionResult, MetricResult, SeriesResult, Trace
+from .core import (
+    AnalysisConfig,
+    DetectionResult,
+    GenerationConfig,
+    MetricResult,
+    ModelConfig,
+    NoiseConfig,
+    SeriesResult,
+    Trace,
+)
+from .pipeline import Pipeline, PipelineResult
 
 
 __all__ = [
     "__version__",
     "BaseKernel",
     "BaseNoise",
+    "CorrelatedGaussianNoise",
     "DetectionResult",
+    "AnalysisConfig",
+    "GenerationConfig",
+    "ModelConfig",
+    "NoiseConfig",
     "BasePeakTrigger",
     "CNNTraceAnalyzer",
     "CustomKernel",
@@ -73,6 +89,8 @@ __all__ = [
     "NegativeBinomialCount",
     "PeakCount",
     "PoissonCount",
+    "Pipeline",
+    "PipelineResult",
     "ProminencePeakTrigger",
     "PulseShapeAnalyzer",
     "SigmaPeakTrigger",
@@ -131,6 +149,17 @@ _LAZY_NEURAL_NETWORK_EXPORTS = set(__all__) - {
     "TwoLobeGaussian",
     "UniformCount",
     "WaveNetTraceAnalyzer",
+    "CorrelatedGaussianNoise",
+    "DetectionResult",
+    "AnalysisConfig",
+    "GenerationConfig",
+    "ModelConfig",
+    "NoiseConfig",
+    "MetricResult",
+    "Pipeline",
+    "PipelineResult",
+    "SeriesResult",
+    "Trace",
 }
 
 

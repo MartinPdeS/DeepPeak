@@ -1,7 +1,5 @@
 """Small plotting helpers for model predictions."""
 
-from __future__ import annotations
-
 from typing import Any
 
 import matplotlib.pyplot as plt

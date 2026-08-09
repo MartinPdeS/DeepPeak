@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from abc import ABC, abstractmethod
 from typing import Tuple, Union
 
@@ -64,4 +62,19 @@ class BaseNoise(ABC):
         x_values: np.ndarray | None = None,
         rng: np.random.Generator | None = None,
     ) -> np.ndarray:
-        """Return additive noise samples with the requested shape."""
+        """Return additive noise samples with the requested shape.
+
+        Parameters
+        ----------
+        shape : tuple of int
+            Requested ``(n_traces, n_samples)`` output shape.
+        x_values : ndarray, optional
+            Sample coordinates used by nonstationary noise models.
+        rng : numpy.random.Generator, optional
+            Random number generator used for sampling.
+
+        Returns
+        -------
+        ndarray
+            Additive noise with shape ``shape``.
+        """

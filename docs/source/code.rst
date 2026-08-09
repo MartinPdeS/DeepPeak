@@ -117,6 +117,33 @@ processing, detection, dilution-series workflows, and plotting.
    :members:
    :undoc-members:
 
+.. autoclass:: DeepPeak.core.AnalysisConfig
+   :members:
+   :undoc-members:
+
+.. autoclass:: DeepPeak.core.GenerationConfig
+   :members:
+   :undoc-members:
+
+.. autoclass:: DeepPeak.core.ModelConfig
+   :members:
+   :undoc-members:
+
+.. autoclass:: DeepPeak.core.NoiseConfig
+   :members:
+   :undoc-members:
+
+Pipeline API
+------------
+
+.. autoclass:: DeepPeak.Pipeline
+   :members:
+   :undoc-members:
+
+.. autoclass:: DeepPeak.PipelineResult
+   :members:
+   :undoc-members:
+
 Plotting API
 ------------
 
@@ -135,7 +162,8 @@ Neural-network API
 
 All neural models reconstruct clean pulse traces. They accept a
 ``TrainingConfig`` through ``fit(config=...)`` for reproducible training with
-optional early stopping and learning-rate scheduling.
+optional early stopping, learning-rate scheduling, deterministic seeds, and
+best-model checkpointing.
 
 .. autoclass:: DeepPeak.models.WaveNet
    :members:
@@ -205,6 +233,11 @@ and quantization.
    :show-inheritance:
 
 .. autoclass:: DeepPeak.NonstationaryGaussianNoise
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+.. autoclass:: DeepPeak.CorrelatedGaussianNoise
    :members:
    :undoc-members:
    :show-inheritance:

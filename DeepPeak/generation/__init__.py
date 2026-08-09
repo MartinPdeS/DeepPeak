@@ -11,13 +11,20 @@ from .kernels import (
     Square,
     TwoLobeGaussian,
 )
-from .noises import BaseNoise, GaussianNoise, LaplaceNoise, NonstationaryGaussianNoise
+from .noises import (
+    BaseNoise,
+    CorrelatedGaussianNoise,
+    GaussianNoise,
+    LaplaceNoise,
+    NonstationaryGaussianNoise,
+)
 from .peak_count import NegativeBinomialCount, PeakCount, PoissonCount, UniformCount
 from .signal_generator import SignalGenerator
 
 __all__ = [
     "BaseKernel",
     "BaseNoise",
+    "CorrelatedGaussianNoise",
     "CustomKernel",
     "CustomKernels",
     "DataSet",

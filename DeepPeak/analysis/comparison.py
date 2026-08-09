@@ -6,11 +6,8 @@ before the same style of peak detector is applied.  Both branches expose the
 same arrival-time, amplitude, and width distributions.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Iterable, Literal, Mapping, Optional
+from typing import Any, Iterable, Literal, Optional
 
 import numpy as np
 import scipy.stats as stats

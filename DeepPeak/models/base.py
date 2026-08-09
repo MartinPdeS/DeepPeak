@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from typing import Any, Iterable, Optional, Union
 import os
@@ -60,7 +58,7 @@ class BaseDeconvolver:
 
         Parameters
         ----------
-        x : np.ndarray
+        signal : np.ndarray
             Input data.
         batch_size : int
             Batch size for prediction.
@@ -142,7 +140,11 @@ class BaseDeconvolver:
             config_kwargs = config.fit_kwargs()
             config_kwargs.update(kwargs)
             kwargs = config_kwargs
-            configured_callbacks.extend(config.callbacks())
+            configured_callbacks.extend(
+                config.callbacks(validation_available="validation_data" in kwargs)
+            )
+            if config.seed is not None:
+                tf.keras.utils.set_random_seed(config.seed)
         if callbacks is not None:
             configured_callbacks.extend(callbacks)
         if configured_callbacks:

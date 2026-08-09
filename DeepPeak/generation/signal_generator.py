@@ -13,19 +13,27 @@ from .peak_count import PeakCount
 class SignalGenerator:
     """Generate synthetic 1D peak signals from kernel parameter samplers.
 
-    Key features:
-    - Supports all kernel classes derived from ``BaseKernel``
-    - Returns labels marking discrete peak locations
-    - Optional Gaussian noise
-    - Optional instrument response, baseline offset, saturation, and quantization
-    - Optional NumPy-based one-hot encoding for the number of peaks
-    - Clean pulse traces are retained alongside noisy observations for
-      reconstruction-model training
+    Notes
+    -----
+    The generator supports all kernel classes derived from ``BaseKernel``,
+    labels discrete peak locations, and can add Gaussian noise, instrument
+    response, baseline offset, saturation, and quantization. Clean pulse
+    traces are retained alongside noisy observations for reconstruction-model
+    training.
     """
 
     def __init__(
         self, sequence_length: int, x_values: Optional[np.ndarray] = None
     ) -> None:
+        """Initialize a generator on a shared one-dimensional sampling grid.
+
+        Parameters
+        ----------
+        sequence_length : int
+            Number of samples in every generated trace.
+        x_values : ndarray, optional
+            Explicit one-dimensional sampling coordinates.
+        """
         self.sequence_length = sequence_length
         self.x_values = (
             x_values if x_values is not None else np.arange(self.sequence_length)
@@ -38,14 +46,36 @@ class SignalGenerator:
         self._dataset_parts: list[DataSet] = []
 
     def add_to_set(self, **generate_kwargs: Any) -> DataSet:
-        """Generate one batch and append it to the internal dataset buffer."""
+        """Generate one batch and append it to the internal dataset buffer.
+
+        Parameters
+        ----------
+        **generate_kwargs : object
+            Arguments forwarded to :meth:`generate`.
+
+        Returns
+        -------
+        DataSet
+            Newly generated batch.
+        """
 
         dataset = self.generate(**generate_kwargs)
         self._dataset_parts.append(dataset)
         return dataset
 
     def dataset(self) -> DataSet:
-        """Return one dataset built by concatenating all buffered batches."""
+        """Return one dataset built by concatenating all buffered batches.
+
+        Returns
+        -------
+        DataSet
+            Concatenated buffered batches.
+
+        Raises
+        ------
+        RuntimeError
+            If no batches have been buffered.
+        """
 
         if len(self._dataset_parts) == 0:
             raise RuntimeError(
@@ -75,6 +105,7 @@ class SignalGenerator:
         quantization_step: Optional[float] = None,
         noise_profile: Literal["constant", "linear"] = "constant",
         noise_end_scale: Union[float, Tuple[float, float]] = 1.0,
+        missing_peak_probability: float = 0.0,
         categorical_peak_count: bool = False,
         shift_min_to_zero: bool = False,
         minimum_level: Optional[Union[float, Tuple[float, float]]] = None,
@@ -127,6 +158,8 @@ class SignalGenerator:
             raise ValueError(
                 "noise_profile is only supported with noise_std, not a custom noise object."
             )
+        if not 0.0 <= float(missing_peak_probability) <= 1.0:
+            raise ValueError("missing_peak_probability must be between 0 and 1.")
 
         if shift_min_to_zero and minimum_level is not None:
             raise ValueError(
@@ -145,6 +178,13 @@ class SignalGenerator:
             peak_count=peak_count,
             rng=rng,
         )
+        peak_presence = np.ones(peak_components.shape[:2], dtype=bool)
+        if missing_peak_probability > 0.0:
+            peak_presence = rng.random(peak_presence.shape) >= missing_peak_probability
+            for sample_index, count in enumerate(kernel.num_peaks):
+                peak_presence[sample_index, int(count) :] = False
+            peak_components = np.nan_to_num(peak_components, nan=0.0)
+            peak_components = peak_components * peak_presence[..., None]
         clean_signals = np.nansum(peak_components, axis=1)
         signals = clean_signals.copy()
 
@@ -161,7 +201,8 @@ class SignalGenerator:
         peak_indices = np.clip(peak_indices, 0, self.sequence_length - 1)
 
         for i in range(self.n_samples):
-            labels[i, peak_indices[i, : kernel.num_peaks[i]]] = 1
+            active = peak_presence[i, : kernel.num_peaks[i]]
+            labels[i, peak_indices[i, : kernel.num_peaks[i]][active]] = 1
 
         resolved_noise = noise
         if resolved_noise is None and noise_std is not None:
@@ -221,6 +262,8 @@ class SignalGenerator:
             instrument_response=response,
             saturation=saturation_bounds,
             quantization_step=quantization_step,
+            peak_presence=peak_presence,
+            active_num_peaks=np.sum(peak_presence, axis=1),
         )
         return dataset
 

@@ -4,8 +4,6 @@ These types deliberately contain no plotting or TensorFlow dependencies and
 are the canonical data contract shared by the package's domain modules.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Mapping, Optional
@@ -72,12 +70,24 @@ class Trace:
 
     @property
     def duration(self) -> float:
-        """Return the duration represented by the samples."""
+        """Return the duration represented by the samples.
+
+        Returns
+        -------
+        float
+            Trace duration in ``dx`` units.
+        """
 
         return float(self.n_samples * self.dx)
 
     def to_dict(self) -> dict[str, Any]:
-        """Return a JSON-compatible representation of the trace metadata."""
+        """Return a JSON-compatible representation of the trace metadata.
+
+        Returns
+        -------
+        dict
+            Serialized trace fields.
+        """
 
         return {
             "signal": self.signal.tolist(),
@@ -88,7 +98,18 @@ class Trace:
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "Trace":
-        """Reconstruct a trace from :meth:`to_dict` output."""
+        """Reconstruct a trace from :meth:`to_dict` output.
+
+        Parameters
+        ----------
+        data : mapping
+            Serialized trace fields.
+
+        Returns
+        -------
+        Trace
+            Reconstructed trace.
+        """
 
         return cls(
             signal=data["signal"],
@@ -100,7 +121,23 @@ class Trace:
 
 @dataclass
 class DetectionResult:
-    """Peaks detected in a trace and the configuration used to find them."""
+    """Peaks detected in a trace and the configuration used to find them.
+
+    Parameters
+    ----------
+    peaks : array-like
+        Detected sample indices.
+    properties : mapping, optional
+        Detector-specific peak properties.
+    peak_count : int, optional
+        Number of detected peaks.
+    detection_kwargs : mapping, optional
+        Detector configuration used for the result.
+    threshold : float, optional
+        Applied detection threshold.
+    amplitudes : array-like, optional
+        Recovered peak amplitudes.
+    """
 
     peaks: np.ndarray
     properties: Mapping[str, Any] = field(default_factory=dict)
@@ -142,7 +179,13 @@ class DetectionResult:
         return dict(self.detection_kwargs)
 
     def to_dict(self) -> dict[str, Any]:
-        """Return a JSON-compatible representation of the detection."""
+        """Return a JSON-compatible representation of the detection.
+
+        Returns
+        -------
+        dict
+            Serialized detection fields.
+        """
 
         return {
             "peaks": self.peaks.tolist(),
@@ -155,7 +198,18 @@ class DetectionResult:
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "DetectionResult":
-        """Reconstruct a detection result from :meth:`to_dict` output."""
+        """Reconstruct a detection result from serialized fields.
+
+        Parameters
+        ----------
+        data : mapping
+            Serialized detection fields.
+
+        Returns
+        -------
+        DetectionResult
+            Reconstructed detection result.
+        """
 
         return cls(
             peaks=data.get("peaks", []),
@@ -169,7 +223,19 @@ class DetectionResult:
 
 @dataclass(frozen=True)
 class MetricResult:
-    """Named scalar or array-valued metrics with optional units and metadata."""
+    """Named scalar or array-valued metrics with optional units and metadata.
+
+    Parameters
+    ----------
+    name : str
+        Metric name.
+    values : object
+        Scalar or array-valued metric values.
+    units : str, optional
+        Value units.
+    metadata : mapping, optional
+        Additional metric metadata.
+    """
 
     name: str
     values: Any
@@ -183,6 +249,13 @@ class MetricResult:
         object.__setattr__(self, "metadata", dict(self.metadata))
 
     def to_dict(self) -> dict[str, Any]:
+        """Return a JSON-compatible representation of the metric.
+
+        Returns
+        -------
+        dict
+            Serialized metric fields.
+        """
         values = _jsonable(self.values)
         return {
             "name": self.name,
@@ -193,7 +266,18 @@ class MetricResult:
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "MetricResult":
-        """Reconstruct a metric result from :meth:`to_dict` output."""
+        """Reconstruct a metric result from serialized fields.
+
+        Parameters
+        ----------
+        data : mapping
+            Serialized metric fields.
+
+        Returns
+        -------
+        MetricResult
+            Reconstructed metric result.
+        """
 
         return cls(
             name=data["name"],
@@ -205,7 +289,15 @@ class MetricResult:
 
 @dataclass
 class SeriesResult:
-    """Container for ordered trace results and their series metadata."""
+    """Container for ordered trace results and their series metadata.
+
+    Parameters
+    ----------
+    records : list, optional
+        Ordered result records.
+    metadata : dict, optional
+        Series-level metadata.
+    """
 
     records: list[Any] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -217,7 +309,13 @@ class SeriesResult:
         return iter(self.records)
 
     def append(self, record: Any) -> None:
-        """Append one record while preserving the ordered-series contract."""
+        """Append one record while preserving the ordered-series contract.
+
+        Parameters
+        ----------
+        record : object
+            Result record to append.
+        """
 
         self.records.append(record)
 
@@ -230,7 +328,18 @@ class SeriesResult:
 
     @classmethod
     def from_dict(cls, data: Mapping[str, Any]) -> "SeriesResult":
-        """Reconstruct a generic series result from serialized records."""
+        """Reconstruct a generic series result from serialized records.
+
+        Parameters
+        ----------
+        data : mapping
+            Serialized series fields.
+
+        Returns
+        -------
+        SeriesResult
+            Reconstructed series result.
+        """
 
         return cls(
             records=list(data.get("records", [])),

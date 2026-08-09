@@ -1,7 +1,5 @@
 """Typed losses for one-dimensional pulse-trace deconvolution."""
 
-from __future__ import annotations
-
 import tensorflow as tf
 
 
@@ -17,7 +15,15 @@ def _prepare(y_true: tf.Tensor, y_pred: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor
 
 @tf.keras.utils.register_keras_serializable(package="DeepPeak")
 class WeightedHuber(tf.keras.losses.Loss):
-    """Huber reconstruction loss weighted by clean pulse amplitude."""
+    """Huber reconstruction loss weighted by clean pulse amplitude.
+
+    Parameters
+    ----------
+    delta : float, default=1.0
+        Huber transition point.
+    alpha : float, default=1.0
+        Weight applied to pulse amplitude.
+    """
 
     def __init__(self, delta: float = 1.0, alpha: float = 1.0, **kwargs):
         super().__init__(**kwargs)
@@ -40,7 +46,17 @@ class WeightedHuber(tf.keras.losses.Loss):
 
 @tf.keras.utils.register_keras_serializable(package="DeepPeak")
 class ShapeAwarePulseLoss(tf.keras.losses.Loss):
-    """Reconstruction loss combining amplitude, shape, and smoothness terms."""
+    """Reconstruction loss combining amplitude, shape, and smoothness terms.
+
+    Parameters
+    ----------
+    amplitude_weight : float, default=1.0
+        Weight of amplitude reconstruction error.
+    shape_weight : float, default=0.25
+        Weight of normalized shape error.
+    smoothness_weight : float, default=0.05
+        Weight of first-derivative error.
+    """
 
     def __init__(
         self,
@@ -96,7 +112,13 @@ class ShapeAwarePulseLoss(tf.keras.losses.Loss):
 
 @tf.keras.utils.register_keras_serializable(package="DeepPeak")
 class WeightedBinaryCrossentropy(tf.keras.losses.Loss):
-    """Binary crossentropy with increased weight for positive targets."""
+    """Binary crossentropy with increased weight for positive targets.
+
+    Parameters
+    ----------
+    alpha : float, default=1.0
+        Additional positive-target weight.
+    """
 
     def __init__(self, alpha: float = 1.0, **kwargs):
         super().__init__(**kwargs)
@@ -113,7 +135,17 @@ class WeightedBinaryCrossentropy(tf.keras.losses.Loss):
 
 @tf.keras.utils.register_keras_serializable(package="DeepPeak")
 class SmoothBinaryCrossentropy(WeightedBinaryCrossentropy):
-    """Weighted BCE with optional temporal smoothness and confidence terms."""
+    """Weighted BCE with optional temporal smoothness and confidence terms.
+
+    Parameters
+    ----------
+    alpha : float, default=1.0
+        Additional positive-target weight.
+    smoothness_weight : float, default=0.05
+        Weight of temporal smoothness error.
+    confidence_weight : float, default=0.0
+        Weight of prediction uncertainty penalty.
+    """
 
     def __init__(
         self,
@@ -155,7 +187,20 @@ def weighted_huber(
     delta: float = 1.0,
     alpha: float = 1.0,
 ):
-    """Function-style or configured weighted Huber reconstruction loss."""
+    """Function-style or configured weighted Huber reconstruction loss.
+
+    Parameters
+    ----------
+    y_true, y_pred : tensor-like, optional
+        If provided, evaluate the loss; otherwise return a configured loss.
+    delta, alpha : float, optional
+        Parameters forwarded to :class:`WeightedHuber`.
+
+    Returns
+    -------
+    WeightedHuber or tensor
+        Configured loss object or evaluated loss value.
+    """
 
     loss = WeightedHuber(delta=delta, alpha=alpha)
     if y_true is None or y_pred is None:
@@ -172,7 +217,20 @@ def shape_aware_pulse_loss(
     smoothness_weight: float = 0.05,
     **kwargs,
 ):
-    """Function-style or configured shape-aware reconstruction loss."""
+    """Function-style or configured shape-aware reconstruction loss.
+
+    Parameters
+    ----------
+    y_true, y_pred : tensor-like, optional
+        If provided, evaluate the loss; otherwise return a configured loss.
+    amplitude_weight, shape_weight, smoothness_weight : float, optional
+        Component weights.
+
+    Returns
+    -------
+    ShapeAwarePulseLoss or tensor
+        Configured loss object or evaluated loss value.
+    """
 
     loss = ShapeAwarePulseLoss(
         amplitude_weight=amplitude_weight,
@@ -186,7 +244,20 @@ def shape_aware_pulse_loss(
 
 
 def weighted_bce(y_true=None, y_pred=None, *, alpha: float = 1.0):
-    """Function-style or configured weighted binary crossentropy."""
+    """Function-style or configured weighted binary crossentropy.
+
+    Parameters
+    ----------
+    y_true, y_pred : tensor-like, optional
+        If provided, evaluate the loss; otherwise return a configured loss.
+    alpha : float, default=1.0
+        Additional positive-target weight.
+
+    Returns
+    -------
+    WeightedBinaryCrossentropy or tensor
+        Configured loss object or evaluated loss value.
+    """
 
     loss = WeightedBinaryCrossentropy(alpha=alpha)
     if y_true is None or y_pred is None:
@@ -202,7 +273,20 @@ def smooth_bce(
     smoothness_weight: float = 0.05,
     confidence_weight: float = 0.0,
 ):
-    """Function-style or configured smooth weighted binary crossentropy."""
+    """Function-style or configured smooth weighted binary crossentropy.
+
+    Parameters
+    ----------
+    y_true, y_pred : tensor-like, optional
+        If provided, evaluate the loss; otherwise return a configured loss.
+    alpha, smoothness_weight, confidence_weight : float, optional
+        Loss component weights.
+
+    Returns
+    -------
+    SmoothBinaryCrossentropy or tensor
+        Configured loss object or evaluated loss value.
+    """
 
     loss = SmoothBinaryCrossentropy(
         alpha=alpha,
