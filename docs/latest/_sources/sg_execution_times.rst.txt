@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**01:06.335** total execution time for 10 files **from all galleries**:
+**01:02.804** total execution time for 10 files **from all galleries**:
 
 .. container::
 
@@ -33,32 +33,32 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_classifier_wavenet.py` (``../examples/classifier_wavenet.py``)
-     - 00:39.741
+     - 00:35.879
      - 0.0
    * - :ref:`sphx_glr_gallery_classifier_autoencoder.py` (``../examples/classifier_autoencoder.py``)
-     - 00:15.211
+     - 00:15.511
      - 0.0
    * - :ref:`sphx_glr_gallery_classifier_dense.py` (``../examples/classifier_dense.py``)
-     - 00:04.939
+     - 00:04.922
      - 0.0
    * - :ref:`sphx_glr_gallery_amplitude_retrieval.py` (``../examples/amplitude_retrieval.py``)
-     - 00:01.563
+     - 00:01.555
      - 0.0
    * - :ref:`sphx_glr_gallery_non_maximum_suppression.py` (``../examples/non_maximum_suppression.py``)
-     - 00:01.486
+     - 00:01.523
      - 0.0
    * - :ref:`sphx_glr_gallery_data_generation_custom_kernel.py` (``../examples/data_generation_custom_kernel.py``)
-     - 00:01.356
+     - 00:01.350
      - 0.0
    * - :ref:`sphx_glr_gallery_data_generation.py` (``../examples/data_generation.py``)
-     - 00:01.283
+     - 00:01.282
      - 0.0
    * - :ref:`sphx_glr_gallery_noise_and_pulse_analysis.py` (``../examples/noise_and_pulse_analysis.py``)
-     - 00:00.378
+     - 00:00.403
      - 0.0
    * - :ref:`sphx_glr_gallery_core_result_objects.py` (``../examples/core_result_objects.py``)
-     - 00:00.213
+     - 00:00.210
      - 0.0
    * - :ref:`sphx_glr_gallery_classical_detection_pipeline.py` (``../examples/classical_detection_pipeline.py``)
-     - 00:00.167
+     - 00:00.166
      - 0.0

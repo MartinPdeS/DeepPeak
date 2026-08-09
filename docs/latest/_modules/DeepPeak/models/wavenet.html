@@ -515,8 +515,12 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseDeconvolver</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.losses</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ShapeAwarePulseLoss</span><span class="p">,</span>
+    <span class="n">SmoothBinaryCrossentropy</span><span class="p">,</span>
+    <span class="n">WeightedBinaryCrossentropy</span><span class="p">,</span>
     <span class="n">WeightedHuber</span><span class="p">,</span>
     <span class="n">shape_aware_pulse_loss</span><span class="p">,</span>
+    <span class="n">smooth_bce</span><span class="p">,</span>
+    <span class="n">weighted_bce</span><span class="p">,</span>
     <span class="n">weighted_huber</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -526,8 +530,12 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
     <span class="n">resolved</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;ShapeAwarePulseLoss&quot;</span><span class="p">:</span> <span class="n">ShapeAwarePulseLoss</span><span class="p">,</span>
+        <span class="s2">&quot;SmoothBinaryCrossentropy&quot;</span><span class="p">:</span> <span class="n">SmoothBinaryCrossentropy</span><span class="p">,</span>
+        <span class="s2">&quot;WeightedBinaryCrossentropy&quot;</span><span class="p">:</span> <span class="n">WeightedBinaryCrossentropy</span><span class="p">,</span>
         <span class="s2">&quot;WeightedHuber&quot;</span><span class="p">:</span> <span class="n">WeightedHuber</span><span class="p">,</span>
         <span class="s2">&quot;shape_aware_pulse_loss&quot;</span><span class="p">:</span> <span class="n">shape_aware_pulse_loss</span><span class="p">,</span>
+        <span class="s2">&quot;smooth_bce&quot;</span><span class="p">:</span> <span class="n">smooth_bce</span><span class="p">,</span>
+        <span class="s2">&quot;weighted_bce&quot;</span><span class="p">:</span> <span class="n">weighted_bce</span><span class="p">,</span>
         <span class="s2">&quot;weighted_huber&quot;</span><span class="p">:</span> <span class="n">weighted_huber</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="k">if</span> <span class="n">custom_objects</span><span class="p">:</span>

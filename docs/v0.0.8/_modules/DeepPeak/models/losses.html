@@ -554,12 +554,25 @@
         <span class="n">amplitude_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
         <span class="n">shape_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
         <span class="n">smoothness_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">delta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">derivative_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amplitude_weight</span><span class="p">)</span>
+        <span class="c1"># ``alpha``, ``delta`` and ``derivative_weight`` were accepted by an</span>
+        <span class="c1"># earlier public version.  Keep them as aliases so saved notebooks and</span>
+        <span class="c1"># model configurations remain loadable.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amplitude_weight</span> <span class="k">if</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">alpha</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shape_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">shape_weight</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">smoothness_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">smoothness_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smoothness_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="n">smoothness_weight</span> <span class="k">if</span> <span class="n">derivative_weight</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">derivative_weight</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">alpha</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">delta</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">delta</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">derivative_weight</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span> <span class="k">if</span> <span class="n">derivative_weight</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">derivative_weight</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
         <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">_prepare</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
@@ -582,6 +595,69 @@
             <span class="s2">&quot;amplitude_weight&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude_weight</span><span class="p">,</span>
             <span class="s2">&quot;shape_weight&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">shape_weight</span><span class="p">,</span>
             <span class="s2">&quot;smoothness_weight&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">smoothness_weight</span><span class="p">,</span>
+            <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">,</span>
+            <span class="s2">&quot;delta&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">delta</span><span class="p">,</span>
+            <span class="s2">&quot;derivative_weight&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">derivative_weight</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="WeightedBinaryCrossentropy">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.models.WeightedBinaryCrossentropy">[docs]</a>
+<span class="nd">@tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">&quot;DeepPeak&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WeightedBinaryCrossentropy</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">Loss</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Binary crossentropy with increased weight for positive targets.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+        <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">_prepare</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="n">bce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">binary_crossentropy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">y_true</span><span class="p">)</span> <span class="o">*</span> <span class="n">bce</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span> <span class="s2">&quot;alpha&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="SmoothBinaryCrossentropy">
+<a class="viewcode-back" href="../../../code.html#DeepPeak.models.SmoothBinaryCrossentropy">[docs]</a>
+<span class="nd">@tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">register_keras_serializable</span><span class="p">(</span><span class="n">package</span><span class="o">=</span><span class="s2">&quot;DeepPeak&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SmoothBinaryCrossentropy</span><span class="p">(</span><span class="n">WeightedBinaryCrossentropy</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weighted BCE with optional temporal smoothness and confidence terms.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">smoothness_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="n">confidence_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">smoothness_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">smoothness_weight</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confidence_weight</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">confidence_weight</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">):</span>
+        <span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span> <span class="o">=</span> <span class="n">_prepare</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="n">bce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">keras</span><span class="o">.</span><span class="n">backend</span><span class="o">.</span><span class="n">binary_crossentropy</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+        <span class="n">weighted_bce</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">((</span><span class="mf">1.0</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">alpha</span> <span class="o">*</span> <span class="n">y_true</span><span class="p">)</span> <span class="o">*</span> <span class="n">bce</span><span class="p">)</span>
+        <span class="n">prediction_diff</span> <span class="o">=</span> <span class="n">y_pred</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">target_diff</span> <span class="o">=</span> <span class="n">y_true</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">-</span> <span class="n">y_true</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">smoothness</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">prediction_diff</span> <span class="o">-</span> <span class="n">target_diff</span><span class="p">))</span>
+        <span class="n">confidence</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">y_pred</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">y_pred</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">weighted_bce</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">smoothness_weight</span> <span class="o">*</span> <span class="n">smoothness</span>
+            <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">confidence_weight</span> <span class="o">*</span> <span class="n">confidence</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_config</span><span class="p">(),</span>
+            <span class="s2">&quot;smoothness_weight&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">smoothness_weight</span><span class="p">,</span>
+            <span class="s2">&quot;confidence_weight&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">confidence_weight</span><span class="p">,</span>
         <span class="p">}</span></div>
 
 
@@ -608,6 +684,7 @@
     <span class="n">amplitude_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
     <span class="n">shape_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span>
     <span class="n">smoothness_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured shape-aware reconstruction loss.&quot;&quot;&quot;</span>
 
@@ -615,6 +692,36 @@
         <span class="n">amplitude_weight</span><span class="o">=</span><span class="n">amplitude_weight</span><span class="p">,</span>
         <span class="n">shape_weight</span><span class="o">=</span><span class="n">shape_weight</span><span class="p">,</span>
         <span class="n">smoothness_weight</span><span class="o">=</span><span class="n">smoothness_weight</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">y_true</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">loss</span>
+    <span class="k">return</span> <span class="n">loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">weighted_bce</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured weighted binary crossentropy.&quot;&quot;&quot;</span>
+
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">WeightedBinaryCrossentropy</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">y_true</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">loss</span>
+    <span class="k">return</span> <span class="n">loss</span><span class="p">(</span><span class="n">y_true</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">smooth_bce</span><span class="p">(</span>
+    <span class="n">y_true</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">y_pred</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">smoothness_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">confidence_weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Function-style or configured smooth weighted binary crossentropy.&quot;&quot;&quot;</span>
+
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">SmoothBinaryCrossentropy</span><span class="p">(</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span>
+        <span class="n">smoothness_weight</span><span class="o">=</span><span class="n">smoothness_weight</span><span class="p">,</span>
+        <span class="n">confidence_weight</span><span class="o">=</span><span class="n">confidence_weight</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">y_true</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">y_pred</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">loss</span>
@@ -623,8 +730,12 @@
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;ShapeAwarePulseLoss&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;SmoothBinaryCrossentropy&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;WeightedBinaryCrossentropy&quot;</span><span class="p">,</span>
     <span class="s2">&quot;WeightedHuber&quot;</span><span class="p">,</span>
     <span class="s2">&quot;shape_aware_pulse_loss&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;smooth_bce&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;weighted_bce&quot;</span><span class="p">,</span>
     <span class="s2">&quot;weighted_huber&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 </pre></div>
