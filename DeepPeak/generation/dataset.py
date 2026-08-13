@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Any, Literal
 import numpy as np
 import matplotlib.pyplot as plt
 from MPSPlots import helper
@@ -13,16 +13,48 @@ AmplitudeThresholdReference = Literal["absolute", "sample_max_amplitude", "signa
 
 
 class DataSet:
-    """
-    A simple container class for datasets.
+    """Container for sample-aligned one-dimensional signal data.
 
-    This class dynamically sets attributes based on the provided keyword arguments,
-    allowing for flexible storage of various dataset components.
+    ``DataSet`` stores signals with shape ``(n_samples, sequence_length)`` and
+    any additional sample-aligned arrays, such as clean traces, labels, peak
+    positions, or amplitudes. Common fields are validated at construction time.
+    Extra keyword arguments are retained as public attributes for domain-specific
+    metadata.
 
     Parameters
     ----------
-    **kwargs : dict
-        Keyword arguments to be set as attributes of the instance.
+    n_samples : int, optional
+        Number of signal traces. Inferred from ``signals`` when omitted.
+    sequence_length : int, optional
+        Number of samples per trace. Inferred from ``signals`` or ``x_values``
+        when omitted.
+    seed : int, optional
+        Seed associated with the dataset generation process. This value is
+        recorded for provenance; it is not used to seed operations on the
+        dataset itself.
+    metadata : dict, optional
+        Additional provenance or experiment metadata. A shallow copy is stored.
+    **kwargs : object
+        Additional dataset fields. ``signals`` is expected to have shape
+        ``(n_samples, sequence_length)``. Arrays whose first dimension equals
+        ``n_samples`` are treated as sample-aligned by methods such as
+        :meth:`shuffle` and :meth:`train_test_split`.
+
+    Raises
+    ------
+    ValueError
+        If signals, coordinates, labels, or clean traces have incompatible
+        shapes.
+
+    Examples
+    --------
+    >>> dataset = DataSet(
+    ...     signals=np.zeros((8, 128)),
+    ...     labels=np.zeros((8, 128)),
+    ...     x_values=np.arange(128),
+    ... )
+    >>> dataset.to_model_inputs().shape
+    (8, 128, 1)
     """
 
     list_of_attributes = None
@@ -32,8 +64,28 @@ class DataSet:
         *,
         n_samples: int | None = None,
         sequence_length: int | None = None,
+        seed: int | None = None,
+        metadata: dict[str, Any] | None = None,
         **kwargs,
     ):
+        """Initialize the dataset and validate its common array dimensions.
+
+        Parameters
+        ----------
+        n_samples, sequence_length, seed, metadata, **kwargs
+            See the :class:`DataSet` class documentation. In particular,
+            ``signals``, ``labels``, and ``clean_signals`` should be supplied
+            as sample-aligned arrays when available.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If supplied arrays do not satisfy the dataset shape contract.
+        """
         self.list_of_attributes = []
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -64,13 +116,298 @@ class DataSet:
             self.sequence_length = int(inferred_sequence_length)
             self.list_of_attributes.append("sequence_length")
 
+        self.seed = seed
+        self.metadata = dict(metadata or {})
+        self._validate_shapes()
+
+    def _validate_shapes(self) -> None:
+        """Validate the common sample and time-axis contract.
+
+        Raises
+        ------
+        ValueError
+            If the signal matrix, coordinate vector, clean traces, or labels
+            do not match the dataset dimensions.
+        """
+        signals = getattr(self, "signals", None)
+        if signals is None:
+            return
+        signals = np.asarray(signals)
+        if signals.ndim != 2:
+            raise ValueError(
+                "signals must have shape (n_samples, sequence_length); "
+                f"received shape {signals.shape}."
+            )
+        if (
+            signals.shape[0] != self.n_samples
+            or signals.shape[1] != self.sequence_length
+        ):
+            raise ValueError(
+                "signals shape does not match n_samples and sequence_length."
+            )
+
+        x_values = getattr(self, "x_values", None)
+        if x_values is not None:
+            x_values = np.asarray(x_values)
+            if x_values.ndim != 1 or x_values.size != self.sequence_length:
+                raise ValueError(
+                    "x_values must have shape (sequence_length,) and match signals."
+                )
+
+        for name in ("clean_signals", "labels"):
+            values = getattr(self, name, None)
+            if values is not None:
+                values = np.asarray(values)
+                if (
+                    values.shape[0] != self.n_samples
+                    or values.shape[-1] != self.sequence_length
+                ):
+                    raise ValueError(
+                        f"{name} must be sample-aligned with shape "
+                        "(n_samples, sequence_length)."
+                    )
+
+    def to_model_inputs(
+        self, *, normalization: str = "none", add_channel: bool = True
+    ) -> np.ndarray:
+        """Convert signals to the channel-last shape expected by neural models.
+
+        Parameters
+        ----------
+        normalization : str, default="none"
+            Normalization mode passed to :meth:`get_normalized_signal`.
+            Supported modes include ``"none"``, ``"zscore"``, ``"minmax"``,
+            ``"l1"``, ``"l2"``, ``"robust_zscore"``, and ``"maxabs"``.
+        add_channel : bool, default=True
+            If true, append a singleton channel dimension and return shape
+            ``(n_samples, sequence_length, 1)``. If false, return the two-
+            dimensional shape ``(n_samples, sequence_length)``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Floating-point copy of the signal data, optionally normalized.
+
+        Raises
+        ------
+        AttributeError
+            If the dataset has no ``signals`` field.
+        ValueError
+            If signals are not a two-dimensional matrix.
+
+        Examples
+        --------
+        >>> inputs = dataset.to_model_inputs(normalization="zscore")
+        >>> inputs.shape
+        (8, 128, 1)
+        """
+        values = (
+            self.get_normalized_signal(normalization)
+            if normalization != "none"
+            else np.asarray(self.signals, dtype=float).copy()
+        )
+        if values.ndim != 2:
+            raise ValueError("Model inputs require signals with two dimensions.")
+        return values[..., None] if add_channel else values
+
+    def targets(
+        self,
+        target: str = "auto",
+        *,
+        add_channel: bool = True,
+        width: float | None = None,
+        profile: Profile = "gaussian",
+        width_definition: WidthDefinition = "fwhm",
+        normalize_peak_to_one: bool = False,
+        normalization_mode: NormalizationMode = "analytic",
+        **reference_kwargs: Any,
+    ) -> np.ndarray:
+        """Return model targets from stored arrays or shaped references.
+
+        Parameters
+        ----------
+        target : {"auto", "labels", "clean_signals", "reference"}, default="auto"
+            Target field to return. ``"labels"`` contains pulse-location
+            targets, typically binary values with one or more marked samples
+            per trace. ``"clean_signals"`` contains reconstructed clean pulse
+            traces. ``"reference"`` builds a shaped target from the stored
+            ``positions`` and ``amplitudes`` using
+            :meth:`get_reference_pulse_trace`. ``"auto"`` selects ``labels``
+            when present and otherwise falls back to ``clean_signals``.
+        add_channel : bool, default=True
+            If true, append a singleton channel dimension and return shape
+            ``(n_samples, sequence_length, 1)``. If false, return shape
+            ``(n_samples, sequence_length)``.
+        width : float, optional
+            Width of a ``"reference"`` target, in the same units as
+            ``x_values``. Required when ``target="reference"``.
+        profile : {"gaussian", "lorentzian"}, default="gaussian"
+            Shape used for a ``"reference"`` target.
+        width_definition : {"fwhm", "sigma", "gamma"}, default="fwhm"
+            Meaning of ``width``. Gaussian targets accept ``"fwhm"`` or
+            ``"sigma"``; Lorentzian targets accept ``"fwhm"`` or ``"gamma"``.
+        normalize_peak_to_one : bool, default=False
+            Normalize each generated reference pulse to unit height before
+            applying its amplitude.
+        normalization_mode : {"analytic", "sampled"}, default="analytic"
+            Normalization strategy used for shaped reference targets.
+        **reference_kwargs
+            Additional arguments forwarded to
+            :meth:`get_reference_pulse_trace`, such as ``amplitude``,
+            ``min_peak_distance``, or ``max_peak_overlap``.
+
+        Returns
+        -------
+        numpy.ndarray
+            Floating-point target array selected from the dataset.
+
+        Raises
+        ------
+        ValueError
+            If ``target`` is invalid, a requested field is absent, the target
+            shape is invalid, or reference parameters are incomplete.
+
+        Examples
+        --------
+        >>> labels = dataset.targets("labels")
+        >>> labels.shape
+        (8, 128, 1)
+        >>> reference = dataset.targets("reference", width=6.0)
+        >>> reference.shape
+        (8, 128, 1)
+        """
+        if target == "auto":
+            target = "labels" if hasattr(self, "labels") else "clean_signals"
+        if target == "reference":
+            if width is None:
+                raise ValueError("width is required when target='reference'.")
+            values = self.get_reference_pulse_trace(
+                width=width,
+                profile=profile,
+                width_definition=width_definition,
+                normalize_peak_to_one=normalize_peak_to_one,
+                normalization_mode=normalization_mode,
+                **reference_kwargs,
+            )
+        else:
+            if target not in {"labels", "clean_signals"}:
+                raise ValueError(
+                    "target must be 'auto', 'labels', 'clean_signals', or "
+                    "'reference'."
+                )
+            if not hasattr(self, target):
+                raise ValueError(f"Dataset does not contain {target!r} targets.")
+            values = np.asarray(getattr(self, target), dtype=float)
+        if values.ndim != 2 or values.shape != (self.n_samples, self.sequence_length):
+            raise ValueError(f"{target} must have shape (n_samples, sequence_length).")
+        return values[..., None] if add_channel else values
+
+    def train_test_split(
+        self,
+        test_size: float | int = 0.2,
+        *,
+        seed: int | None = None,
+        shuffle: bool = True,
+    ) -> tuple["DataSet", "DataSet"]:
+        """Split all sample-aligned fields into train and test datasets.
+
+        Parameters
+        ----------
+        test_size : float or int, default=0.2
+            If a float, the fraction of samples assigned to the test set. If
+            an integer, the exact number of test samples.
+        seed : int, optional
+            Seed for the permutation used when ``shuffle=True``.
+        shuffle : bool, default=True
+            Whether to permute samples before splitting. Set false to preserve
+            the original order and use the final samples as the test set.
+
+        Returns
+        -------
+        train : DataSet
+            Training subset containing every sample-aligned field.
+        test : DataSet
+            Test subset containing every sample-aligned field.
+
+        Raises
+        ------
+        TypeError
+            If ``test_size`` is neither an integer nor a float.
+        ValueError
+            If ``test_size`` does not define a non-empty test set smaller than
+            the complete dataset.
+
+        Notes
+        -----
+        The original dataset's ``seed`` and metadata are copied to both
+        subsets. The split seed is added to each subset's metadata under
+        ``"split_seed"``.
+        """
+        if isinstance(test_size, float):
+            if not 0.0 < test_size < 1.0:
+                raise ValueError("A float test_size must be between 0 and 1.")
+            n_test = max(1, int(np.ceil(self.n_samples * test_size)))
+        elif isinstance(test_size, (int, np.integer)):
+            n_test = int(test_size)
+            if not 0 < n_test < self.n_samples:
+                raise ValueError(
+                    "An integer test_size must be between 1 and n_samples - 1."
+                )
+        else:
+            raise TypeError("test_size must be a float or integer.")
+
+        indices = np.arange(self.n_samples)
+        if shuffle:
+            indices = np.random.default_rng(seed).permutation(indices)
+        train_indices, test_indices = indices[:-n_test], indices[-n_test:]
+
+        def subset(selected: np.ndarray) -> "DataSet":
+            values = {}
+            for name in self.list_of_attributes:
+                value = getattr(self, name)
+                if (
+                    isinstance(value, np.ndarray)
+                    and value.ndim >= 1
+                    and value.shape[0] == self.n_samples
+                ):
+                    values[name] = value[selected].copy()
+                elif name not in {"n_samples", "sequence_length"}:
+                    values[name] = self._copy_attribute_value(value)
+            return DataSet(
+                **values,
+                seed=self.seed,
+                metadata={**self.metadata, "split_seed": seed},
+            )
+
+        return subset(train_indices), subset(test_indices)
+
     def __repr__(self):
         class_name = self.__class__.__name__
         attributes = ", ".join(f"{key}" for key in self.list_of_attributes)
         return f"{class_name}({attributes})"
 
     def shuffle(self, seed: int | None = None, inplace: bool = False) -> "DataSet":
-        """Shuffle sample-aligned attributes with one shared permutation."""
+        """Shuffle all sample-aligned fields with one shared permutation.
+
+        Parameters
+        ----------
+        seed : int, optional
+            Seed used to create the sample permutation.
+        inplace : bool, default=False
+            If true, mutate and return this dataset. If false, return a new
+            dataset and leave the original unchanged.
+
+        Returns
+        -------
+        DataSet
+            Shuffled dataset. All arrays whose first dimension equals
+            ``n_samples`` retain their alignment.
+
+        Raises
+        ------
+        AttributeError
+            If the number of samples cannot be inferred.
+        """
 
         n_samples = self._resolve_n_samples()
         permutation = np.random.default_rng(seed).permutation(n_samples)
@@ -115,8 +452,7 @@ class DataSet:
         return value
 
     def get_normalized_signal(self, normalization: str = "zscore"):
-        """
-        Normalize dataset signals.
+        """Normalize each signal trace independently.
 
         Parameters
         ----------
@@ -147,8 +483,21 @@ class DataSet:
 
         Returns
         -------
-        ndarray
-            Normalized signal array.
+        numpy.ndarray
+            Normalized signal array with shape
+            ``(n_samples, sequence_length)``.
+
+        Raises
+        ------
+        ValueError
+            If ``normalization`` is not a supported mode or the signal array
+            has an incompatible shape.
+
+        Examples
+        --------
+        >>> normalized = dataset.get_normalized_signal("zscore")
+        >>> normalized.shape
+        (8, 128)
         """
         return processing.normalize_signal(
             self.signals, normalization=normalization, axis=1
@@ -205,7 +554,7 @@ class DataSet:
             squeeze=False,
         )
 
-        for plot_index, ax in zip(indices, axes.flatten()):
+        for panel_index, (plot_index, ax) in enumerate(zip(indices, axes.flatten())):
             signal = self.signals[plot_index]
 
             ax.plot(self.x_values, signal, label="signal", color="black")
@@ -229,12 +578,12 @@ class DataSet:
                 handles.append(reference_handle)
                 labels.append("Reference pulse")
 
-            by_label = {}
-            for h, l in zip(handles, labels):
-                if l and not l.startswith("_") and l not in by_label:
-                    by_label[l] = h
-
-            ax.legend(by_label.values(), by_label.keys())
+            if panel_index == 0:
+                by_label = {}
+                for h, l in zip(handles, labels):
+                    if l and not l.startswith("_") and l not in by_label:
+                        by_label[l] = h
+                ax.legend(by_label.values(), by_label.keys())
             ax.set_title(f"Sample {plot_index}")
 
         figure.supxlabel("Time step [AU]", y=0)

@@ -291,7 +291,7 @@ For questions or contributions, contact `martin.poinsinet.de.sivry@gmail.com <ma
     :target: https://www.python.org/
 .. |colab| image:: https://colab.research.google.com/assets/colab-badge.svg
     :alt: Google Colab
-    :target: https://colab.research.google.com/github/MartinPdeS/DeepPeak/blob/master/notebook.ipynb
+    :target: https://colab.research.google.com/github/MartinPdeS/DeepPeak/blob/master/notebooks/wavenet_training.ipynb
 .. |docs| image:: https://github.com/martinpdes/deeppeak/actions/workflows/deploy_documentation.yml/badge.svg
     :target: https://martinpdes.github.io/DeepPeak/
     :alt: Documentation Status

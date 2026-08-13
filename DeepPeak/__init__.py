@@ -118,6 +118,7 @@ __all__ = [
     "smooth_bce",
     "weighted_bce",
     "weighted_huber",
+    "ModelEvaluationResult",
 ]
 
 

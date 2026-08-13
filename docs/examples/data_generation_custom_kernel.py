@@ -46,7 +46,7 @@ generator = SignalGenerator(
 dataset = generator.generate(
     n_samples=sample_count,
     kernel=_kernel,
-    peak_count=UniformCount(bounds=(1, 1)),
+    peak_count=UniformCount(bounds=(NUM_PEAKS, NUM_PEAKS)),
     noise_std=(0, 1),  # Add some noise
     categorical_peak_count=False,
     drift=(0, 10),

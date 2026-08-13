@@ -417,6 +417,9 @@ class WaveNet(BaseDeconvolver):
         # Build Keras model architecture
         instance.build()
 
+        if hasattr(instance.optimizer, "build"):
+            instance.optimizer.build(instance.model.trainable_variables)
+
         # Load weights if available
         if os.path.exists(weights_path):
             instance.model.load_weights(weights_path)

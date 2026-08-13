@@ -5,7 +5,14 @@ from pathlib import Path
 
 import DeepPeak
 
-__all__ = ["root_path", "project_path", "doc_path", "doc_css_path", "logo_path"]
+__all__ = [
+    "root_path",
+    "project_path",
+    "doc_path",
+    "doc_css_path",
+    "logo_path",
+    "weights_path",
+]
 
 root_path = Path(DeepPeak.__path__[0])
 

@@ -10,6 +10,7 @@ import tempfile
 from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
 from DeepPeak.utils import merge_and_plot_histories
 from .training import TrainingConfig
+from .evaluation import ModelEvaluationResult
 
 HistoryLike = Union[tf.keras.callbacks.History, dict]
 
@@ -18,13 +19,35 @@ class BaseDeconvolver:
     histories = []
 
     def save(self, path: str) -> None:
-        """Save the compiled model (architecture + weights)."""
+        """Save the model architecture, weights, and compile configuration.
+
+        Parameters
+        ----------
+        path : str
+            Destination path accepted by :meth:`tf.keras.Model.save`.
+
+        Returns
+        -------
+        None
+        """
         self._ensure_built()
         self.model.save(path)
 
     def load_weights(self, path: str) -> None:
-        """Load weights into a built model."""
+        """Load weights from a Keras checkpoint into the model.
+
+        Parameters
+        ----------
+        path : str
+            Path to a weights checkpoint accepted by Keras.
+
+        Returns
+        -------
+        None
+        """
         self._ensure_built()
+        if hasattr(self.optimizer, "build"):
+            self.optimizer.build(self.model.trainable_variables)
         self.model.load_weights(path)
 
     def _ensure_built(self) -> None:
@@ -42,7 +65,17 @@ class BaseDeconvolver:
         raise TypeError(f"Unsupported history type: {type(h)}")
 
     def summary(self, *args, **kwargs) -> None:
-        """Print the model summary."""
+        """Print the underlying Keras model summary.
+
+        Parameters
+        ----------
+        *args, **kwargs
+            Arguments forwarded to :meth:`tf.keras.Model.summary`.
+
+        Returns
+        -------
+        None
+        """
         self._ensure_built()
         self.model.summary(*args, **kwargs)
 
@@ -67,8 +100,19 @@ class BaseDeconvolver:
         Returns
         -------
         np.ndarray
-            Reconstructed signal values.
+            Model predictions, usually shaped as
+            ``(n_samples, sequence_length, n_output_channels)``.
+
+        Raises
+        ------
+        ValueError
+            If ``signal`` is not a compatible two- or three-dimensional
+            channel-last array.
         """
+        signal = np.asarray(signal)
+        if signal.ndim == 2:
+            signal = signal[..., None]
+        self._validate_model_input(signal)
         self._ensure_built()
         p = self.model.predict(signal, batch_size=batch_size, verbose=verbose)
         return p
@@ -76,8 +120,7 @@ class BaseDeconvolver:
     def evaluate(
         self, x: np.ndarray, y: np.ndarray, *, batch_size: int = 32, verbose: int = 0
     ) -> dict:
-        """
-        Evaluate the model; returns a dict of metric -> value.
+        """Evaluate the model and return its named metric values.
 
         Parameters
         ----------
@@ -89,19 +132,185 @@ class BaseDeconvolver:
             Batch size for evaluation.
         verbose : int
             Verbosity mode (0 = silent, 1 = progress bar, 2 = one line per epoch).
+
+        Returns
+        -------
+        dict[str, float]
+            Mapping from metric names to scalar values.
+
+        Raises
+        ------
+        ValueError
+            If ``x`` and ``y`` do not follow the channel-last model contract.
         """
+        x = np.asarray(x)
+        y = np.asarray(y)
+        self._validate_model_arrays(x, y)
         self._ensure_built()
         results = self.model.evaluate(
             x, y, batch_size=batch_size, verbose=verbose, return_dict=True
         )
         return results
 
-    def receptive_field(self) -> int:
-        """
-        Receptive field in time steps for the dilated stack (causal).
+    def fit_dataset(
+        self,
+        dataset: Any,
+        *,
+        target: str | np.ndarray = "auto",
+        target_kwargs: dict[str, Any] | None = None,
+        normalization: str = "none",
+        config: TrainingConfig | None = None,
+        callbacks: Iterable[tf.keras.callbacks.Callback] | None = None,
+        **kwargs: Any,
+    ) -> tf.keras.callbacks.History:
+        """Train directly from a sample-aligned :class:`DataSet`.
 
-        For dilation rates d_i = 2^i and kernel size K:
-            RF = 1 + sum_i (K - 1) * d_i
+        Parameters
+        ----------
+        dataset : DataSet
+            Dataset providing ``signals`` and either ``labels`` or
+            ``clean_signals``.
+        target : str or numpy.ndarray, default="auto"
+            Target field passed to :meth:`DataSet.targets`, or precomputed
+            target values shaped ``(n_samples, sequence_length)`` or
+            ``(n_samples, sequence_length, 1)``.
+        target_kwargs : dict, optional
+            Additional keyword arguments passed to :meth:`DataSet.targets`.
+            For example, use ``{"width": 6.0, "profile": "gaussian"}``
+            with ``target="reference"``.
+        normalization : str, default="none"
+            Input normalization passed to :meth:`DataSet.to_model_inputs`.
+        config : TrainingConfig, optional
+            Optional training configuration used to construct fit arguments
+            and callbacks.
+        callbacks : iterable of tensorflow.keras.callbacks.Callback, optional
+            Additional callbacks appended to callbacks from ``config``.
+        **kwargs
+            Additional arguments forwarded to :meth:`fit` and Keras.
+
+        Returns
+        -------
+        tensorflow.keras.callbacks.History
+            History returned by Keras after training.
+        """
+        inputs = dataset.to_model_inputs(normalization=normalization)
+        targets = self._resolve_dataset_targets(dataset, target, target_kwargs)
+        self._validate_model_arrays(inputs, targets)
+        return self.fit(inputs, targets, config=config, callbacks=callbacks, **kwargs)
+
+    def evaluate_dataset(
+        self,
+        dataset: Any,
+        *,
+        target: str | np.ndarray = "auto",
+        target_kwargs: dict[str, Any] | None = None,
+        normalization: str = "none",
+        return_arrays: bool = True,
+        batch_size: int = 32,
+        verbose: int = 0,
+    ) -> ModelEvaluationResult:
+        """Evaluate a model on a :class:`DataSet` and retain predictions.
+
+        Parameters
+        ----------
+        dataset : DataSet
+            Dataset providing model inputs and targets.
+        target : str or numpy.ndarray, default="auto"
+            Target field passed to :meth:`DataSet.targets`, or precomputed
+            target values shaped ``(n_samples, sequence_length)`` or
+            ``(n_samples, sequence_length, 1)``.
+        target_kwargs : dict, optional
+            Additional keyword arguments passed to :meth:`DataSet.targets`.
+        normalization : str, default="none"
+            Input normalization passed to :meth:`DataSet.to_model_inputs`.
+        return_arrays : bool, default=True
+            Whether to store inputs, targets, and predictions in the result.
+        batch_size : int, default=32
+            Number of samples processed per batch.
+        verbose : int, default=0
+            Keras verbosity level.
+
+        Returns
+        -------
+        ModelEvaluationResult
+            Named metrics and, when requested, the arrays used for evaluation.
+        """
+        inputs = dataset.to_model_inputs(normalization=normalization)
+        targets = self._resolve_dataset_targets(dataset, target, target_kwargs)
+        self._validate_model_arrays(inputs, targets)
+        metrics = self.evaluate(inputs, targets, batch_size=batch_size, verbose=verbose)
+        predictions = None
+        if return_arrays:
+            predictions = np.asarray(
+                self.predict(inputs, batch_size=batch_size, verbose=verbose)
+            )
+            if predictions.shape != targets.shape:
+                raise ValueError(
+                    "Model predictions must match target shape; "
+                    f"received {predictions.shape}, expected {targets.shape}."
+                )
+        return ModelEvaluationResult(
+            metrics={name: float(value) for name, value in metrics.items()},
+            inputs=inputs if return_arrays else None,
+            targets=targets if return_arrays else None,
+            predictions=predictions,
+        )
+
+    @staticmethod
+    def _resolve_dataset_targets(
+        dataset: Any,
+        target: str | np.ndarray,
+        target_kwargs: dict[str, Any] | None,
+    ) -> np.ndarray:
+        """Resolve a target name or normalize a precomputed target array."""
+        if isinstance(target, str):
+            return dataset.targets(target, **(target_kwargs or {}))
+        if target_kwargs:
+            raise ValueError(
+                "target_kwargs can only be used when target is a target name."
+            )
+        values = np.asarray(target, dtype=float)
+        if values.ndim == 2:
+            values = values[..., None]
+        if values.ndim != 3:
+            raise ValueError(
+                "Precomputed targets must have shape "
+                "(n_samples, sequence_length) or "
+                "(n_samples, sequence_length, 1)."
+            )
+        return values
+
+    def _validate_model_arrays(self, inputs: np.ndarray, targets: np.ndarray) -> None:
+        """Validate the standard channel-last model array contract."""
+        if inputs.ndim != 3 or targets.ndim != 3:
+            raise ValueError("Model inputs and targets must be 3D channel-last arrays.")
+        if inputs.shape[0] != targets.shape[0] or inputs.shape[1] != targets.shape[1]:
+            raise ValueError(
+                "Model inputs and targets must share samples and sequence length."
+            )
+
+    def _validate_model_input(self, inputs: np.ndarray) -> None:
+        """Validate a channel-last input batch before prediction."""
+        if inputs.ndim != 3:
+            raise ValueError("Model inputs must be a 3D channel-last array.")
+        if hasattr(self, "sequence_length") and inputs.shape[1] != self.sequence_length:
+            raise ValueError(
+                "Model input sequence length does not match the model: "
+                f"received {inputs.shape[1]}, expected {self.sequence_length}."
+            )
+
+    def receptive_field(self) -> int:
+        """Return the causal receptive-field length in time steps.
+
+        Returns
+        -------
+        int
+            Number of input time steps that can influence one output sample.
+
+        Notes
+        -----
+        For dilation rates ``d_i = 2**i`` and kernel size ``K``, the field is
+        ``1 + sum((K - 1) * d_i)`` over all dilation layers.
         """
         rf = 1 + sum(
             (self.kernel_size - 1) * (2**i) for i in range(self.num_dilation_layers)

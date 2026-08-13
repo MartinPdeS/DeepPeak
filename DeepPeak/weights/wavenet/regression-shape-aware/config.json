@@ -1,0 +1,55 @@
+{
+  "sequence_length": 1000,
+  "num_filters": 32,
+  "num_dilation_layers": 6,
+  "kernel_size": 4,
+  "output_activation": "linear",
+  "dropout_rate": 0.0,
+  "optimizer": {
+    "module": "keras.optimizers",
+    "class_name": "Adam",
+    "config": {
+      "name": "adam",
+      "learning_rate": 9.999999974752427e-07,
+      "weight_decay": null,
+      "clipnorm": null,
+      "global_clipnorm": null,
+      "clipvalue": null,
+      "use_ema": false,
+      "ema_momentum": 0.99,
+      "ema_overwrite_frequency": null,
+      "loss_scale_factor": null,
+      "gradient_accumulation_steps": null,
+      "beta_1": 0.9,
+      "beta_2": 0.999,
+      "epsilon": 1e-07,
+      "amsgrad": false
+    },
+    "registered_name": null
+  },
+  "loss": {
+    "module": "DeepPeak.neural_networks.losses",
+    "class_name": "ShapeAwarePulseLoss",
+    "config": {
+      "name": "shape_aware_pulse_loss",
+      "reduction": "sum_over_batch_size",
+      "alpha": 6.0,
+      "delta": 0.15,
+      "derivative_weight": 0.2,
+      "derivative_delta": 0.1
+    },
+    "registered_name": "DeepPeak>ShapeAwarePulseLoss"
+  },
+  "metrics": [
+    {
+      "module": "keras.metrics",
+      "class_name": "MeanAbsoluteError",
+      "config": {
+        "name": "mae",
+        "dtype": "float32"
+      },
+      "registered_name": null
+    }
+  ],
+  "seed": null
+}

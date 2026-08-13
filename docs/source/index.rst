@@ -11,6 +11,7 @@ Documentation map
     :maxdepth: 2
 
     getting_started
+    neural_workflow
     code
     migration
     testing

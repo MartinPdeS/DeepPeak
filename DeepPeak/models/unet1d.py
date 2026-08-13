@@ -231,6 +231,9 @@ class UNet1D(BaseDeconvolver):
         )
         instance.build()
 
+        if hasattr(instance.optimizer, "build"):
+            instance.optimizer.build(instance.model.trainable_variables)
+
         if os.path.exists(weights_path):
             instance.model.load_weights(weights_path)
             print(f"Weights loaded from {weights_path}")

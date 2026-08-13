@@ -32,5 +32,7 @@ Suggested order
    downstream trace diagnostics.
 #. Use the classifier examples only when TensorFlow and a trained model are
    required.
+#. Use ``pulse_kernel_extraction.py`` to extract representative pulse kernels
+   and a reusable kernel library from experimental CSV traces.
 #. Read the direct-versus-deconvolved comparison section in ``getting_started``
    before training a model for reconstruction.

@@ -66,6 +66,7 @@ class ShapeAwarePulseLoss(tf.keras.losses.Loss):
         alpha: float | None = None,
         delta: float | None = None,
         derivative_weight: float | None = None,
+        derivative_delta: float | None = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -81,6 +82,9 @@ class ShapeAwarePulseLoss(tf.keras.losses.Loss):
         self.delta = None if delta is None else float(delta)
         self.derivative_weight = (
             None if derivative_weight is None else float(derivative_weight)
+        )
+        self.derivative_delta = (
+            None if derivative_delta is None else float(derivative_delta)
         )
 
     def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
@@ -107,6 +111,7 @@ class ShapeAwarePulseLoss(tf.keras.losses.Loss):
             "alpha": self.alpha,
             "delta": self.delta,
             "derivative_weight": self.derivative_weight,
+            "derivative_delta": self.derivative_delta,
         }
 
 
@@ -152,15 +157,19 @@ class SmoothBinaryCrossentropy(WeightedBinaryCrossentropy):
         alpha: float = 1.0,
         smoothness_weight: float = 0.05,
         confidence_weight: float = 0.0,
+        from_logits: bool = False,
         **kwargs,
     ):
         super().__init__(alpha=alpha, **kwargs)
         self.smoothness_weight = float(smoothness_weight)
         self.confidence_weight = float(confidence_weight)
+        self.from_logits = bool(from_logits)
 
     def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         y_true, y_pred = _prepare(y_true, y_pred)
-        bce = tf.keras.backend.binary_crossentropy(y_true, y_pred)
+        bce = tf.keras.backend.binary_crossentropy(
+            y_true, y_pred, from_logits=self.from_logits
+        )
         weighted_bce = tf.reduce_mean((1.0 + self.alpha * y_true) * bce)
         prediction_diff = y_pred[:, 1:] - y_pred[:, :-1]
         target_diff = y_true[:, 1:] - y_true[:, :-1]
@@ -177,6 +186,7 @@ class SmoothBinaryCrossentropy(WeightedBinaryCrossentropy):
             **super().get_config(),
             "smoothness_weight": self.smoothness_weight,
             "confidence_weight": self.confidence_weight,
+            "from_logits": self.from_logits,
         }
 
 

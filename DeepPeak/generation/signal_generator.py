@@ -252,6 +252,8 @@ class SignalGenerator:
         dataset = DataSet(
             n_samples=self.n_samples,
             sequence_length=self.sequence_length,
+            seed=seed,
+            metadata={"generator": "SignalGenerator"},
             signals=signals,
             clean_signals=clean_signals,
             **kernel.get_kwargs(),
@@ -351,7 +353,10 @@ class SignalGenerator:
         )
         merged_dtype = np.result_type(*[array.dtype for array in present_arrays])
 
-        if not np.issubdtype(merged_dtype, np.number):
+        if np.issubdtype(merged_dtype, np.bool_):
+            fill_dtype = np.bool_
+            fill_value = False
+        elif not np.issubdtype(merged_dtype, np.number):
             for array in present_arrays[1:]:
                 if array.shape[1:] != template_shape:
                     raise ValueError(

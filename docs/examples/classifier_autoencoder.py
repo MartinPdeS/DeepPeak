@@ -33,7 +33,7 @@ SEQUENCE_LENGTH = 200
 
 pulse_kernel = Lorentzian(
     amplitude=(1, 20),
-    position=(0.1, 0.9),
+    position=(0.1 * SEQUENCE_LENGTH, 0.9 * SEQUENCE_LENGTH),
     width=(0.03, 0.05),
 )
 
@@ -42,7 +42,7 @@ generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 dataset = generator.generate(
     n_samples=100,
     kernel=pulse_kernel,
-    peak_count=UniformCount(bounds=(1, NUM_PEAKS)),
+    peak_count=UniformCount(bounds=(NUM_PEAKS, NUM_PEAKS)),
     noise_std=0.1,
     categorical_peak_count=False,
 )

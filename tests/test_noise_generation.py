@@ -7,7 +7,7 @@ from DeepPeak import (
     NonstationaryGaussianNoise,
     SignalGenerator,
 )
-from DeepPeak.generation import Gaussian, UniformCount
+from DeepPeak.generation import CustomKernels, Gaussian, PoissonCount, UniformCount
 
 
 def _collapse(signals: np.ndarray) -> np.ndarray:
@@ -116,3 +116,27 @@ def test_generator_rejects_invalid_realism_options():
             peak_count=UniformCount(bounds=(1, 1)),
             quantization_step=0.0,
         )
+
+
+def test_buffered_batches_merge_boolean_peak_presence_with_blank_traces():
+    generator = SignalGenerator(sequence_length=64)
+    kernel = CustomKernels(
+        kernel_set=np.ones((2, 16)),
+        amplitude=(1.0, 1.0),
+        position=(16.0, 48.0),
+    )
+    generator.add_to_set(
+        n_samples=4,
+        kernel=kernel,
+        peak_count=PoissonCount(bounds=(0, 3), rate=1.5),
+    )
+    generator.add_to_set(
+        n_samples=2,
+        kernel=kernel,
+        peak_count=PoissonCount(bounds=(0, 0), rate=0.0),
+    )
+
+    dataset = generator.dataset()
+
+    assert dataset.peak_presence.shape == (6, 3)
+    assert not np.any(dataset.peak_presence[-2:])

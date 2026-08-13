@@ -17,7 +17,9 @@
 !meta.yaml
 !pyproject.toml
 !README.rst
-!notebook.ipynb
+!notebooks
+!notebooks/
+!notebooks/*.ipynb
 !CMakeLists.txt
 !pytest.ini
 !.coveragerc
@@ -36,3 +38,7 @@ docs/source/gallery/
 *Makefile*
 
 # Package specifics
+!data
+!data/run_5_ref
+!data/run_5_ref/dilution_300x_1.csv
+!data/run_5_ref/dilution_1000x_1.csv

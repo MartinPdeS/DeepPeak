@@ -1,0 +1,43 @@
+{
+  "sequence_length": 1000,
+  "num_filters": 32,
+  "num_levels": 3,
+  "kernel_size": 3,
+  "optimizer": {
+    "module": "keras.optimizers",
+    "class_name": "Adam",
+    "config": {
+      "name": "adam",
+      "learning_rate": 9.999999747378752e-05,
+      "weight_decay": null,
+      "clipnorm": null,
+      "global_clipnorm": null,
+      "clipvalue": null,
+      "use_ema": false,
+      "ema_momentum": 0.99,
+      "ema_overwrite_frequency": null,
+      "loss_scale_factor": null,
+      "gradient_accumulation_steps": null,
+      "beta_1": 0.9,
+      "beta_2": 0.999,
+      "epsilon": 1e-07,
+      "amsgrad": false
+    },
+    "registered_name": null
+  },
+  "loss": {
+    "module": "DeepPeak.neural_networks.losses",
+    "class_name": "SmoothBinaryCrossentropy",
+    "config": {
+      "name": "smooth_bce",
+      "reduction": "sum_over_batch_size",
+      "alpha": 4.0,
+      "smoothness_weight": 0.5,
+      "confidence_weight": 1.0,
+      "from_logits": false
+    },
+    "registered_name": "DeepPeak>SmoothBinaryCrossentropy"
+  },
+  "metrics": [],
+  "seed": null
+}

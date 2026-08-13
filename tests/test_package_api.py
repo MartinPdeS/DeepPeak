@@ -45,6 +45,7 @@ def test_neural_network_package_declares_lazy_public_api():
         "WaveNet",
         "WeightedBinaryCrossentropy",
         "WeightedHuber",
+        "ModelEvaluationResult",
         "plot_predictions",
         "TrainingConfig",
         "shape_aware_pulse_loss",

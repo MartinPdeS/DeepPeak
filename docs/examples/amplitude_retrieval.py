@@ -20,7 +20,7 @@ gaussian_width = 0.03
 
 pulse_kernel = Lorentzian(
     amplitude=(50, 100),  # Amplitude range
-    position=(0.1, 0.9),  # Peak position range
+    position=(0.1 * SEQUENCE_LENGTH, 0.9 * SEQUENCE_LENGTH),  # Peak position range
     width=gaussian_width,  # Width range
 )
 
