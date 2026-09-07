@@ -14,9 +14,14 @@
 !.gitignore
 !.pre-commit-config.yaml
 !LICENSE
-!meta.yaml
+!conda.recipe
+!conda.recipe/meta.yaml
 !pyproject.toml
 !README.rst
+!CONTRIBUTING.md
+!/Makefile
+!tools
+!tools/*.py
 !notebooks
 !notebooks/
 !notebooks/*.ipynb
@@ -36,6 +41,7 @@ docs/source/gallery/
 *.cmake
 *CMakeFiles*
 *Makefile*
+!/Makefile
 
 # Package specifics
 !data

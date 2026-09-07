@@ -1,25 +1,20 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy coverage
+name: Publish coverage
 
 on:
   push:
-    branches: [ "master" ]
-    tags:
-      - '*'
+    branches: [master]
   pull_request:
-    branches: [ "master" ]
+    branches: [master]
 
-
-# Sets permissions of the  GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: write
-  pages: write
-  id-token: write
+  pull-requests: write
 
 jobs:
-  ManyLinux_x86_64:
-    uses: MartinPdeS/MPSActions/.github/workflows/publish_coverage.yml@master
+  coverage:
+    uses: MartinPdeS/MPSActions/.github/workflows/publish_coverage.yml@v5
     with:
       python-version: "3.11"
+      coverage-package: DeepPeak
     secrets:
       _GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

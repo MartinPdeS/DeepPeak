@@ -1,21 +1,20 @@
-name: Deploy Conda Packages
+name: Publish Conda package
 
 on:
   push:
-    branches: [ "master" ]
-    tags:
-      - '*'
-  pull_request:
-    branches: [ "master" ]
+    tags: ["v*"]
 
 permissions:
-    contents: write
+  contents: read
 
 jobs:
-  ManyLinux_x86_64:
-    uses: MartinPdeS/MPSActions/.github/workflows/publish_compiled_package_to_anaconda.yml@master
+  publish:
+    uses: MartinPdeS/MPSActions/.github/workflows/publish_compiled_package_to_anaconda.yml@v5
     with:
       python_versions: '["3.10", "3.11", "3.12"]'
       os_list: '["ubuntu-latest", "macos-latest"]'
+      package_name: deeppeak
+      recipe_path: conda.recipe
+      test_import: DeepPeak
     secrets:
       ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}
