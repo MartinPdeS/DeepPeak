@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Calculate the next semantic version from Git tags."""
 
-from __future__ import annotations
 
 import re
 import subprocess

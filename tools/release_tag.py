@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Create a release commit and annotated semantic-version tag."""
 
-from __future__ import annotations
 
 import re
 import subprocess
