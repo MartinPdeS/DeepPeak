@@ -1,17 +1,16 @@
-name: Publish coverage
+name: Deploy coverage
 
 on:
   push:
-    branches: [master]
+    branches: [ "**" ]
   pull_request:
-    branches: [master]
+    branches: [ "master" ]
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
-  coverage:
+  ManyLinux_x86_64:
     uses: MartinPdeS/MPSActions/.github/workflows/publish_coverage.yml@v5
     with:
       python-version: "3.11"
