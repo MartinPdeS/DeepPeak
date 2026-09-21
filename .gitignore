@@ -25,6 +25,11 @@
 !notebooks
 !notebooks/
 !notebooks/*.ipynb
+!showcase
+!showcase/
+!showcase/webinar/
+!showcase/webinar/ev_high_throughput_detection/
+!showcase/webinar/ev_high_throughput_detection/**
 !CMakeLists.txt
 !pytest.ini
 !.coveragerc
@@ -42,9 +47,7 @@ docs/source/gallery/
 *CMakeFiles*
 *Makefile*
 !/Makefile
+!showcase/webinar/build_presentation.applescript
 
-# Package specifics
-!data
-!data/run_5_ref
-!data/run_5_ref/dilution_300x_1.csv
-!data/run_5_ref/dilution_1000x_1.csv
+# Large experimental inputs are kept outside Git.
+data/

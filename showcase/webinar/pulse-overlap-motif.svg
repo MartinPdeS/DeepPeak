@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520">
+  <rect width="960" height="520" fill="#f5faf9"/>
+  <g stroke="#d8e7e4" stroke-width="2">
+    <path d="M70 110H900M70 220H900M70 330H900M70 440H900"/>
+    <path d="M160 65V455M350 65V455M540 65V455M730 65V455"/>
+  </g>
+  <path d="M70 398 C150 398 154 397 182 396 C208 394 221 370 237 278 C252 190 270 140 293 140 C324 140 327 315 350 366 C376 423 401 397 455 398 C510 399 520 385 535 298 C550 207 569 166 591 166 C618 166 626 326 647 373 C670 423 692 398 744 398 C793 398 804 398 900 398" fill="none" stroke="#006d77" stroke-width="15" stroke-linecap="round"/>
+  <path d="M70 398 C286 398 315 398 350 395 C389 392 408 366 427 275 C444 195 463 145 486 145 C516 145 520 308 543 365 C568 426 592 398 900 398" fill="none" stroke="#ef8354" stroke-width="15" stroke-linecap="round"/>
+  <g fill="#004854">
+    <circle cx="293" cy="140" r="11"/>
+    <circle cx="486" cy="145" r="11"/>
+    <circle cx="591" cy="166" r="11"/>
+  </g>
+  <g fill="#006d77" font-family="Avenir Next, Helvetica, sans-serif" font-size="22" font-weight="600">
+    <text x="218" y="85">RESOLVED</text>
+    <text x="440" y="85">OVERLAP</text>
+    <text x="548" y="113">RECOVERED</text>
+  </g>
+</svg>

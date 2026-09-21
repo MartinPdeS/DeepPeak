@@ -4,7 +4,8 @@ Extracting Pulse Kernels from Experimental Traces
 
 This example extracts representative pulse shapes and a small kernel library
 from experimental CSV traces. The example data are stored in
-``data/run_5_ref`` in the repository.
+``data/run_5_ref`` in the local checkout. The raw CSV files are intentionally
+excluded from Git because of their size and must be supplied separately.
 """
 
 # %%
