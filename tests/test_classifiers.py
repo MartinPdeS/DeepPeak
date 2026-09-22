@@ -3,9 +3,10 @@ import json
 
 import numpy as np
 import pytest
-import tensorflow as tf
 
-from DeepPeak.models import (
+tf = pytest.importorskip("tensorflow")
+
+from DeepPeak.models import (  # noqa: E402
     DenseNet,
     ShapeAwarePulseLoss,
     SmoothBinaryCrossentropy,
@@ -18,7 +19,7 @@ from DeepPeak.models import (
     weighted_bce,
     weighted_huber,
 )
-from DeepPeak.generation import Gaussian, SignalGenerator, UniformCount
+from DeepPeak.generation import Gaussian, SignalGenerator, UniformCount  # noqa: E402
 
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200

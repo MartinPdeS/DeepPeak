@@ -1,4 +1,7 @@
 import numpy as np
+import pytest
+
+pytest.importorskip("tensorflow")
 
 from DeepPeak.generation import DataSet
 from DeepPeak.models.base import BaseDeconvolver

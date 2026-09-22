@@ -8,18 +8,21 @@ permissions:
   contents: read
 
 jobs:
-  release:
-    uses: MartinPdeS/MPSActions/.github/workflows/publish_release.yml@v5
+  pypi:
+    uses: MartinPdeS/MPSActions/.github/workflows/publish_pure_package_to_PyPi.yml@v5
     with:
-      pypi_python_version: "3.11"
-      pypi_build_linux: true
-      pypi_build_macos: false
-      pypi_build_windows: false
-      conda_python_versions: '["3.11", "3.12", "3.13"]'
-      conda_os_list: '["ubuntu-latest", "macos-latest"]'
-      conda_package_name: deeppeak
-      conda_recipe_path: conda.recipe
-      conda_test_import: DeepPeak
+      python-version: "3.11"
+      test-command: python -c "import DeepPeak; print(DeepPeak.__version__)"
     secrets:
       PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+
+  conda:
+    uses: MartinPdeS/MPSActions/.github/workflows/publish_compiled_package_to_anaconda.yml@v3
+    with:
+      python_versions: '["3.11"]'
+      os_list: '["ubuntu-latest"]'
+      package_name: deeppeak
+      recipe_path: conda.recipe
+      test_import: DeepPeak
+    secrets:
       ANACONDA_API_TOKEN: ${{ secrets.ANACONDA_API_TOKEN }}

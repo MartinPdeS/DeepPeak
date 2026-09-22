@@ -1,5 +1,7 @@
 import pytest
 
+pytest.importorskip("tensorflow")
+
 from DeepPeak.models import TrainingConfig
 
 

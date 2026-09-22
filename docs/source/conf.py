@@ -69,7 +69,9 @@ sphinx_gallery_conf = {
     "image_scrapers": ("matplotlib"),
     "ignore_pattern": "/__",
     "filename_pattern": r".*\.py",
-    "plot_gallery": True,
+    # Building documentation must remain dependency-light and deterministic.
+    # Set DEEPPEAK_DOCS_EXECUTE_EXAMPLES=1 for a deliberate executable build.
+    "plot_gallery": os.getenv("DEEPPEAK_DOCS_EXECUTE_EXAMPLES") == "1",
     "thumbnail_size": [600, 600],
     "download_all_examples": False,
     "reset_modules": reset_mpl,
