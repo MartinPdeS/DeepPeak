@@ -315,5 +315,6 @@ For questions or contributions, contact `martin.poinsinet.de.sivry@gmail.com <ma
 .. |anaconda_date| image:: https://anaconda.org/martinpdes/deeppeak/badges/latest_release_relative_date.svg
     :alt: Latest release date
     :target: https://anaconda.org/martinpdes/deeppeak
-.. |logo| image:: https://github.com/MartinPdeS/DeepPeak/raw/master/docs/images/logo.svg
+.. |logo| image:: https://github.com/MartinPdeS/DeepPeak/raw/master/docs/images/branding/deeppeak-logo-concept-v2.png
     :alt: DeepPeak logo
+    :width: 100%
