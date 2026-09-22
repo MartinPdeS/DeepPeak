@@ -37,7 +37,9 @@ class CsvTrace:
         self.x, self.y_raw = self.load_csv_two_line_header(
             filename=filename, n_rows=n_rows
         )
-        self.x *= 1e-3
+        # Pandas 3 may expose a read-only NumPy view. Avoid in-place mutation
+        # so trace loading works with both writable arrays and read-only views.
+        self.x = self.x * 1e-3
         self.y_processed = self.y_raw
 
     @property
