@@ -313,9 +313,8 @@ class ZeroCrossing:
         """
         y = np.asarray(signal, dtype=float).squeeze()
         t = np.asarray(time_samples, dtype=float).squeeze()
-        assert (
-            y.ndim == 1 and t.ndim == 1 and y.size == t.size
-        ), "signal and time_samples must be 1D and same length"
+        aligned_vectors = y.ndim == 1 and t.ndim == 1 and y.size == t.size
+        assert aligned_vectors, "signal and time_samples must be 1D and same length"
 
         dt = float(t[1] - t[0])
 

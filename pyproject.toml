@@ -72,5 +72,8 @@ documentation = [
 
 dev = [
     "flake8 ==7.3.0",
-    "ruff >=0.6",
+    "ruff ==0.11.2",
 ]
+
+[tool.ruff]
+extend-exclude = ["DeepPeak/_version.py"]
