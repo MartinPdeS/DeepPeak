@@ -1,9 +1,8 @@
-from typing import Optional
 from dataclasses import dataclass
 import numpy as np
 from numpy.typing import NDArray
 
-from .base import BaseKernel, RangeValue, FloatRange
+from .base import BaseKernel
 from ..peak_count import PeakCount
 
 
@@ -45,8 +44,6 @@ class Lorentzian(BaseKernel):
         n_peaks: tuple,
         categorical_peak_count: bool = False,
         peak_count: PeakCount | None = None,
-        peak_count_distribution: str = "uniform",
-        peak_count_rate: Optional[float] = None,
         rng: np.random.Generator | None = None,
     ) -> NDArray:
         """
@@ -76,8 +73,6 @@ class Lorentzian(BaseKernel):
             n_peaks=n_peaks,
             categorical_peak_count=categorical_peak_count,
             peak_count=peak_count,
-            peak_count_distribution=peak_count_distribution,
-            peak_count_rate=peak_count_rate,
             rng=rng,
             has_width=True,
         )

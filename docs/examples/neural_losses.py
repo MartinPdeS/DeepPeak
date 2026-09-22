@@ -1,4 +1,9 @@
-"""DeepPeak neural losses and configurable training."""
+"""
+Neural losses and configurable training
+=======================================
+
+Use serializable losses with any DeepPeak deconvolution architecture.
+"""
 
 # %%
 import numpy as np

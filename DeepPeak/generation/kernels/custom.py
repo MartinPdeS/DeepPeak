@@ -187,8 +187,6 @@ class CustomKernel(BaseKernel):
         n_peaks: tuple,
         categorical_peak_count: bool = False,
         peak_count: PeakCount | None = None,
-        peak_count_distribution: str = "uniform",
-        peak_count_rate: Optional[float] = None,
         rng: np.random.Generator | None = None,
     ) -> NDArray:
         """
@@ -205,12 +203,7 @@ class CustomKernel(BaseKernel):
         categorical_peak_count : bool, default=False
             If ``True``, encode the sampled peak count as one-hot values.
         peak_count : PeakCount or None, optional
-            Optional peak-count sampler overriding the legacy distribution arguments.
-        peak_count_distribution : {"uniform", "poisson"}, default="uniform"
-            Legacy peak-count distribution used when ``peak_count`` is not provided.
-        peak_count_rate : float or tuple[float, float], optional
-            Legacy Poisson rate configuration used when
-            ``peak_count_distribution='poisson'``.
+            Peak-count sampler. Uniform sampling within ``n_peaks`` is used when omitted.
 
         Returns
         -------
@@ -225,8 +218,6 @@ class CustomKernel(BaseKernel):
             n_peaks=n_peaks,
             categorical_peak_count=categorical_peak_count,
             peak_count=peak_count,
-            peak_count_distribution=peak_count_distribution,
-            peak_count_rate=peak_count_rate,
             rng=rng,
             has_width=False,
         )
@@ -315,7 +306,6 @@ class CustomKernel(BaseKernel):
 
         for i in range(n_samples):
             for j in range(max_peaks):
-
                 A = amplitudes[i, j, 0]
                 x0 = centers[i, j, 0]
                 shift = center_shifts[i, j, 0]
@@ -482,8 +472,6 @@ class CustomKernels(BaseKernel):
         n_peaks: tuple,
         categorical_peak_count: bool = False,
         peak_count: PeakCount | None = None,
-        peak_count_distribution: str = "uniform",
-        peak_count_rate: Optional[float] = None,
         rng: np.random.Generator | None = None,
     ) -> NDArray:
         rng = np.random.default_rng() if rng is None else rng
@@ -493,8 +481,6 @@ class CustomKernels(BaseKernel):
             n_peaks=n_peaks,
             categorical_peak_count=categorical_peak_count,
             peak_count=peak_count,
-            peak_count_distribution=peak_count_distribution,
-            peak_count_rate=peak_count_rate,
             rng=rng,
             has_width=False,
         )
@@ -558,7 +544,6 @@ class CustomKernels(BaseKernel):
 
         for i in range(n_samples):
             for j in range(max_peaks):
-
                 A = amplitudes[i, j, 0]
                 x0 = centers[i, j, 0]
 

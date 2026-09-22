@@ -1,14 +1,10 @@
 import re
 from typing import Any, Iterable, Optional, Union
-import os
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from MPSPlots import helper
-import tempfile
 
-from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
-from DeepPeak.utils import merge_and_plot_histories
 from .training import TrainingConfig
 from .evaluation import ModelEvaluationResult
 

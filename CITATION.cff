@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use DeepPeak in your research, please cite this software."
+title: "DeepPeak: peak detection and trace analysis for one-dimensional signals"
+type: software
+authors:
+  - family-names: "Poinsinet de Sivry-Houle"
+    given-names: "Martin"
+repository-code: "https://github.com/MartinPdeS/DeepPeak"
+url: "https://martinpdes.github.io/DeepPeak/"
+license: MIT
+version: 0.2.0
+date-released: 2026-09-22

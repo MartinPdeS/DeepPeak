@@ -151,6 +151,8 @@ def low_pass_filter(
     sampling_rate = _validate_sampling_rate(sampling_rate)
     cutoff_hz = _validate_cutoff_hz(bandlimit, sampling_rate)
     transition_width_hz = _validate_transition_width_hz(transition_width_hz)
+    if response_shape not in {"brickwall", "cosine"}:
+        raise ValueError('response_shape must be either "brickwall" or "cosine".')
 
     original_length = adata.shape[axis]
     if pad_to_length is not None:
@@ -188,8 +190,6 @@ def low_pass_filter(
         magnitude_response = _cosine_taper_low_pass(
             frequencies_hz, cutoff_hz, transition_width_hz
         )
-    else:
-        raise ValueError('response_shape must be either "brickwall" or "cosine".')
 
     reshape_shape = [1] * spectrum.ndim
     reshape_shape[axis] = magnitude_response.shape[0]
@@ -275,6 +275,8 @@ def high_pass_filter(
     sampling_rate = _validate_sampling_rate(sampling_rate)
     cutoff_hz = _validate_cutoff_hz(bandlimit, sampling_rate)
     transition_width_hz = _validate_transition_width_hz(transition_width_hz)
+    if response_shape not in {"brickwall", "cosine"}:
+        raise ValueError('response_shape must be either "brickwall" or "cosine".')
 
     original_length = adata.shape[axis]
     if pad_to_length is not None:
@@ -312,8 +314,6 @@ def high_pass_filter(
         magnitude_response = _cosine_taper_high_pass(
             frequencies_hz, cutoff_hz, transition_width_hz
         )
-    else:
-        raise ValueError('response_shape must be either "brickwall" or "cosine".')
 
     reshape_shape = [1] * spectrum.ndim
     reshape_shape[axis] = magnitude_response.shape[0]

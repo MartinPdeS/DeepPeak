@@ -64,8 +64,9 @@ class TraceRecord:
 
         return float(self.dx * self.signal.size)
 
-    def to_trace(self):
-        """Return this record's signal as a lightweight core ``Trace``."""
+    @property
+    def trace(self):
+        """Return the canonical :class:`DeepPeak.core.Trace` input."""
 
         from ...core.types import Trace
 
@@ -78,12 +79,6 @@ class TraceRecord:
                 "concentration": self.concentration,
             },
         )
-
-    @property
-    def trace(self):
-        """Return the canonical :class:`DeepPeak.core.Trace` view."""
-
-        return self.to_trace()
 
     def to_dict(self) -> dict[str, Any]:
         """Return a serializable representation of this trace result."""
@@ -914,7 +909,6 @@ class TraceRecord:
         if axes is not None:
             trace_axis, histogram_axis = axes
             figure = trace_axis.figure
-            created_figure = False
         else:
             figure, (trace_axis, histogram_axis) = plt.subplots(
                 ncols=2,
@@ -922,7 +916,6 @@ class TraceRecord:
                 sharey=True,
                 gridspec_kw={"width_ratios": [4.0, 1.2], "wspace": 0.05},
             )
-            created_figure = True
 
         self.plot_standard_detection(
             x_axis=x_axis,
@@ -1286,7 +1279,6 @@ class TraceRecord:
         if axes is not None:
             trace_axis, histogram_axis = axes
             figure = trace_axis.figure
-            created_figure = False
         else:
             figure, (trace_axis, histogram_axis) = plt.subplots(
                 ncols=2,
@@ -1294,7 +1286,6 @@ class TraceRecord:
                 sharey=True,
                 gridspec_kw={"width_ratios": [4.0, 1.2], "wspace": 0.05},
             )
-            created_figure = True
 
         self.plot_wavenet_detection(
             x_axis=x_axis,

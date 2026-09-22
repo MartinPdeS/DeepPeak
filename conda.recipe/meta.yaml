@@ -39,7 +39,6 @@ test:
   imports:
     - DeepPeak
   requires:
-    - tensorflow
     - python {{PY_VER}}*
     - pytest >=0.6
     - pytest-cov >=2.0

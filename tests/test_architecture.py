@@ -37,7 +37,7 @@ def test_core_result_objects_validate_and_serialize():
     assert len(SeriesResult.from_dict(series.to_dict())) == 1
 
 
-def test_legacy_trace_and_series_results_adapt_to_core_objects():
+def test_analysis_results_expose_core_trace_and_serialization():
     from pathlib import Path
 
     from DeepPeak.analysis.metrics import PeakCountSeriesResult, TraceRecord
@@ -65,10 +65,9 @@ def test_legacy_trace_and_series_results_adapt_to_core_objects():
         records=[record],
     )
 
-    assert record.to_trace().n_samples == 2
     assert record.trace.n_samples == 2
     assert record.to_dict()["standard"]["peak_count"] == 0
-    assert len(result.to_series_result()) == 1
+    assert len(result.records) == 1
     figure = standard_detection(record, config=PlotConfig(close=True))
     assert figure is not None
 

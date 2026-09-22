@@ -2,8 +2,7 @@ import numpy as np
 
 from DeepPeak.analysis import (
     HeightPeakTrigger,
-    StandardDilutionSeries,
-    WaveNetTraceAnalyzer,
+    TraceAnalyzer,
     compute_peak_width_distribution_metrics,
     metrics as analysis_metrics,
 )
@@ -17,7 +16,7 @@ class DummyWaveNet:
 
 
 def test_compute_peak_width_distribution_metrics_returns_expected_statistics():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(
             height=1.5,

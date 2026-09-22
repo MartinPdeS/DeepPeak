@@ -13,7 +13,7 @@ except ImportError:
 
 from .analysis import (
     BasePeakTrigger,
-    CNNTraceAnalyzer,
+    NeuralTraceAnalyzer,
     FlashDilutionSeries,
     HeightPeakTrigger,
     PulseShapeAnalyzer,
@@ -24,7 +24,7 @@ from .analysis import (
     SeriesComparisonResult,
     TraceComparisonAnalyzer,
     TraceComparisonResult,
-    WaveNetTraceAnalyzer,
+    TraceAnalyzer,
 )
 from .generation.dataset import DataSet
 from .generation.kernels import (
@@ -52,13 +52,17 @@ from .generation.peak_count import (
 from .generation import SignalGenerator
 from .core import (
     AnalysisConfig,
+    DetectionConfig,
     DetectionResult,
     GenerationConfig,
     MetricResult,
     ModelConfig,
     NoiseConfig,
+    PlotConfig,
+    SeriesConfig,
     SeriesResult,
     Trace,
+    TraceConfig,
 )
 from .pipeline import Pipeline, PipelineResult
 
@@ -70,11 +74,14 @@ __all__ = [
     "CorrelatedGaussianNoise",
     "DetectionResult",
     "AnalysisConfig",
+    "DetectionConfig",
     "GenerationConfig",
     "ModelConfig",
     "NoiseConfig",
+    "PlotConfig",
+    "SeriesConfig",
     "BasePeakTrigger",
-    "CNNTraceAnalyzer",
+    "NeuralTraceAnalyzer",
     "CustomKernel",
     "DataSet",
     "Dirac",
@@ -104,9 +111,10 @@ __all__ = [
     "TraceComparisonResult",
     "TwoLobeGaussian",
     "Trace",
+    "TraceConfig",
     "TrainingConfig",
     "UniformCount",
-    "WaveNetTraceAnalyzer",
+    "TraceAnalyzer",
     "DenseNet",
     "ShapeAwarePulseLoss",
     "SmoothBinaryCrossentropy",
@@ -127,7 +135,7 @@ _LAZY_NEURAL_NETWORK_EXPORTS = set(__all__) - {
     "BaseKernel",
     "BaseNoise",
     "BasePeakTrigger",
-    "CNNTraceAnalyzer",
+    "NeuralTraceAnalyzer",
     "CustomKernel",
     "DataSet",
     "Dirac",
@@ -149,18 +157,22 @@ _LAZY_NEURAL_NETWORK_EXPORTS = set(__all__) - {
     "StandardTraceAnalyzer",
     "TwoLobeGaussian",
     "UniformCount",
-    "WaveNetTraceAnalyzer",
+    "TraceAnalyzer",
     "CorrelatedGaussianNoise",
     "DetectionResult",
     "AnalysisConfig",
+    "DetectionConfig",
     "GenerationConfig",
     "ModelConfig",
     "NoiseConfig",
+    "PlotConfig",
     "MetricResult",
     "Pipeline",
     "PipelineResult",
     "SeriesResult",
+    "SeriesConfig",
     "Trace",
+    "TraceConfig",
 }
 
 

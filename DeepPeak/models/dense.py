@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Tuple, Union
+from typing import Optional, Tuple, Union
 from dataclasses import dataclass, field
 import tensorflow as tf
 from tensorflow.keras import layers, models  # type: ignore

@@ -4,11 +4,9 @@ from typing import Any
 
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
-from MPSPlots import helper
 import numpy as np
 
 
-@helper.post_mpl_plot
 def plot_predictions(
     model: Any,
     dataset: Any,

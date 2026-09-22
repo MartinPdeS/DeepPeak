@@ -1,8 +1,7 @@
-from typing import Optional
 import numpy as np
 from dataclasses import dataclass
 from numpy.typing import NDArray
-from .base import BaseKernel, RangeValue, FloatRange
+from .base import BaseKernel, RangeValue
 from ..peak_count import PeakCount
 
 
@@ -54,8 +53,6 @@ class Gaussian(BaseKernel):
         n_peaks: tuple,
         categorical_peak_count: bool = False,
         peak_count: PeakCount | None = None,
-        peak_count_distribution: str = "uniform",
-        peak_count_rate: Optional[float] = None,
         rng: np.random.Generator | None = None,
     ) -> np.ndarray:
         """
@@ -85,8 +82,6 @@ class Gaussian(BaseKernel):
             n_peaks=n_peaks,
             categorical_peak_count=categorical_peak_count,
             peak_count=peak_count,
-            peak_count_distribution=peak_count_distribution,
-            peak_count_rate=peak_count_rate,
             rng=rng,
             has_width=True,
         )

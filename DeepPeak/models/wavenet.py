@@ -1,12 +1,10 @@
 from typing import Any, Mapping, Optional, Tuple, Union
 from dataclasses import dataclass, field
-import tempfile
 import os
 
 
 import tensorflow as tf
 from tensorflow.keras import layers, models  # type: ignore
-from tensorflow.keras.callbacks import ModelCheckpoint  # type: ignore
 
 from .base import BaseDeconvolver
 from .losses import (
@@ -288,7 +286,7 @@ class WaveNet(BaseDeconvolver):
         path : str
             Directory where to save model components.
         """
-        import os, json
+        import json
 
         os.makedirs(path, exist_ok=True)
 
@@ -345,7 +343,6 @@ class WaveNet(BaseDeconvolver):
         WaveNet
             Fully reconstructed WaveNet instance.
         """
-        import os
         import json
         from tensorflow import keras
 
@@ -360,7 +357,11 @@ class WaveNet(BaseDeconvolver):
                 sequence_length=model.input_shape[1],
                 num_filters=model.get_layer("input_projection").filters,
                 num_dilation_layers=len(
-                    [l for l in model.layers if l.name.startswith("dilated_conv_")]
+                    [
+                        layer
+                        for layer in model.layers
+                        if layer.name.startswith("dilated_conv_")
+                    ]
                 ),
                 kernel_size=model.get_layer("dilated_conv_0").kernel_size[0],
                 output_activation=model.get_layer("output")

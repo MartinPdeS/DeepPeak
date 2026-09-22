@@ -14,12 +14,12 @@ Materials for a webinar on using DeepPeak to detect extracellular vesicles at hi
 
 | Time | Slides | Segment |
 | --- | --- | --- |
-| 00:00-04:00 | 1-3 | Context: the coincidence bottleneck in time-domain cytometry |
-| 04:00-10:00 | 4-6 | Method: FLASH and realistic DeepPeak training |
-| 10:00-17:00 | 7-11 | CYTO evidence: system, CNN localization, and three-fold validation |
-| 17:00-20:00 | 12-14 | Quality controls, EV translation, and takeaways |
+| 00:00-05:00 | 1-4 | DeepPeak package: capabilities and reusable Python workflow |
+| 05:00-10:00 | 5-8 | Problem and method: coincidence, FLASH, and realistic training |
+| 10:00-17:00 | 9-13 | CYTO evidence: system, CNN localization, and three-fold validation |
+| 17:00-20:00 | 14-16 | Quality controls, EV translation, and takeaways |
 
-The experimental result slides are adapted from the CYTO 2026 presentation in the related DeepPeak project. They show an internal experimental case study and should be presented with the stated validation limits.
+Slides 3-4 introduce DeepPeak as an open-source Python package, including its public workflow and main capability areas. The experimental result slides are adapted from the CYTO 2026 presentation in the related DeepPeak project. They show an internal experimental case study and should be presented with the stated validation limits.
 
 ## Materials
 

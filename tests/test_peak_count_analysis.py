@@ -7,7 +7,7 @@ import pytest
 from DeepPeak.core import DetectionResult
 from DeepPeak.analysis import (
     BasePeakTrigger,
-    CNNTraceAnalyzer,
+    NeuralTraceAnalyzer,
     CsvTrace,
     FlashDilutionSeries,
     HeightPeakTrigger,
@@ -15,14 +15,25 @@ from DeepPeak.analysis import (
     SigmaPeakTrigger,
     StandardDilutionSeries,
     StandardTraceAnalyzer,
-    WaveNetTraceAnalyzer,
+    TraceAnalyzer,
     compute_peak_amplitude_distribution_metrics,
     compute_peak_width_distribution_metrics,
     metrics as analysis_metrics,
 )
 from DeepPeak.analysis.dilution_series import _BaseDilutionSeries
 
-PeakCountSeries = StandardDilutionSeries
+
+def PeakCountSeries(*, wavenet, std_trigger, cnn_trigger, trace_files, **kwargs):
+    """Build the private dual-detector fixture used by series integration tests."""
+
+    return _BaseDilutionSeries(
+        cnn=wavenet,
+        trigger=std_trigger,
+        cnn_trigger=cnn_trigger,
+        files=trace_files,
+        detector_mode="both",
+        **kwargs,
+    )
 
 
 class DummyWaveNet:
@@ -33,7 +44,7 @@ class DummyWaveNet:
 
 
 def test_wavenet_trace_analyzer_analyzes_processed_signal():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -52,7 +63,7 @@ def test_wavenet_trace_analyzer_analyzes_processed_signal():
 
 
 def test_wavenet_trace_analyzer_segments_one_dimensional_traces():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -82,7 +93,7 @@ def test_standard_trace_analyzer_only_populates_standard_detection():
 
 
 def test_cnn_trace_analyzer_only_populates_cnn_detection():
-    analyzer = CNNTraceAnalyzer(
+    analyzer = NeuralTraceAnalyzer(
         wavenet=DummyWaveNet(),
         cnn_trigger=HeightPeakTrigger(height=0.6),
         signal_normalization="minmax",
@@ -114,7 +125,7 @@ def test_analysis_package_exports_series_result_type():
 def test_analysis_package_exports_renamed_loader_and_specific_plotters():
     assert CsvTrace.__name__ == "CsvTrace"
     assert StandardTraceAnalyzer.__name__ == "StandardTraceAnalyzer"
-    assert CNNTraceAnalyzer.__name__ == "CNNTraceAnalyzer"
+    assert NeuralTraceAnalyzer.__name__ == "NeuralTraceAnalyzer"
     assert StandardDilutionSeries.__name__ == "StandardDilutionSeries"
     assert FlashDilutionSeries.__name__ == "FlashDilutionSeries"
     assert callable(StandardDilutionSeries.get_expected_particle_flow_for_result)
@@ -410,7 +421,7 @@ def test_peak_count_series_accepts_explicit_trace_files(monkeypatch, tmp_path):
     def fake_load_signal(self, filename):
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
 
-    monkeypatch.setattr(PeakCountSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     result = series.run()
 
@@ -441,7 +452,7 @@ def test_expected_particle_flow_scales_from_reference_trace(monkeypatch, tmp_pat
             return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
 
-    monkeypatch.setattr(PeakCountSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -792,7 +803,7 @@ def test_plot_expected_poisson_inter_arrival_histogram_overlays_expected_curve(
             return np.array([0.0, 0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 4.0]), 0.25
         return np.array([0.0, 2.0, 0.0, 0.0, 3.0, 0.0, 4.0, 0.0]), 0.25
 
-    monkeypatch.setattr(PeakCountSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -916,7 +927,7 @@ def test_plot_measured_vs_expected_particle_flows_adds_ideal_line(
             return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
 
-    monkeypatch.setattr(PeakCountSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -953,7 +964,7 @@ def test_plot_measured_vs_expected_particle_flows_applies_affine_calibration(
             return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
 
-    monkeypatch.setattr(PeakCountSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -993,7 +1004,7 @@ def test_plot_measured_particle_flows_uses_dilution_axis(monkeypatch, tmp_path):
             return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 0.0]), 0.25
         return np.array([0.0, 0.0, 0.4, 2.5, 0.2, 0.0, 0.0, 3.0]), 0.25
 
-    monkeypatch.setattr(PeakCountSeries, "_load_signal", fake_load_signal)
+    monkeypatch.setattr(_BaseDilutionSeries, "_load_signal", fake_load_signal)
 
     series.run()
 
@@ -1318,7 +1329,7 @@ def test_dilution_series_run_requires_at_least_one_detector(tmp_path):
     filename = tmp_path / "replicate_1.csv"
     filename.write_text("placeholder")
 
-    series = _BaseDilutionSeries(
+    _BaseDilutionSeries(
         folder=tmp_path,
         initial_concentration=100.0,
         nrows=1,
@@ -1506,7 +1517,7 @@ def test_distribution_plot_accessors_expose_namespaced_plot_api(monkeypatch, tmp
 
 
 def test_trace_record_plot_methods_accept_analyzer_records():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1526,7 +1537,7 @@ def test_trace_record_plot_methods_accept_analyzer_records():
 
 
 def test_trace_record_exposes_plot_methods():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1644,7 +1655,7 @@ def test_trace_record_wavenet_detection_rejects_invalid_time_units():
 
 
 def test_trace_record_plot_methods_raise_clear_error_when_record_is_passed_again():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1662,7 +1673,7 @@ def test_trace_record_plot_methods_raise_clear_error_when_record_is_passed_again
 
 
 def test_trace_record_plots_have_no_title_by_default():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1680,7 +1691,7 @@ def test_trace_record_plots_have_no_title_by_default():
 
 
 def test_trace_record_legends_render_above_peak_markers():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1877,7 +1888,7 @@ def test_accessor_single_axis_plots_accept_existing_axes(monkeypatch, tmp_path):
 
 
 def test_analyzer_accepts_peak_trigger_instances():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1895,7 +1906,7 @@ def test_analyzer_accepts_peak_trigger_instances():
 
 
 def test_analyzer_accepts_explicit_cnn_low_pass():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1911,7 +1922,7 @@ def test_analyzer_accepts_explicit_cnn_low_pass():
 
 
 def test_sigma_trigger_resolves_hysteresis_in_sigma_units():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=SigmaPeakTrigger(sigma=1.0, hysteresis=1.0),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -1933,7 +1944,7 @@ def test_peak_trigger_rejects_hysteresis_above_height_early():
 
 
 def test_analyzer_rejects_hysteresis_above_sigma_resolved_threshold():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=SigmaPeakTrigger(sigma=1.0, hysteresis=10.0),
         cnn_trigger=HeightPeakTrigger(height=0.6),

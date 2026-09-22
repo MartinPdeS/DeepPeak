@@ -42,7 +42,7 @@ from ..detection.triggers import (
     ProminencePeakTrigger,
     SigmaPeakTrigger,
 )
-from .wavenet_trace import CNNTraceAnalyzer, StandardTraceAnalyzer, WaveNetTraceAnalyzer
+from .wavenet_trace import NeuralTraceAnalyzer, StandardTraceAnalyzer, TraceAnalyzer
 from .comparison import (
     SeriesComparisonResult,
     TraceComparisonAnalyzer,
@@ -60,7 +60,7 @@ __all__ = [
     "NoiseAnalyzer",
     "PulseShapeAnalyzer",
     "BasePeakTrigger",
-    "CNNTraceAnalyzer",
+    "NeuralTraceAnalyzer",
     "HeightPeakTrigger",
     "ProminencePeakTrigger",
     "SigmaPeakTrigger",
@@ -69,7 +69,7 @@ __all__ = [
     "StandardDilutionSeries",
     "TraceRecord",
     "WaveNetAnalyzerConfig",
-    "WaveNetTraceAnalyzer",
+    "TraceAnalyzer",
     "SeriesComparisonResult",
     "TraceComparisonAnalyzer",
     "TraceComparisonResult",

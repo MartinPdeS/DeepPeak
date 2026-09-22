@@ -54,7 +54,7 @@ dataset.plot(number_of_samples=3, reference_pulse_trace=dataset.clean_signals)
 
 # %%
 # Build and summarize the DenseNet deconvolver
-# -------------------------------------------
+# --------------------------------------------
 dense_net = DenseNet(
     sequence_length=SEQUENCE_LENGTH,
     filters=(32, 64, 128),
@@ -69,7 +69,7 @@ dense_net.summary()
 
 # %%
 # Train against clean pulse traces
-# --------------------
+# --------------------------------
 history = dense_net.fit(
     dataset.signals,
     dataset.clean_signals[..., None],

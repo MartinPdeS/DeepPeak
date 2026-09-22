@@ -11,14 +11,21 @@ def test_top_level_public_api_exports_core_types():
     assert DeepPeak.Pipeline.__name__ == "Pipeline"
     assert DeepPeak.Gaussian.__name__ == "Gaussian"
     assert DeepPeak.TwoLobeGaussian.__name__ == "TwoLobeGaussian"
-    assert DeepPeak.WaveNetTraceAnalyzer.__name__ == "WaveNetTraceAnalyzer"
+    assert DeepPeak.TraceAnalyzer.__name__ == "TraceAnalyzer"
+    assert DeepPeak.NeuralTraceAnalyzer.__name__ == "NeuralTraceAnalyzer"
+    assert DeepPeak.DetectionConfig.__name__ == "DetectionConfig"
+    assert DeepPeak.PlotConfig.__name__ == "PlotConfig"
+    assert DeepPeak.SeriesConfig.__name__ == "SeriesConfig"
+    assert DeepPeak.TraceConfig.__name__ == "TraceConfig"
 
 
-def test_top_level_public_api_drops_compatibility_series_exports():
+def test_top_level_public_api_excludes_removed_series_exports():
     assert not hasattr(DeepPeak, "_BaseDilutionSeries")
     assert not hasattr(DeepPeak, "DilutionSeries")
     assert not hasattr(DeepPeak, "PeakCountSeries")
     assert not hasattr(DeepPeak, "SignalDatasetGenerator")
+    assert not hasattr(DeepPeak, "WaveNetTraceAnalyzer")
+    assert not hasattr(DeepPeak, "CNNTraceAnalyzer")
 
 
 def test_generation_package_exposes_domain_modules():

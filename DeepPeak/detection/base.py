@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 
 
 class BaseAmplitudeSolver:
-
     @staticmethod
     def _gram_from_centers(
         centers_2d: NDArray[np.float64], sigma: float

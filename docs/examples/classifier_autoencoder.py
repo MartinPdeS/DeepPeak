@@ -69,7 +69,7 @@ unet.summary()
 
 # %%
 # Train against clean pulse traces
-# --------------------
+# --------------------------------
 history = unet.fit(
     dataset.signals,
     dataset.clean_signals[..., None],

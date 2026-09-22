@@ -58,7 +58,7 @@ _ = dataset.plot(
 
 # %%
 # Build and summarize the WaveNet deconvolver
-# ------------------------------------------
+# -------------------------------------------
 wavenet = WaveNet(
     sequence_length=SEQUENCE_LENGTH,
     num_filters=64,
@@ -74,7 +74,7 @@ wavenet.build()
 
 # %%
 # Train against clean pulse traces
-# --------------------
+# --------------------------------
 history = wavenet.fit(
     dataset.signals,
     dataset.clean_signals[..., None],

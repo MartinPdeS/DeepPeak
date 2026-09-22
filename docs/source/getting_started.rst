@@ -78,8 +78,7 @@ Choosing an API layer
 For a single signal, use ``Trace`` and one of the trace analyzers. For repeated
 measurements, use ``StandardDilutionSeries`` or ``FlashDilutionSeries`` with a
 ``SeriesConfig``. For visualization, import functions from
-``DeepPeak.plotting`` rather than coupling new analysis code to plotting
-methods on legacy record objects.
+``DeepPeak.plotting`` to keep analysis and presentation concerns separate.
 
 See the :doc:`gallery/index` for runnable examples and the :doc:`code` page for
 the complete API reference.

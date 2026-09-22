@@ -22,12 +22,21 @@ Tests are grouped by capability:
   diagnostics;
 * ``test_classifiers.py`` covers optional TensorFlow model behavior.
 
-For a fast local check, run the lightweight API and analysis tests first:
+For a fast local check, exclude tests requiring the optional ML stack:
 
 .. code-block:: console
 
-   MPLBACKEND=Agg python -m pytest -q tests/test_architecture.py \
-       tests/test_peak_count_analysis.py
+   MPLBACKEND=Agg python -m pytest -q -m "not ml and not slow"
+
+Run the focused neural architecture, metric, and serialization checks with:
+
+.. code-block:: console
+
+   TF_CPP_MIN_LOG_LEVEL=2 CUDA_VISIBLE_DEVICES=-1 python -m pytest -q -m ml
+
+Full multi-epoch training belongs in reproducible benchmark jobs, not the unit
+suite. Coverage is measured across both lanes; new changes must not reduce the
+reported percentage, and the project target is 80% branch coverage.
 
 Examples in the Sphinx-Gallery are executable documentation. They should
 return figures rather than call ``plt.show()`` so that the same examples work

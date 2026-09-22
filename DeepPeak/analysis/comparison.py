@@ -14,7 +14,7 @@ import scipy.stats as stats
 
 from ..core.types import DetectionResult, Trace
 from ..detection.triggers import BasePeakTrigger
-from .wavenet_trace import CNNTraceAnalyzer, StandardTraceAnalyzer
+from .wavenet_trace import NeuralTraceAnalyzer, StandardTraceAnalyzer
 
 Branch = Literal["standard", "deconvolved"]
 DistributionName = Literal["arrival", "amplitude", "width"]
@@ -251,7 +251,7 @@ class TraceComparisonAnalyzer:
         if self.deconvolver is None:
             return TraceComparisonResult(trace=trace, standard=standard)
 
-        deconvolved_analyzer = CNNTraceAnalyzer(
+        deconvolved_analyzer = NeuralTraceAnalyzer(
             wavenet=self.deconvolver,
             cnn_trigger=self.deconvolved_trigger,
             sequence_length=sequence_length,

@@ -63,29 +63,12 @@ class ShapeAwarePulseLoss(tf.keras.losses.Loss):
         amplitude_weight: float = 1.0,
         shape_weight: float = 0.25,
         smoothness_weight: float = 0.05,
-        alpha: float | None = None,
-        delta: float | None = None,
-        derivative_weight: float | None = None,
-        derivative_delta: float | None = None,
         **kwargs,
     ):
         super().__init__(**kwargs)
-        # ``alpha``, ``delta`` and ``derivative_weight`` were accepted by an
-        # earlier public version.  Keep them as aliases so saved notebooks and
-        # model configurations remain loadable.
-        self.amplitude_weight = float(amplitude_weight if alpha is None else alpha)
+        self.amplitude_weight = float(amplitude_weight)
         self.shape_weight = float(shape_weight)
-        self.smoothness_weight = float(
-            smoothness_weight if derivative_weight is None else derivative_weight
-        )
-        self.alpha = None if alpha is None else float(alpha)
-        self.delta = None if delta is None else float(delta)
-        self.derivative_weight = (
-            None if derivative_weight is None else float(derivative_weight)
-        )
-        self.derivative_delta = (
-            None if derivative_delta is None else float(derivative_delta)
-        )
+        self.smoothness_weight = float(smoothness_weight)
 
     def call(self, y_true: tf.Tensor, y_pred: tf.Tensor) -> tf.Tensor:
         y_true, y_pred = _prepare(y_true, y_pred)
@@ -108,10 +91,6 @@ class ShapeAwarePulseLoss(tf.keras.losses.Loss):
             "amplitude_weight": self.amplitude_weight,
             "shape_weight": self.shape_weight,
             "smoothness_weight": self.smoothness_weight,
-            "alpha": self.alpha,
-            "delta": self.delta,
-            "derivative_weight": self.derivative_weight,
-            "derivative_delta": self.derivative_delta,
         }
 
 

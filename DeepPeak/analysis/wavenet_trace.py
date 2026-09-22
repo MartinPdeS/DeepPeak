@@ -11,7 +11,6 @@ from typing import Any, Dict, Optional, Tuple, Union
 import numpy as np
 
 from DeepPeak import processing, utils
-from DeepPeak.detection.base import BaseAmplitudeSolver
 from DeepPeak.detection.peak_locator import find_peaks_prominence, find_peaks_standard
 from DeepPeak.io.trace_io import CsvTrace
 from DeepPeak.core.types import DetectionResult
@@ -484,7 +483,7 @@ class StandardTraceAnalyzer(_BaseTraceAnalyzer):
         )
 
 
-class CNNTraceAnalyzer(_BaseTraceAnalyzer):
+class NeuralTraceAnalyzer(_BaseTraceAnalyzer):
     """Analyze one processed trace with WaveNet prediction and CNN peak detection."""
 
     def __init__(
@@ -544,7 +543,9 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
         """Detect CNN peaks from a canonical :class:`~DeepPeak.core.Trace`."""
 
         if detector != "cnn":
-            raise InvalidDetectorError('CNNTraceAnalyzer only supports detector="cnn".')
+            raise InvalidDetectorError(
+                'NeuralTraceAnalyzer only supports detector="cnn".'
+            )
         record = self.analyze_processed_signal(
             trace.signal,
             dx=trace.dx,
@@ -787,12 +788,8 @@ class CNNTraceAnalyzer(_BaseTraceAnalyzer):
         )
 
 
-class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
-    """Backward-compatible analyzer exposing both standard and CNN detectors.
-
-    New code should prefer composing :class:`StandardTraceAnalyzer` and
-    :class:`CNNTraceAnalyzer` explicitly.
-    """
+class TraceAnalyzer(_BaseTraceAnalyzer):
+    """High-level analyzer for direct and neural peak-detection branches."""
 
     def __init__(
         self,
@@ -833,7 +830,7 @@ class WaveNetTraceAnalyzer(_BaseTraceAnalyzer):
         self.cnn_analyzer = (
             None
             if cnn_trigger is None
-            else CNNTraceAnalyzer(
+            else NeuralTraceAnalyzer(
                 wavenet=wavenet,
                 cnn_trigger=cnn_trigger,
                 sequence_length=self.config.sequence_length,

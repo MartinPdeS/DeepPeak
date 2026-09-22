@@ -17,7 +17,7 @@ Analysis API
    :undoc-members:
    :show-inheritance:
 
-.. autoclass:: DeepPeak.analysis.WaveNetTraceAnalyzer
+.. autoclass:: DeepPeak.analysis.TraceAnalyzer
    :members:
    :undoc-members:
    :show-inheritance:
@@ -77,8 +77,8 @@ Core result API
 Analysis errors
 ---------------
 
-DeepPeak exposes specific exceptions while retaining compatibility with the
-corresponding built-in exception types.
+DeepPeak exposes specific exception types for configuration, detector, and
+analysis-state failures.
 
 .. autoclass:: DeepPeak.core.InvalidConfigurationError
    :members:

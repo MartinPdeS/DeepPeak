@@ -36,7 +36,7 @@ from .metrics import (
 )
 
 from ..detection.triggers import BasePeakTrigger
-from .wavenet_trace import CNNTraceAnalyzer, StandardTraceAnalyzer
+from .wavenet_trace import NeuralTraceAnalyzer, StandardTraceAnalyzer
 
 
 def _iterate_explicit_trace_files(
@@ -1131,14 +1131,14 @@ class _BaseDilutionSeries:
     def _resolve_sequence_length(self) -> int:
         if self._sequence_length_override is None and self.cnn is None:
             return max(int(self.nrows), 1)
-        return CNNTraceAnalyzer._infer_sequence_length(
+        return NeuralTraceAnalyzer._infer_sequence_length(
             self.cnn,
             sequence_length=self._sequence_length_override,
         )
 
     def _build_analyzers(
         self,
-    ) -> Tuple[Optional[StandardTraceAnalyzer], Optional[CNNTraceAnalyzer]]:
+    ) -> Tuple[Optional[StandardTraceAnalyzer], Optional[NeuralTraceAnalyzer]]:
         standard_analyzer = (
             None
             if self.trigger is None or self.detector not in {"standard", "both"}
@@ -1153,7 +1153,7 @@ class _BaseDilutionSeries:
         cnn_analyzer = (
             None
             if self.cnn is None or self.detector not in {"flash", "both"}
-            else CNNTraceAnalyzer(
+            else NeuralTraceAnalyzer(
                 wavenet=self.cnn,
                 cnn_trigger=self.cnn_trigger,
                 sequence_length=self.sequence_length,
@@ -1741,43 +1741,7 @@ class StandardDilutionSeries(_BaseDilutionSeries):
         prediction_sampling_rate_hz: float = 125_000_000.0,
         dilution_parser: Optional[Callable[[Path], float]] = None,
         config: Optional[SeriesConfig] = None,
-        trace_files: Optional[List[Tuple[Union[str, Path], float]]] = None,
-        wavenet: Optional[Any] = None,
-        std_trigger: Optional[BasePeakTrigger] = None,
-        cnn_trigger: Optional[BasePeakTrigger] = None,
     ) -> None:
-        legacy_combined = any(
-            value is not None
-            for value in (trace_files, wavenet, std_trigger, cnn_trigger)
-        )
-        if files is None:
-            files = trace_files
-        if trigger is None:
-            trigger = std_trigger or cnn_trigger
-
-        if legacy_combined:
-            _BaseDilutionSeries.__init__(
-                self,
-                folder=folder,
-                files=files,
-                trigger=trigger,
-                cnn=wavenet,
-                cnn_trigger=cnn_trigger,
-                detector_mode="both" if wavenet is not None else "standard",
-                water_file=water_file,
-                initial_concentration=initial_concentration,
-                nrows=nrows,
-                low_pass=low_pass,
-                sequence_length=sequence_length,
-                signal_normalization=signal_normalization,
-                prediction_sampling_rate_hz=prediction_sampling_rate_hz,
-                dilution_parser=dilution_parser,
-                config=config,
-            )
-            self.wavenet = self.cnn
-            self.flash_analyzer = self.cnn_analyzer
-            return
-
         super().__init__(
             folder=folder,
             files=files,

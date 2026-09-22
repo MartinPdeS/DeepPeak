@@ -1,12 +1,12 @@
 import dataclasses
 from abc import ABC
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 from numpy.typing import NDArray
 
-from ..peak_count import PeakCount, PoissonCount, UniformCount
+from ..peak_count import PeakCount, UniformCount
 
 
 RangeValue = Tuple[float, float] | float | Tuple[int, int] | int
@@ -289,8 +289,6 @@ class BaseKernel(ABC):
         *,
         categorical_peak_count: bool,
         peak_count: PeakCount | None,
-        peak_count_distribution: str,
-        peak_count_rate: Optional[Union[float, Tuple[float, float]]],
         has_width: bool,
         rng: np.random.Generator,
     ) -> tuple[
@@ -308,8 +306,6 @@ class BaseKernel(ABC):
             n_samples=n_samples,
             n_peaks=n_peaks,
             peak_count=peak_count,
-            peak_count_distribution=peak_count_distribution,
-            peak_count_rate=peak_count_rate,
             rng=rng,
         )
 
@@ -381,8 +377,6 @@ class BaseKernel(ABC):
         n_samples: int,
         n_peaks: tuple,
         peak_count: PeakCount | None = None,
-        peak_count_distribution: str = "uniform",
-        peak_count_rate: Optional[Union[float, Tuple[float, float]]] = None,
         rng: np.random.Generator | None = None,
     ) -> tuple[NDArray[np.int64], int, int]:
         """Sample per-trace peak counts within inclusive bounds."""
@@ -397,23 +391,6 @@ class BaseKernel(ABC):
             counts = peak_count.sample(n_samples, rng=rng)
             return np.asarray(counts, dtype=np.int64), min_peaks, max_peaks
 
-        distribution = str(peak_count_distribution).strip().lower()
-        if distribution == "uniform":
-            counts = UniformCount(bounds=(min_peaks, max_peaks)).sample(
-                n_samples, rng=rng
-            )
-        elif distribution == "poisson":
-            if peak_count_rate is None:
-                raise ValueError(
-                    "peak_count_rate must be provided when peak_count_distribution='poisson'."
-                )
-            counts = PoissonCount(
-                bounds=(min_peaks, max_peaks),
-                rate=peak_count_rate,
-            ).sample(n_samples, rng=rng)
-        else:
-            raise ValueError(
-                "peak_count_distribution must be either 'uniform' or 'poisson'."
-            )
+        counts = UniformCount(bounds=(min_peaks, max_peaks)).sample(n_samples, rng=rng)
 
         return np.asarray(counts, dtype=np.int64), min_peaks, max_peaks

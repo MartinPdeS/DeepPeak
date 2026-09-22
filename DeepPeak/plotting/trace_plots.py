@@ -4,8 +4,7 @@ These helpers deliberately keep one plotting function per view so notebooks can
 compose figures explicitly instead of relying on large multi-purpose plotters.
 """
 
-from pathlib import Path
-from typing import Optional, Tuple, Union
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import numpy as np

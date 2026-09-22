@@ -292,8 +292,7 @@ class DataSet:
         else:
             if target not in {"labels", "clean_signals"}:
                 raise ValueError(
-                    "target must be 'auto', 'labels', 'clean_signals', or "
-                    "'reference'."
+                    "target must be 'auto', 'labels', 'clean_signals', or 'reference'."
                 )
             if not hasattr(self, target):
                 raise ValueError(f"Dataset does not contain {target!r} targets.")
@@ -580,9 +579,9 @@ class DataSet:
 
             if panel_index == 0:
                 by_label = {}
-                for h, l in zip(handles, labels):
-                    if l and not l.startswith("_") and l not in by_label:
-                        by_label[l] = h
+                for handle, label in zip(handles, labels):
+                    if label and not label.startswith("_") and label not in by_label:
+                        by_label[label] = handle
                 ax.legend(by_label.values(), by_label.keys())
             ax.set_title(f"Sample {plot_index}")
 
@@ -934,7 +933,7 @@ class DataSet:
                 )
                 threshold = min_peak_amplitude * sample_max_amplitude
             elif threshold_mode == "signal_max":
-                signal_max = np.max(np.abs(signals), axis=1, keepdims=True)
+                signal_max = np.max(np.abs(self.signals), axis=1, keepdims=True)
                 threshold = min_peak_amplitude * signal_max
             else:
                 raise ValueError(

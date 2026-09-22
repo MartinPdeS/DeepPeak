@@ -17,6 +17,9 @@
 !conda.recipe
 !conda.recipe/meta.yaml
 !pyproject.toml
+!MANIFEST.in
+!CHANGELOG.md
+!CITATION.cff
 !README.rst
 !CONTRIBUTING.md
 !/Makefile

@@ -6,7 +6,7 @@ from DeepPeak.core import DetectionResult
 from DeepPeak.analysis import (
     HeightPeakTrigger,
     StandardDilutionSeries,
-    WaveNetTraceAnalyzer,
+    TraceAnalyzer,
     compute_peak_amplitude_distribution_metrics,
     metrics as analysis_metrics,
 )
@@ -20,7 +20,7 @@ class DummyWaveNet:
 
 
 def test_compute_peak_amplitude_distribution_metrics_returns_expected_statistics():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -46,7 +46,7 @@ def test_compute_peak_amplitude_distribution_metrics_returns_expected_statistics
 
 
 def test_cnn_amplitude_metrics_require_recovered_amplitudes():
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=DummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=1.5),
         cnn_trigger=HeightPeakTrigger(height=0.6),
@@ -74,7 +74,7 @@ def test_cnn_amplitude_metrics_prefer_recovered_amplitudes_for_overlapping_peaks
             prediction[..., 15] = 1.0
             return prediction
 
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=WideDummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=0.4),
         cnn_trigger=HeightPeakTrigger(height=0.5),
@@ -113,7 +113,7 @@ def test_cnn_amplitude_recovery_matches_analytical_solution_for_three_overlappin
             prediction[..., 19] = 1.0
             return prediction
 
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=WideDummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=0.4),
         cnn_trigger=HeightPeakTrigger(height=0.5),
@@ -149,7 +149,7 @@ def test_cnn_amplitude_recovery_can_subtract_constant_baseline():
             prediction[..., 15] = 1.0
             return prediction
 
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=WideDummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=0.4),
         cnn_trigger=HeightPeakTrigger(height=0.5),
@@ -184,7 +184,7 @@ def test_cnn_amplitude_recovery_exposes_configured_cluster_radius():
             prediction[..., 15] = 1.0
             return prediction
 
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=WideDummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=0.4),
         cnn_trigger=HeightPeakTrigger(height=0.5),
@@ -258,7 +258,7 @@ def test_amplitude_accessor_can_compare_standard_and_cnn_sources():
             prediction[..., 15] = 1.0
             return prediction
 
-    analyzer = WaveNetTraceAnalyzer(
+    analyzer = TraceAnalyzer(
         wavenet=WideDummyWaveNet(),
         std_trigger=HeightPeakTrigger(height=0.4),
         cnn_trigger=HeightPeakTrigger(height=0.5),

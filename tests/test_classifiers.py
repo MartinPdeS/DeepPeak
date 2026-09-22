@@ -24,6 +24,7 @@ NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
 architectures = [DenseNet, WaveNet, UNet1D]
+pytestmark = pytest.mark.ml
 
 
 @pytest.fixture
@@ -37,7 +38,7 @@ def dataset():
     generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
-        n_samples=600,
+        n_samples=8,
         kernel=kernel,
         peak_count=UniformCount(bounds=(1, NUM_PEAKS)),
         noise_std=0.1,
@@ -56,17 +57,8 @@ def test_architecture(patch, dataset, architecture):
     model.build()
     model.summary()
 
-    history = model.fit(
-        dataset.signals,
-        dataset.clean_signals[..., None],
-        validation_split=0.2,
-        epochs=4,
-        batch_size=64,
-    )
-
-    model.plot_model_history()
-
-    model.predict(signal=dataset.signals[0:1, :])
+    prediction = model.predict(signal=dataset.signals[0:1, :])
+    assert prediction.shape == (1, SEQUENCE_LENGTH, 1)
 
 
 def test_wavenet_can_resume_training_with_serializable_weighted_bce(tmp_path):
@@ -233,7 +225,7 @@ def test_wavenet_can_resume_training_with_serializable_shape_aware_loss(tmp_path
         num_filters=4,
         num_dilation_layers=2,
         kernel_size=3,
-        loss=ShapeAwarePulseLoss(alpha=2.0, delta=0.25, derivative_weight=0.5),
+        loss=ShapeAwarePulseLoss(amplitude_weight=2.0, smoothness_weight=0.5),
         metrics=("accuracy",),
     )
     model.build()

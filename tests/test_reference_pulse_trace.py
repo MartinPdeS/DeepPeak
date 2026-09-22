@@ -293,7 +293,7 @@ def test_kernel_plot_draws_on_provided_axis() -> None:
     np.testing.assert_allclose(ax.lines[0].get_xdata(), x_values)
 
 
-def test_signal_generator_rejects_legacy_n_peaks_keyword() -> None:
+def test_signal_generator_rejects_removed_n_peaks_keyword() -> None:
     generator = SignalGenerator(sequence_length=64)
     kernel = Gaussian(
         amplitude=(1.0, 2.0),

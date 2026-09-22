@@ -35,7 +35,7 @@ def _record(dilution: float, peak_count: int) -> TraceRecord:
     )
 
 
-def test_configuration_errors_are_specific_and_backward_compatible():
+def test_configuration_errors_are_specific():
     with pytest.raises(InvalidConfigurationError) as error:
         DetectionConfig(sequence_length=0)
 

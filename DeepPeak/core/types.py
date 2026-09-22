@@ -170,14 +170,6 @@ class DetectionResult:
                     "amplitudes must be empty or match the number of peaks."
                 )
 
-    @property
-    def std_kwargs(self) -> dict[str, Any]:
-        return dict(self.detection_kwargs)
-
-    @property
-    def cnn_kwargs(self) -> dict[str, Any]:
-        return dict(self.detection_kwargs)
-
     def to_dict(self) -> dict[str, Any]:
         """Return a JSON-compatible representation of the detection.
 

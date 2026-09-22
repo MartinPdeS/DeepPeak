@@ -2,10 +2,10 @@ from .datasets import dataset_split
 from .history import merge_and_plot_histories
 from .iterables import batched
 from .io import build_trace_files_from_folder
+from ..processing import low_pass_filter
 from .signal_processing import (
     filter_with_wavelet_transform,
     get_normalized_signal,
-    low_pass_filter,
     process_signal,
     robust_sigma_from_diff,
     segment_signal,

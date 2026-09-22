@@ -2,8 +2,6 @@ from typing import Literal
 
 import numpy as np
 
-from DeepPeak.processing import low_pass_filter
-
 
 def filter_with_wavelet_transform(
     signals: np.ndarray,

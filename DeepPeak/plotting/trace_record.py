@@ -1,9 +1,4 @@
-"""Plotting entry points for canonical trace analysis records.
-
-The analysis package still exposes methods on ``TraceRecord`` for notebook
-compatibility. New code can keep plotting orchestration in this module and
-depend only on the record and ``PlotConfig`` contracts.
-"""
+"""Plotting entry points for canonical trace analysis records."""
 
 from typing import Any
 
