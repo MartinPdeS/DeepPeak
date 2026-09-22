@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "DeepPeak"
-version = "0.3.0"
+version = "0.4.0"
 description = "Peak detection, trace analysis, and dilution-series tooling for 1D signals."
 license = { file = "LICENSE" }
 readme = "README.rst"
