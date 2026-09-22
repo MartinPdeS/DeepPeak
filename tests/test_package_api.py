@@ -1,3 +1,7 @@
+import json
+import subprocess
+import sys
+
 import DeepPeak
 from DeepPeak import models
 
@@ -74,3 +78,27 @@ def test_top_level_api_declares_lazy_ml_exports():
     assert "smooth_bce" in DeepPeak.__all__
     assert "weighted_bce" in DeepPeak.__all__
     assert "weighted_huber" in DeepPeak.__all__
+
+
+def test_package_and_models_import_without_heavy_optional_stacks():
+    script = """
+import json
+import sys
+import DeepPeak
+import DeepPeak.models
+print(json.dumps({
+    "matplotlib": "matplotlib" in sys.modules,
+    "tensorflow": "tensorflow" in sys.modules,
+}))
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert json.loads(completed.stdout) == {
+        "matplotlib": False,
+        "tensorflow": False,
+    }

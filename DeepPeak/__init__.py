@@ -1,191 +1,106 @@
-"""Top-level public API for DeepPeak.
+"""Lazy top-level public API for DeepPeak.
 
-The root package exposes the lightweight analysis, dataset-generation, kernel,
-and noise-model types that are expected to be stable for library users.
-TensorFlow-based classifier objects are loaded lazily so importing
-:mod:`DeepPeak` does not require the optional machine-learning stack.
+Public objects are imported only when first accessed. This keeps package and
+subpackage imports lightweight: using :mod:`DeepPeak.models`, for example,
+does not initialize analysis, plotting, or TensorFlow until needed.
 """
 
+from importlib import import_module
+from typing import Any
+
 try:
-    from ._version import version as __version__  # noqa: F401
+    from ._version import version as __version__
 except ImportError:
     __version__ = "0.0.0"
 
-from .analysis import (
-    BasePeakTrigger,
-    NeuralTraceAnalyzer,
-    FlashDilutionSeries,
-    HeightPeakTrigger,
-    PulseShapeAnalyzer,
-    ProminencePeakTrigger,
-    SigmaPeakTrigger,
-    StandardDilutionSeries,
-    StandardTraceAnalyzer,
-    SeriesComparisonResult,
-    TraceComparisonAnalyzer,
-    TraceComparisonResult,
-    TraceAnalyzer,
-)
-from .generation.dataset import DataSet
-from .generation.kernels import (
-    BaseKernel,
-    CustomKernel,
-    Dirac,
-    Gaussian,
-    Lorentzian,
-    Square,
-    TwoLobeGaussian,
-)
-from .generation.noises import (
-    BaseNoise,
-    CorrelatedGaussianNoise,
-    GaussianNoise,
-    LaplaceNoise,
-    NonstationaryGaussianNoise,
-)
-from .generation.peak_count import (
-    NegativeBinomialCount,
-    PeakCount,
-    PoissonCount,
-    UniformCount,
-)
-from .generation import SignalGenerator
-from .core import (
-    AnalysisConfig,
-    DetectionConfig,
-    DetectionResult,
-    GenerationConfig,
-    MetricResult,
-    ModelConfig,
-    NoiseConfig,
-    PlotConfig,
-    SeriesConfig,
-    SeriesResult,
-    Trace,
-    TraceConfig,
-)
-from .pipeline import Pipeline, PipelineResult
 
-
-__all__ = [
-    "__version__",
-    "BaseKernel",
-    "BaseNoise",
-    "CorrelatedGaussianNoise",
-    "DetectionResult",
-    "AnalysisConfig",
-    "DetectionConfig",
-    "GenerationConfig",
-    "ModelConfig",
-    "NoiseConfig",
-    "PlotConfig",
-    "SeriesConfig",
-    "BasePeakTrigger",
-    "NeuralTraceAnalyzer",
-    "CustomKernel",
-    "DataSet",
-    "Dirac",
-    "FlashDilutionSeries",
-    "Gaussian",
-    "GaussianNoise",
-    "HeightPeakTrigger",
-    "LaplaceNoise",
-    "NonstationaryGaussianNoise",
-    "Lorentzian",
-    "MetricResult",
-    "NegativeBinomialCount",
-    "PeakCount",
-    "PoissonCount",
-    "Pipeline",
-    "PipelineResult",
-    "ProminencePeakTrigger",
-    "PulseShapeAnalyzer",
-    "SigmaPeakTrigger",
-    "SignalGenerator",
-    "Square",
-    "SeriesResult",
-    "StandardDilutionSeries",
-    "StandardTraceAnalyzer",
-    "SeriesComparisonResult",
-    "TraceComparisonAnalyzer",
-    "TraceComparisonResult",
-    "TwoLobeGaussian",
-    "Trace",
-    "TraceConfig",
-    "TrainingConfig",
-    "UniformCount",
-    "TraceAnalyzer",
-    "DenseNet",
-    "ShapeAwarePulseLoss",
-    "SmoothBinaryCrossentropy",
-    "UNet1D",
-    "WaveNet",
-    "WeightedHuber",
-    "WeightedBinaryCrossentropy",
-    "shape_aware_pulse_loss",
-    "smooth_bce",
-    "weighted_bce",
-    "weighted_huber",
-    "ModelEvaluationResult",
-]
-
-
-_LAZY_NEURAL_NETWORK_EXPORTS = set(__all__) - {
-    "__version__",
-    "BaseKernel",
-    "BaseNoise",
-    "BasePeakTrigger",
-    "NeuralTraceAnalyzer",
-    "CustomKernel",
-    "DataSet",
-    "Dirac",
-    "FlashDilutionSeries",
-    "Gaussian",
-    "GaussianNoise",
-    "HeightPeakTrigger",
-    "LaplaceNoise",
-    "Lorentzian",
-    "NegativeBinomialCount",
-    "PeakCount",
-    "PoissonCount",
-    "ProminencePeakTrigger",
-    "PulseShapeAnalyzer",
-    "SigmaPeakTrigger",
-    "SignalGenerator",
-    "Square",
-    "StandardDilutionSeries",
-    "StandardTraceAnalyzer",
-    "TwoLobeGaussian",
-    "UniformCount",
-    "TraceAnalyzer",
-    "CorrelatedGaussianNoise",
-    "DetectionResult",
-    "AnalysisConfig",
-    "DetectionConfig",
-    "GenerationConfig",
-    "ModelConfig",
-    "NoiseConfig",
-    "PlotConfig",
-    "MetricResult",
-    "Pipeline",
-    "PipelineResult",
-    "SeriesResult",
-    "SeriesConfig",
-    "Trace",
-    "TraceConfig",
+_EXPORTS = {
+    # Analysis
+    "BasePeakTrigger": ("detection.triggers", "BasePeakTrigger"),
+    "FlashDilutionSeries": ("analysis.dilution_series", "FlashDilutionSeries"),
+    "HeightPeakTrigger": ("detection.triggers", "HeightPeakTrigger"),
+    "NeuralTraceAnalyzer": ("analysis.wavenet_trace", "NeuralTraceAnalyzer"),
+    "ProminencePeakTrigger": ("detection.triggers", "ProminencePeakTrigger"),
+    "PulseShapeAnalyzer": ("analysis.pulse_shape", "PulseShapeAnalyzer"),
+    "SeriesComparisonResult": ("analysis.comparison", "SeriesComparisonResult"),
+    "SigmaPeakTrigger": ("detection.triggers", "SigmaPeakTrigger"),
+    "StandardDilutionSeries": (
+        "analysis.dilution_series",
+        "StandardDilutionSeries",
+    ),
+    "StandardTraceAnalyzer": ("analysis.wavenet_trace", "StandardTraceAnalyzer"),
+    "TraceAnalyzer": ("analysis.wavenet_trace", "TraceAnalyzer"),
+    "TraceComparisonAnalyzer": ("analysis.comparison", "TraceComparisonAnalyzer"),
+    "TraceComparisonResult": ("analysis.comparison", "TraceComparisonResult"),
+    # Generation
+    "BaseKernel": ("generation.kernels", "BaseKernel"),
+    "BaseNoise": ("generation.noises", "BaseNoise"),
+    "CorrelatedGaussianNoise": (
+        "generation.noises",
+        "CorrelatedGaussianNoise",
+    ),
+    "CustomKernel": ("generation.kernels", "CustomKernel"),
+    "DataSet": ("generation.dataset", "DataSet"),
+    "Dirac": ("generation.kernels", "Dirac"),
+    "Gaussian": ("generation.kernels", "Gaussian"),
+    "GaussianNoise": ("generation.noises", "GaussianNoise"),
+    "LaplaceNoise": ("generation.noises", "LaplaceNoise"),
+    "Lorentzian": ("generation.kernels", "Lorentzian"),
+    "NegativeBinomialCount": ("generation.peak_count", "NegativeBinomialCount"),
+    "NonstationaryGaussianNoise": (
+        "generation.noises",
+        "NonstationaryGaussianNoise",
+    ),
+    "PeakCount": ("generation.peak_count", "PeakCount"),
+    "PoissonCount": ("generation.peak_count", "PoissonCount"),
+    "SignalGenerator": ("generation.signal_generator", "SignalGenerator"),
+    "Square": ("generation.kernels", "Square"),
+    "TwoLobeGaussian": ("generation.kernels", "TwoLobeGaussian"),
+    "UniformCount": ("generation.peak_count", "UniformCount"),
+    # Core and pipeline
+    "AnalysisConfig": ("core", "AnalysisConfig"),
+    "DetectionConfig": ("core", "DetectionConfig"),
+    "DetectionResult": ("core", "DetectionResult"),
+    "GenerationConfig": ("core", "GenerationConfig"),
+    "MetricResult": ("core", "MetricResult"),
+    "ModelConfig": ("core", "ModelConfig"),
+    "NoiseConfig": ("core", "NoiseConfig"),
+    "Pipeline": ("pipeline", "Pipeline"),
+    "PipelineResult": ("pipeline", "PipelineResult"),
+    "PlotConfig": ("core", "PlotConfig"),
+    "SeriesConfig": ("core", "SeriesConfig"),
+    "SeriesResult": ("core", "SeriesResult"),
+    "Trace": ("core", "Trace"),
+    "TraceConfig": ("core", "TraceConfig"),
+    # Optional machine-learning API (DeepPeak.models is itself lazy).
+    "DenseNet": ("models", "DenseNet"),
+    "ModelEvaluationResult": ("models", "ModelEvaluationResult"),
+    "ShapeAwarePulseLoss": ("models", "ShapeAwarePulseLoss"),
+    "SmoothBinaryCrossentropy": ("models", "SmoothBinaryCrossentropy"),
+    "TrainingConfig": ("models", "TrainingConfig"),
+    "UNet1D": ("models", "UNet1D"),
+    "WaveNet": ("models", "WaveNet"),
+    "WeightedBinaryCrossentropy": ("models", "WeightedBinaryCrossentropy"),
+    "WeightedHuber": ("models", "WeightedHuber"),
+    "shape_aware_pulse_loss": ("models", "shape_aware_pulse_loss"),
+    "smooth_bce": ("models", "smooth_bce"),
+    "weighted_bce": ("models", "weighted_bce"),
+    "weighted_huber": ("models", "weighted_huber"),
 }
 
+__all__ = ["__version__", *_EXPORTS]
 
-def __getattr__(name: str):
-    """Load TensorFlow-backed symbols only when they are requested."""
 
-    if name not in _LAZY_NEURAL_NETWORK_EXPORTS:
-        raise AttributeError(f"module 'DeepPeak' has no attribute {name!r}")
+def __getattr__(name: str) -> Any:
+    """Import and cache a public object on first access."""
 
     try:
-        from . import models
+        module_name, attribute_name = _EXPORTS[name]
+    except KeyError as error:
+        raise AttributeError(f"module 'DeepPeak' has no attribute {name!r}") from error
 
-        value = getattr(models, name)
+    try:
+        value = getattr(import_module(f"{__name__}.{module_name}"), attribute_name)
     except ModuleNotFoundError as error:
         if error.name in {"tensorflow", "sklearn"}:
             raise ModuleNotFoundError(
@@ -195,3 +110,9 @@ def __getattr__(name: str):
 
     globals()[name] = value
     return value
+
+
+def __dir__() -> list[str]:
+    """Return eagerly defined and lazily exported public names."""
+
+    return sorted(set(globals()) | set(__all__))
