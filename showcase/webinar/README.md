@@ -32,9 +32,14 @@ amsterdam-umc-logo-presentation.png      Presentation-ready logo asset
 pulse-overlap-motif.svg                  Editable source of the pulse visual
 pulse-overlap-motif.png                  Presentation-ready pulse visual
 cyto-*.png                               CYTO 2026 experimental evidence figures
+build_overlap_logo.py                    Generates transparent overlap logo variants
+deeppeak-overlap-logo-*.png              First-slide logo assets for dark and light fields
+deeppeak-overlap-logo-*.svg              Vector originals of the first-slide logo assets
 ```
 
 Run `python showcase/webinar/build_presentation.py` from the repository root to rebuild the primary polished deck on macOS with Keynote installed. The generator requires `python-pptx`.
+
+Run `python showcase/webinar/build_overlap_logo.py` to regenerate the transparent first-slide logo. Use the `-dark` asset on the deck's dark teal field.
 
 Run `osascript showcase/webinar/build_presentation.applescript` to generate `presentation_native_placeholder.key`, a native Keynote template with named built-in `White` theme layouts, a shared title treatment, orange underline, presenter footer, and editable blank figure placeholders.
 
