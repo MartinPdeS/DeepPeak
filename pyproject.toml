@@ -72,7 +72,7 @@ documentation = [
 
 dev = [
     "flake8 ==7.3.0",
-    "ruff ==0.11.2",
+    "ruff ==0.16.9",
 ]
 
 [tool.ruff]
