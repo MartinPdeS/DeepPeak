@@ -22,6 +22,7 @@
 !CITATION.cff
 !README.rst
 !CONTRIBUTING.md
+!AGENTS.md
 !/Makefile
 !tools
 !tools/*.py
