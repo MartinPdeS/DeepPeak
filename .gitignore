@@ -1,0 +1,57 @@
+
+# Ignore all
+/*
+
+# Except ...
+!.github
+!.gitmodules
+!extern
+!DeepPeak
+!development
+!docs
+!tests
+!.flake8
+!.gitignore
+!.pre-commit-config.yaml
+!LICENSE
+!conda.recipe
+!conda.recipe/meta.yaml
+!pyproject.toml
+!MANIFEST.in
+!CHANGELOG.md
+!CITATION.cff
+!README.rst
+!CONTRIBUTING.md
+!AGENTS.md
+!/Makefile
+!tools
+!tools/*.py
+!notebooks
+!notebooks/
+!notebooks/*.ipynb
+!showcase
+!showcase/
+!showcase/webinar/
+!showcase/webinar/ev_high_throughput_detection/
+!showcase/webinar/ev_high_throughput_detection/**
+!CMakeLists.txt
+!pytest.ini
+!.coveragerc
+
+# But ignore docs/build inside docs and code
+docs/build/
+docs/source/gallery/
+
+# Compiled files in the project
+*__pycache__*
+*.DS_Store*
+*.so*
+*.a*
+*.cmake
+*CMakeFiles*
+*Makefile*
+!/Makefile
+!showcase/webinar/build_presentation.applescript
+
+# Large experimental inputs are kept outside Git.
+data/

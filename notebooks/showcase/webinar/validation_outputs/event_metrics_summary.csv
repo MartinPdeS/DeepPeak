@@ -1,0 +1,2 @@
+method,precision,recall,count_bias_percent,timing_error_samples,amplitude_error,throughput_traces_per_second
+Classical baseline,0.894,0.836,6.453,0.69,0.155,7565.557

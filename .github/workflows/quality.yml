@@ -1,0 +1,23 @@
+name: Static quality checks
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python and CI dependencies
+        uses: MartinPdeS/MPSActions/actions/setup-python@0f5927acf88b25b5d253421e508387897096a2cc
+        with:
+          python-version: "3.11"
+          install-command: >-
+            python -m pip install --upgrade pip && python -m pip install "ruff==0.11.2"
+      - run: python -m ruff check DeepPeak tests
+      - run: python -m ruff format --check DeepPeak tests

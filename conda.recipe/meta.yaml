@@ -1,0 +1,54 @@
+package:
+  name: deeppeak
+  version: 0.4.1
+
+source:
+  path: ..
+
+build:
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+
+requirements:
+  host:
+    - python {{ PY_VER }}*
+    - setuptools >=40.8.0
+    - wheel
+    - setuptools-scm >=8.0
+  run:
+    - numpy
+    - pandas
+    - matplotlib
+    - scipy
+    - martinpdes::mpsplots
+
+about:
+  home: https://github.com/MartinPdeS/DeepPeak
+  license: MIT
+  summary: "A package for flow-cytometry simulations."
+  description: DeepPeak is a library for Neural Network Peak detection algorithm.
+  dev_url: https://github.com/MartinPdeS/DeepPeak
+  doc_url: https://martinpdes.github.io/DeepPeak/
+  license_file: LICENSE
+  keywords:
+    - neural network
+    - encoder/decoder
+    - machine learning
+
+test:
+  imports:
+    - DeepPeak
+  requires:
+    - python {{PY_VER}}*
+    - pytest >=0.6
+    - pytest-cov >=2.0
+    - pytest-json-report ~=1.5.0
+    - coverage ~=7.6.1
+  commands:
+    - python -m pytest
+  source_files:
+    - tests
+
+extra:
+  recipe-maintainers:
+    - MartinPdeS
