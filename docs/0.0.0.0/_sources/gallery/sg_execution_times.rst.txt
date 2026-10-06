@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:22.700** total execution time for 5 files **from gallery**:
+**00:00.000** total execution time for 14 files **from gallery**:
 
 .. container::
 
@@ -32,18 +32,45 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_classifier_wavenet.py` (``classifier_wavenet.py``)
-     - 00:09.750
+   * - :ref:`sphx_glr_gallery_amplitude_retrieval.py` (``amplitude_retrieval.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_classical_detection_pipeline.py` (``classical_detection_pipeline.py``)
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_classifier_autoencoder.py` (``classifier_autoencoder.py``)
-     - 00:08.104
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_classifier_dense.py` (``classifier_dense.py``)
-     - 00:04.012
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_classifier_wavenet.py` (``classifier_wavenet.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_core_result_objects.py` (``core_result_objects.py``)
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_data_generation.py` (``data_generation.py``)
-     - 00:00.449
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_data_generation_custom_kernel.py` (``data_generation_custom_kernel.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_neural_losses.py` (``neural_losses.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_noise_and_pulse_analysis.py` (``noise_and_pulse_analysis.py``)
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_non_maximum_suppression.py` (``non_maximum_suppression.py``)
-     - 00:00.384
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_pretrained_weights.py` (``pretrained_weights.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_pulse_kernel_extraction.py` (``pulse_kernel_extraction.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_wavenet_realistic_training.py` (``wavenet_realistic_training.py``)
+     - 00:00.000
      - 0.0

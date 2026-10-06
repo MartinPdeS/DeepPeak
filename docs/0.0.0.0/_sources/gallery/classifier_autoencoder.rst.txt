@@ -18,47 +18,41 @@
 .. _sphx_glr_gallery_classifier_autoencoder.py:
 
 
-DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals
-======================================================================
+U-Net Deconvolver: Reconstructing Clean Pulse Traces
+====================================================================
 
-This example demonstrates how to use DeepPeak's DenseNet classifier to identify
-regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.
+This example demonstrates how to train DeepPeak's U-Net as a deconvolver.
 
 We will:
 - Generate a dataset of noisy signals with random Gaussian peaks
-- Build and train a DenseNet classifier to detect ROIs
-- Visualize the training process and model predictions
+- Build and train a U-Net reconstruction model
+- Visualize the training process and reconstructed signals
 
 .. note::
     This example is fully reproducible and suitable for Sphinx-Gallery documentation.
 
-.. GENERATED FROM PYTHON SOURCE LINES 19-21
+.. GENERATED FROM PYTHON SOURCE LINES 18-20
 
 Imports and reproducibility
---------------------------
+-----------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 21-28
+.. GENERATED FROM PYTHON SOURCE LINES 20-28
 
 .. code-block:: Python
 
     import numpy as np
-    import matplotlib.pyplot as plt
-    from DeepPeak.signals import SignalDatasetGenerator, Kernel
-    from DeepPeak.machine_learning.classifier import Autoencoder
+
+    from DeepPeak.models import TrainingConfig, UNet1D
+    from DeepPeak.generation import SignalGenerator
+    from DeepPeak import Lorentzian, UniformCount
 
     np.random.seed(42)
-
-
-
-
-
-
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 29-31
 
 Generate synthetic dataset
--------------------------
+---------------------------
 
 .. GENERATED FROM PYTHON SOURCE LINES 31-50
 
@@ -67,248 +61,83 @@ Generate synthetic dataset
     NUM_PEAKS = 3
     SEQUENCE_LENGTH = 200
 
-    generator = SignalDatasetGenerator(
-        n_samples=100,
-        sequence_length=SEQUENCE_LENGTH
+    pulse_kernel = Lorentzian(
+        amplitude=(1, 20),
+        position=(0.1 * SEQUENCE_LENGTH, 0.9 * SEQUENCE_LENGTH),
+        width=(0.03, 0.05),
     )
+
+    generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
     dataset = generator.generate(
-        signal_type=Kernel.GAUSSIAN,
-        n_peaks=(1, NUM_PEAKS),
-        amplitude=(1, 20),
-        position=(0.1, 0.9),
-        width=(0.03, 0.05),
+        n_samples=100,
+        kernel=pulse_kernel,
+        peak_count=UniformCount(bounds=(NUM_PEAKS, NUM_PEAKS)),
         noise_std=0.1,
         categorical_peak_count=False,
-        compute_region_of_interest=True
     )
-
-
-
-
-
-
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 51-53
 
-Visualize a few example signals and their regions of interest
-------------------------------------------------------------
+Visualize observed and clean example signals
+-------------------------------------------------------------
 
 .. GENERATED FROM PYTHON SOURCE LINES 53-55
 
 .. code-block:: Python
 
-    dataset.plot(number_of_samples=3)
-
-
-
-
-.. image-sg:: /gallery/images/sphx_glr_classifier_autoencoder_001.png
-   :alt: classifier autoencoder
-   :srcset: /gallery/images/sphx_glr_classifier_autoencoder_001.png
-   :class: sphx-glr-single-img
-
-
-
+    dataset.plot(number_of_samples=3, reference_pulse_trace=dataset.clean_signals)
 
 
 .. GENERATED FROM PYTHON SOURCE LINES 56-58
 
-Build and summarize the WaveNet classifier
+Build and summarize the U-Net deconvolver
 ------------------------------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 58-72
+.. GENERATED FROM PYTHON SOURCE LINES 58-70
 
 .. code-block:: Python
 
-    dense_net = Autoencoder(
+    unet = UNet1D(
         sequence_length=SEQUENCE_LENGTH,
-        dropout_rate=0.30,
-        filters=(32, 64, 128),
+        num_filters=32,
+        num_levels=3,
         kernel_size=3,
-        pool_size=2,
-        upsample_size=2,
-        optimizer='adam',
-        loss='binary_crossentropy',
-        metrics=['accuracy']
+        optimizer="adam",
+        loss="huber",
+        metrics=["mae"],
     )
-    dense_net.build()
-    dense_net.summary()
+    unet.build()
+    unet.summary()
 
 
+.. GENERATED FROM PYTHON SOURCE LINES 71-73
 
+Train against clean pulse traces
+--------------------------------
 
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Model: "AutoencoderROILocator"
-    ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
-    ┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
-    ┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
-    │ input (InputLayer)              │ (None, 200, 1)         │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_conv0 (Conv1D)              │ (None, 200, 32)        │           128 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_drop0 (Dropout)             │ (None, 200, 32)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_pool0 (MaxPooling1D)        │ (None, 100, 32)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_conv1 (Conv1D)              │ (None, 100, 64)        │         6,208 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_drop1 (Dropout)             │ (None, 100, 64)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ enc_pool1 (MaxPooling1D)        │ (None, 50, 64)         │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ bottleneck_conv (Conv1D)        │ (None, 50, 128)        │        24,704 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ bottleneck_drop (Dropout)       │ (None, 50, 128)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_up0 (UpSampling1D)          │ (None, 100, 128)       │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_conv0 (Conv1D)              │ (None, 100, 64)        │        24,640 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_up1 (UpSampling1D)          │ (None, 200, 64)        │             0 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ dec_conv1 (Conv1D)              │ (None, 200, 32)        │         6,176 │
-    ├─────────────────────────────────┼────────────────────────┼───────────────┤
-    │ ROI (Conv1D)                    │ (None, 200, 1)         │            33 │
-    └─────────────────────────────────┴────────────────────────┴───────────────┘
-     Total params: 61,889 (241.75 KB)
-     Trainable params: 61,889 (241.75 KB)
-     Non-trainable params: 0 (0.00 B)
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 73-75
-
-Train the classifier
---------------------
-
-.. GENERATED FROM PYTHON SOURCE LINES 75-83
+.. GENERATED FROM PYTHON SOURCE LINES 73-79
 
 .. code-block:: Python
 
-    history = dense_net.fit(
+    history = unet.fit(
         dataset.signals,
-        dataset.region_of_interest,
-        validation_split=0.2,
-        epochs=20,
-        batch_size=64
+        dataset.clean_signals[..., None],
+        config=TrainingConfig(epochs=20, batch_size=64, validation_split=0.2),
     )
 
 
-
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    Epoch 1/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 1s 2s/step - accuracy: 0.6825 - loss: 0.6828    2/2 ━━━━━━━━━━━━━━━━━━━━ 2s 260ms/step - accuracy: 0.7361 - loss: 0.6803 - val_accuracy: 0.9613 - val_loss: 0.6435
-    Epoch 2/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 42ms/step - accuracy: 0.9487 - loss: 0.6387    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9496 - loss: 0.6363 - val_accuracy: 0.9613 - val_loss: 0.6322
-    Epoch 3/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9488 - loss: 0.5923    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9500 - loss: 0.5914 - val_accuracy: 0.9675 - val_loss: 0.6077
-    Epoch 4/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9513 - loss: 0.5543    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9509 - loss: 0.5478 - val_accuracy: 0.9717 - val_loss: 0.5437
-    Epoch 5/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9519 - loss: 0.5039    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9515 - loss: 0.4937 - val_accuracy: 0.9490 - val_loss: 0.4886
-    Epoch 6/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9501 - loss: 0.4321    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9506 - loss: 0.4201 - val_accuracy: 0.9317 - val_loss: 0.4242
-    Epoch 7/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9521 - loss: 0.3404    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9508 - loss: 0.3317 - val_accuracy: 0.9490 - val_loss: 0.3057
-    Epoch 8/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 38ms/step - accuracy: 0.9562 - loss: 0.2643    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9571 - loss: 0.2568 - val_accuracy: 0.9295 - val_loss: 0.2450
-    Epoch 9/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9513 - loss: 0.1787    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9492 - loss: 0.1763 - val_accuracy: 0.9285 - val_loss: 0.1801
-    Epoch 10/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9545 - loss: 0.1304    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9532 - loss: 0.1337 - val_accuracy: 0.9375 - val_loss: 0.1311
-    Epoch 11/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 40ms/step - accuracy: 0.9559 - loss: 0.1102    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9565 - loss: 0.1128 - val_accuracy: 0.9422 - val_loss: 0.1172
-    Epoch 12/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9522 - loss: 0.1052    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 54ms/step - accuracy: 0.9527 - loss: 0.1036 - val_accuracy: 0.9450 - val_loss: 0.1150
-    Epoch 13/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9551 - loss: 0.0947    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9534 - loss: 0.0975 - val_accuracy: 0.9628 - val_loss: 0.1113
-    Epoch 14/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9537 - loss: 0.0960    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 48ms/step - accuracy: 0.9549 - loss: 0.0939 - val_accuracy: 0.9728 - val_loss: 0.1046
-    Epoch 15/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9535 - loss: 0.0941    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9544 - loss: 0.0915 - val_accuracy: 0.9705 - val_loss: 0.0974
-    Epoch 16/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9549 - loss: 0.0905    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9544 - loss: 0.0905 - val_accuracy: 0.9757 - val_loss: 0.0935
-    Epoch 17/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9559 - loss: 0.0908    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9574 - loss: 0.0867 - val_accuracy: 0.9595 - val_loss: 0.0929
-    Epoch 18/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9591 - loss: 0.0852    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 49ms/step - accuracy: 0.9591 - loss: 0.0865 - val_accuracy: 0.9528 - val_loss: 0.0944
-    Epoch 19/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9550 - loss: 0.0921    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 50ms/step - accuracy: 0.9570 - loss: 0.0874 - val_accuracy: 0.9528 - val_loss: 0.0939
-    Epoch 20/20
-    1/2 ━━━━━━━━━━━━━━━━━━━━ 0s 39ms/step - accuracy: 0.9575 - loss: 0.0869    2/2 ━━━━━━━━━━━━━━━━━━━━ 0s 55ms/step - accuracy: 0.9585 - loss: 0.0861 - val_accuracy: 0.9605 - val_loss: 0.0900
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 84-86
+.. GENERATED FROM PYTHON SOURCE LINES 80-82
 
 Plot training history
 ---------------------
 
-.. GENERATED FROM PYTHON SOURCE LINES 86-88
+.. GENERATED FROM PYTHON SOURCE LINES 82-83
 
 .. code-block:: Python
 
-    dense_net.plot_model_history(history)
-
-
-
-
-.. image-sg:: /gallery/images/sphx_glr_classifier_autoencoder_002.png
-   :alt: Loss, Accuracy
-   :srcset: /gallery/images/sphx_glr_classifier_autoencoder_002.png
-   :class: sphx-glr-single-img
-
-
-
-
-
-.. GENERATED FROM PYTHON SOURCE LINES 89-91
-
-Predict and visualize on a test signal
---------------------------------------
-
-.. GENERATED FROM PYTHON SOURCE LINES 91-94
-
-.. code-block:: Python
-
-    dense_net.plot_prediction(
-        signal=dataset.signals[0:1, :],
-        threshold=0.4
-    )
-
-
-.. image-sg:: /gallery/images/sphx_glr_classifier_autoencoder_003.png
-   :alt: Predicted Region of Interest
-   :srcset: /gallery/images/sphx_glr_classifier_autoencoder_003.png
-   :class: sphx-glr-single-img
-
-
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-
-    <Figure size 1200x500 with 1 Axes>
-
-
-
-
-.. rst-class:: sphx-glr-timing
-
-   **Total running time of the script:** (0 minutes 8.104 seconds)
+    unet.plot_model_history()
 
 
 .. _sphx_glr_download_gallery_classifier_autoencoder.py:

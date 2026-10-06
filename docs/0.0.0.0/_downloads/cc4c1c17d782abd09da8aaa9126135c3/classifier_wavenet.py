@@ -1,14 +1,13 @@
 """
-DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals
+WaveNet Deconvolver: Reconstructing Clean Pulse Traces
 ======================================================================
 
-This example demonstrates how to use DeepPeak's DenseNet classifier to identify
-regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.
+This example demonstrates how to train DeepPeak's WaveNet as a deconvolver.
 
 We will:
 - Generate a dataset of noisy signals with random Gaussian peaks
-- Build and train a DenseNet classifier to detect ROIs
-- Visualize the training process and model predictions
+- Build and train a WaveNet reconstruction model
+- Visualize the training process and reconstructed signals
 
 .. note::
     This example is fully reproducible and suitable for Sphinx-Gallery documentation.
@@ -17,76 +16,72 @@ We will:
 
 # %%
 # Imports and reproducibility
-# --------------------------
+# -----------------------------
 import numpy as np
-import matplotlib.pyplot as plt
-from DeepPeak.signals import SignalDatasetGenerator, Kernel
-from DeepPeak.machine_learning.classifier import WaveNet
+
+from DeepPeak.models import TrainingConfig, WaveNet
+from DeepPeak.generation import SignalGenerator
+from DeepPeak import Gaussian, UniformCount
 
 np.random.seed(42)
 
 # %%
 # Generate synthetic dataset
-# -------------------------
+# ---------------------------
 NUM_PEAKS = 3
 SEQUENCE_LENGTH = 200
 
-generator = SignalDatasetGenerator(
-    n_samples=100,
-    sequence_length=SEQUENCE_LENGTH
+pulse_kernel = Gaussian(
+    amplitude=(10, 20),
+    position=(0.1 * SEQUENCE_LENGTH, 0.9 * SEQUENCE_LENGTH),
+    width=(5, 10),
 )
+
+generator = SignalGenerator(sequence_length=SEQUENCE_LENGTH)
 
 dataset = generator.generate(
-    signal_type=Kernel.GAUSSIAN,
-    n_peaks=(1, NUM_PEAKS),
-    amplitude=(1, 20),
-    position=(0.1, 0.9),
-    width=(0.03, 0.05),
-    noise_std=0.1,
+    n_samples=1000,
+    kernel=pulse_kernel,
+    peak_count=UniformCount(bounds=(NUM_PEAKS, NUM_PEAKS)),
+    noise_std=0.03,
     categorical_peak_count=False,
-    compute_region_of_interest=True
 )
 
 # %%
-# Visualize a few example signals and their regions of interest
-# ------------------------------------------------------------
-dataset.plot(number_of_samples=3)
+# Visualize observed and clean example signals
+# -------------------------------------------------------------
+_ = dataset.plot(
+    number_of_samples=6,
+    number_of_columns=3,
+    reference_pulse_trace=dataset.clean_signals,
+)
 
 # %%
-# Build and summarize the WaveNet classifier
-# ------------------------------------------
-dense_net = WaveNet(
+# Build and summarize the WaveNet deconvolver
+# -------------------------------------------
+wavenet = WaveNet(
     sequence_length=SEQUENCE_LENGTH,
     num_filters=64,
-    num_dilation_layers=6,
-    kernel_size=3,
-    optimizer='adam',
-    loss='binary_crossentropy',
-    metrics=['accuracy']
+    num_dilation_layers=3,
+    kernel_size=4,
+    optimizer="adam",
+    output_activation="linear",
+    loss="huber",
+    metrics=["mae"],
 )
-dense_net.build()
-dense_net.summary()
+
+wavenet.build()
 
 # %%
-# Train the classifier
-# --------------------
-history = dense_net.fit(
+# Train against clean pulse traces
+# --------------------------------
+history = wavenet.fit(
     dataset.signals,
-    dataset.region_of_interest,
-    validation_split=0.2,
-    epochs=20,
-    batch_size=64
+    dataset.clean_signals[..., None],
+    config=TrainingConfig(epochs=40, batch_size=64, validation_split=0.2),
 )
 
 # %%
 # Plot training history
 # ---------------------
-dense_net.plot_model_history(history)
-
-# %%
-# Predict and visualize on a test signal
-# --------------------------------------
-dense_net.plot_prediction(
-    signal=dataset.signals[0:1, :],
-    threshold=0.4
-)
+_ = wavenet.plot_model_history()

@@ -17,3 +17,19 @@ div.highlight a {
 .bd-footer .footer-items__end, .bd-footer .footer-items__start {
   flex-direction: row;
 }
+
+:root {
+  --deeppeak-teal: #006d77;
+  --deeppeak-dark-teal: #004854;
+  --deeppeak-coral: #ef8354;
+  --deeppeak-evidence: #b56b12;
+  --deeppeak-ink: #102a33;
+  --deeppeak-paper: #f8fbfa;
+}
+
+.bd-main h1 { color: var(--deeppeak-ink); }
+.bd-main h2 { color: var(--deeppeak-teal); border-bottom: 2px solid #d9eef1; }
+.bd-main h3 { color: var(--deeppeak-evidence); }
+.admonition.note { border-left-color: var(--deeppeak-teal); }
+.admonition.important { border-left-color: var(--deeppeak-coral); }
+div.highlight { border-left: 4px solid var(--deeppeak-dark-teal); border-radius: 6px; }

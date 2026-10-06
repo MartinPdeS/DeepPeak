@@ -1,143 +1,48 @@
 :orphan:
 
-DeepPeak Examples
-=================
 
-Welcome to the DeepPeak examples gallery! This directory contains comprehensive examples demonstrating the key capabilities of the DeepPeak library for signal processing and peak detection using deep learning.
+Examples
+========
 
-Overview
---------
+Welcome to the DeepPeak examples gallery! This directory contains executable
+examples demonstrating the public DeepPeak API for signal processing, peak
+detection, analysis, and visualization. Examples are designed to run with a
+non-interactive Matplotlib backend and return figures instead of requiring a
+user to close plot windows.
 
-DeepPeak is a Python library designed for detecting and analyzing peaks in 1D signals using machine learning approaches. These examples showcase the library's main features:
+
+DeepPeak is a Python library designed for generating, detecting, and analyzing peaks in 1D signals. These examples showcase the library's main features:
 
 - **Signal Generation**: Create synthetic datasets with controllable noise and peak characteristics
-- **Machine Learning Classifiers**: Train neural networks to detect regions of interest
+- **Classical Detection**: Detect peaks with trigger and suppression algorithms
+- **Neural deconvolution**: Train models to reconstruct clean pulse traces
+- **Direct-versus-deconvolved comparison**: Compare arrival, amplitude, and width distributions
+- **Stable Results**: Pass trace, detection, and metric objects between pipeline stages
+- **Trace Analysis**: Characterize noise and pulse shapes
 - **Peak Detection Algorithms**: Apply traditional and ML-enhanced peak detection methods
 - **Visualization Tools**: Plot and analyze results with built-in visualization utilities
 
-Examples Description
---------------------
-
-**Data Generation and Visualization**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:doc:`data_generation`
-    Learn how to generate synthetic signals with Gaussian pulses and visualize them with region-of-interest masks. This is the foundation for understanding how DeepPeak handles signal data.
-
-**Machine Learning Classifiers**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:doc:`classifier_dense`
-    Demonstrates training a DenseNet classifier to identify regions of interest in noisy signals containing Gaussian peaks. Shows the complete workflow from data preparation to model evaluation.
-
-:doc:`classifier_autoencoder`
-    Explores using autoencoder architectures for unsupervised feature learning and anomaly detection in signal data.
-
-:doc:`classifier_wavenet`
-    Showcases the WaveNet classifier for temporal pattern recognition in 1D signals, leveraging dilated convolutions for multi-scale feature extraction.
-
-**Peak Detection Algorithms**
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-:doc:`non_maximum_suppression`
-    Implements classical non-maximum suppression for peak detection, providing a baseline comparison for machine learning approaches.
-
-Getting Started
+Suggested order
 ---------------
 
-To run these examples, you'll need to install DeepPeak and its dependencies:
+#. Start with ``core_result_objects.py`` to learn the stable data contracts.
+#. Continue with ``classical_detection_pipeline.py`` for a complete detector
+   workflow.
+#. Use ``data_generation.py`` and ``data_generation_custom_kernel.py`` to
+   create controlled training signals.
+#. Explore ``noise_and_pulse_analysis.py`` and ``amplitude_retrieval.py`` for
+   downstream trace diagnostics.
+#. Use the classifier examples only when TensorFlow and a trained model are
+   required.
+#. Use ``pulse_kernel_extraction.py`` to extract representative pulse kernels
+   and a reusable kernel library from experimental CSV traces.
+#. Read the direct-versus-deconvolved comparison section in ``getting_started``
+   before training a model for reconstruction.
 
-.. code-block:: bash
 
-    pip install DeepPeak
+.. raw:: html
 
-Each example is self-contained and can be run independently. They are designed to be:
-
-- **Educational**: Clear explanations of concepts and methods
-- **Reproducible**: Fixed random seeds and documented parameters
-- **Interactive**: Rich visualizations to understand the data and results
-- **Practical**: Real-world applicable techniques and best practices
-
-Example Structure
------------------
-
-Each example follows a consistent structure:
-
-1. **Introduction**: Brief overview of the demonstrated technique
-2. **Data Preparation**: Signal generation or loading
-3. **Method Application**: Algorithm implementation and training
-4. **Results Visualization**: Plotting and analysis of outputs
-5. **Discussion**: Interpretation of results and next steps
-
-Usage Tips
-----------
-
-**For Beginners**
-    Start with the ``data_generation`` example to understand the data format, then proceed to ``classifier_dense`` for a complete machine learning workflow.
-
-**For Researchers**
-    The examples demonstrate reproducible research practices with proper documentation, visualization, and evaluation metrics.
-
-**For Developers**
-    Each example showcases different aspects of the DeepPeak API, serving as practical documentation for library usage.
-
-Requirements
-------------
-
-The examples require:
-
-- Python ≥ 3.8
-- DeepPeak library
-- NumPy, Matplotlib for basic functionality
-- TensorFlow/Keras for machine learning examples
-- Additional dependencies are automatically installed with DeepPeak
-
-Running Examples
----------------
-
-You can run examples in several ways:
-
-**Direct execution**:
-
-.. code-block:: bash
-
-    python classifier_dense.py
-
-**Jupyter notebook**:
-    Convert any example to a notebook for interactive exploration:
-
-.. code-block:: bash
-
-    jupytext --to notebook classifier_dense.py
-
-**Sphinx-Gallery**:
-    These examples are designed for Sphinx-Gallery and will automatically generate beautiful documentation with embedded plots.
-
-Contributing
-------------
-
-Found an issue or want to add a new example? Contributions are welcome! Please:
-
-1. Follow the existing example structure and style
-2. Include clear documentation and comments
-3. Add appropriate visualizations
-4. Test your example thoroughly
-5. Submit a pull request
-
-For questions or suggestions, please open an issue on the `DeepPeak GitHub repository <https://github.com/MartinPdeS/DeepPeak>`_.
-
-Next Steps
-----------
-
-After exploring these examples, you might want to:
-
-- Adapt the code for your own signal data
-- Experiment with different neural network architectures
-- Combine multiple detection methods for robust peak detection
-- Explore advanced topics in the main DeepPeak documentation
-
-Happy peak detecting!
-
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
 
 
 .. raw:: html
@@ -148,69 +53,171 @@ Happy peak detecting!
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates the use of the NonMaximumSuppression class to detect Gaussian pulses in a one-dimensional signal. It generates a synthetic dataset of Gaussian pulses, applies the non-maximum suppression algorithm, and plots the results.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_amplitude_retrieval_thumb.png
+    :alt:
+
+  :doc:`/gallery/amplitude_retrieval`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Amplitude Retrieval for Overlapping Pulses</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Generate a noisy synthetic signal, run the classical detector, wrap its raw output in a stable DetectionResult, and visualize the result.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_classical_detection_pipeline_thumb.png
+    :alt:
+
+  :doc:`/gallery/classical_detection_pipeline`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Classical Detection Pipeline with Stable Results</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s U-Net as a deconvolver.">
 
 .. only:: html
 
   .. image:: /gallery/images/thumb/sphx_glr_classifier_autoencoder_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_classifier_autoencoder.py`
+  :doc:`/gallery/classifier_autoencoder`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
+      <div class="sphx-glr-thumbnail-title">U-Net Deconvolver: Reconstructing Clean Pulse Traces</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s DenseNet as a deconvolver.">
 
 .. only:: html
 
   .. image:: /gallery/images/thumb/sphx_glr_classifier_dense_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_classifier_dense.py`
+  :doc:`/gallery/classifier_dense`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
+      <div class="sphx-glr-thumbnail-title">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to use DeepPeak&#x27;s DenseNet classifier to identify regions of interest (ROIs) in synthetic 1D signals containing Gaussian peaks.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to train DeepPeak&#x27;s WaveNet as a deconvolver.">
 
 .. only:: html
 
   .. image:: /gallery/images/thumb/sphx_glr_classifier_wavenet_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_classifier_wavenet.py`
+  :doc:`/gallery/classifier_wavenet`
 
 .. raw:: html
 
-      <div class="sphx-glr-thumbnail-title">DenseNet Classifier: Detecting Regions of Interest in Synthetic Signals</div>
+      <div class="sphx-glr-thumbnail-title">WaveNet Deconvolver: Reconstructing Clean Pulse Traces</div>
     </div>
 
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Compute a Region of Interest (ROI) mask based on pulse positions.   3. Visualize signals with peak positions, amplitudes, and the ROI mask.">
+    <div class="sphx-glr-thumbcontainer" tooltip="This example introduces the lightweight result objects shared by the new DeepPeak architecture. They contain numerical data and metadata, but no TensorFlow or plotting dependencies.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_core_result_objects_thumb.png
+    :alt:
+
+  :doc:`/gallery/core_result_objects`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Core Result Objects: Trace, DetectionResult, and MetricResult</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals.">
 
 .. only:: html
 
   .. image:: /gallery/images/thumb/sphx_glr_data_generation_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_data_generation.py`
+  :doc:`/gallery/data_generation`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Generating and Visualizing Signal Data</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example demonstrates how to:   1. Generate synthetic signals with up to 3 Gaussian pulses.   2. Retain clean pulse traces as reconstruction targets.   3. Visualize observed and clean pulse signals.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_data_generation_custom_kernel_thumb.png
+    :alt:
+
+  :doc:`/gallery/data_generation_custom_kernel`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Generating data With a Custom Kernel</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Use serializable losses with any DeepPeak deconvolution architecture.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_neural_losses_thumb.png
+    :alt:
+
+  :doc:`/gallery/neural_losses`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Neural losses and configurable training</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Use the analysis layer to characterize noise regions and align detected pulses for shape statistics.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_noise_and_pulse_analysis_thumb.png
+    :alt:
+
+  :doc:`/gallery/noise_and_pulse_analysis`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Noise and Pulse-Shape Analysis</div>
     </div>
 
 
@@ -223,11 +230,62 @@ Happy peak detecting!
   .. image:: /gallery/images/thumb/sphx_glr_non_maximum_suppression_thumb.png
     :alt:
 
-  :ref:`sphx_glr_gallery_non_maximum_suppression.py`
+  :doc:`/gallery/non_maximum_suppression`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Non-Maximum Suppression for Gaussian Pulse Detection</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example trains compact WaveNet and U-Net models on a small synthetic dataset, saves them using DeepPeak&#x27;s model-artifact format, reloads them, and compares both reconstructions with the clean target. The same save directories can later be moved into DeepPeak/weights for reuse.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_pretrained_weights_thumb.png
+    :alt:
+
+  :doc:`/gallery/pretrained_weights`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Train, Save, and Reload Models</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example extracts representative pulse shapes and a small kernel library from experimental CSV traces. The example data are stored in data/run_5_ref in the local checkout. The raw CSV files are intentionally excluded from Git because of their size and must be supplied separately.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_pulse_kernel_extraction_thumb.png
+    :alt:
+
+  :doc:`/gallery/pulse_kernel_extraction`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Extracting Pulse Kernels from Experimental Traces</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This example follows a production-style training workflow: a library of slightly different asymmetric pulse shapes, variable noise and baseline drift, Poisson-distributed pulse counts, explicit blank traces, per-trace normalization, and validation-aware WaveNet training.">
+
+.. only:: html
+
+  .. image:: /gallery/images/thumb/sphx_glr_wavenet_realistic_training_thumb.png
+    :alt:
+
+  :doc:`/gallery/wavenet_realistic_training`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Train WaveNet on Realistic Multi-Pulse Traces</div>
     </div>
 
 
@@ -241,11 +299,20 @@ Happy peak detecting!
 .. toctree::
    :hidden:
 
+   /gallery/amplitude_retrieval
+   /gallery/classical_detection_pipeline
    /gallery/classifier_autoencoder
    /gallery/classifier_dense
    /gallery/classifier_wavenet
+   /gallery/core_result_objects
    /gallery/data_generation
+   /gallery/data_generation_custom_kernel
+   /gallery/neural_losses
+   /gallery/noise_and_pulse_analysis
    /gallery/non_maximum_suppression
+   /gallery/pretrained_weights
+   /gallery/pulse_kernel_extraction
+   /gallery/wavenet_realistic_training
 
 
 
