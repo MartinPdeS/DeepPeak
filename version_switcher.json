@@ -1,115 +1,82 @@
 [
-{
-  "name": "latest",
-  "version": "latest",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/latest"
-}
-,
-{
-  "name": "v0.5.1",
-  "version": "v0.5.1",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.5.1"
-}
-,
-{
-  "name": "v0.5.0",
-  "version": "v0.5.0",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.5.0"
-}
-,
-{
-  "name": "v0.4.1",
-  "version": "v0.4.1",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.4.1"
-}
-,
-{
-  "name": "v0.4.0",
-  "version": "v0.4.0",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.4.0"
-}
-,
-{
-  "name": "v0.3.0",
-  "version": "v0.3.0",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.3.0"
-}
-,
-{
-  "name": "v0.1.1",
-  "version": "v0.1.1",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.1.1"
-}
-,
-{
-  "name": "v0.1.0",
-  "version": "v0.1.0",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.1.0"
-}
-,
-{
-  "name": "v0.0.8",
-  "version": "v0.0.8",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.8"
-}
-,
-{
-  "name": "v0.0.7",
-  "version": "v0.0.7",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.7"
-}
-,
-{
-  "name": "v0.0.6",
-  "version": "v0.0.6",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.6"
-}
-,
-{
-  "name": "v0.0.5",
-  "version": "v0.0.5",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.5"
-}
-,
-{
-  "name": "v0.0.4",
-  "version": "v0.0.4",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.4"
-}
-,
-{
-  "name": "v0.0.3",
-  "version": "v0.0.3",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.3"
-}
-,
-{
-  "name": "v0.0.2",
-  "version": "v0.0.2",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.2"
-}
-,
-{
-  "name": "v0.0.1",
-  "version": "v0.0.1",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.1"
-}
-,
-{
-  "name": "source",
-  "version": "source",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/source"
-}
-,
-{
-  "name": "examples",
-  "version": "examples",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/examples"
-}
-,
-{
-  "name": "0.0.0.0",
-  "version": "0.0.0.0",
-  "url": "https://martinpdes.github.io/DeepPeak/docs/0.0.0.0"
-}
+  {
+    "name": "latest",
+    "version": "latest",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/latest"
+  },
+  {
+    "name": "v0.5.1",
+    "version": "v0.5.1",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.5.1"
+  },
+  {
+    "name": "v0.5.0",
+    "version": "v0.5.0",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.5.0"
+  },
+  {
+    "name": "v0.4.1",
+    "version": "v0.4.1",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.4.1"
+  },
+  {
+    "name": "v0.4.0",
+    "version": "v0.4.0",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.4.0"
+  },
+  {
+    "name": "v0.3.0",
+    "version": "v0.3.0",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.3.0"
+  },
+  {
+    "name": "v0.1.1",
+    "version": "v0.1.1",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.1.1"
+  },
+  {
+    "name": "v0.1.0",
+    "version": "v0.1.0",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.1.0"
+  },
+  {
+    "name": "v0.0.8",
+    "version": "v0.0.8",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.8"
+  },
+  {
+    "name": "v0.0.7",
+    "version": "v0.0.7",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.7"
+  },
+  {
+    "name": "v0.0.6",
+    "version": "v0.0.6",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.6"
+  },
+  {
+    "name": "v0.0.5",
+    "version": "v0.0.5",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.5"
+  },
+  {
+    "name": "v0.0.4",
+    "version": "v0.0.4",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.4"
+  },
+  {
+    "name": "v0.0.3",
+    "version": "v0.0.3",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.3"
+  },
+  {
+    "name": "v0.0.2",
+    "version": "v0.0.2",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.2"
+  },
+  {
+    "name": "v0.0.1",
+    "version": "v0.0.1",
+    "url": "https://martinpdes.github.io/DeepPeak/docs/v0.0.1"
+  }
 ]
