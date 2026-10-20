@@ -1,6 +1,7 @@
 """DeepPeak documentation configuration."""
 
 import os
+from pathlib import Path
 
 import matplotlib
 
@@ -47,6 +48,13 @@ globals().update(
             "within_subsection_order": FileNameSortKey,
         },
     )
+)
+
+# Sphinx-Gallery resolves ``default_thumb_file`` from the process directory.
+# Use an absolute source-tree path so this remains valid in CI as well as when
+# the documentation is built from the repository root or ``docs/source``.
+sphinx_gallery_conf["default_thumb_file"] = str(
+    Path(__file__).parent / "_static" / "thumbnail.png"
 )
 
 autodoc_mock_imports = [
