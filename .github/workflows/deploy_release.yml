@@ -9,8 +9,16 @@ permissions:
 
 jobs:
   release:
-    uses: MartinPdeS/MPSActions/.github/workflows/publish_release.yml@v11
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: MartinPdeS/MPSActions/.github/workflows/publish_release.yml@v12
     with:
+      documentation: true
+      documentation_package_name: DeepPeak
+      documentation_python_version: "3.11"
+      debug: true
       pypi_package_type: pure
       pypi_python_version: "3.11"
       pypi_test_command: "python -c 'import DeepPeak; print(DeepPeak.__version__)'"

@@ -1,25 +1,22 @@
 name: Documentation
-
-on:
+'on':
   push:
-    branches: [ "**" ]
-    tags: [ "v*" ]
+    branches:
+    - '**'
   pull_request:
-    branches: [ "master" ]
-
+    branches:
+    - master
 permissions:
-  contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: documentation-page-deployment
-  cancel-in-progress: false
-
+  contents: read
 jobs:
-  ManyLinux_x86_64:
-    uses: MartinPdeS/MPSActions/.github/workflows/publish_documentation.yml@v11
+  documentation:
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    uses: MartinPdeS/MPSActions/.github/workflows/publish_documentation.yml@v12
     with:
-      python-version: "3.11"
-      package-name: "DeepPeak"
-      deploy-pages: ${{ github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v')) }}
+      python-version: '3.11'
+      package-name: DeepPeak
+      deploy-pages: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      debug: true
