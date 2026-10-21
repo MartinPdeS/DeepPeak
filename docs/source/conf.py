@@ -44,7 +44,6 @@ globals().update(
 autodoc_mock_imports = [
     "numpy",
     "matplotlib",
-    "numpydoc",
     "scipy",
     "tensorflow",
     "sklearn",
