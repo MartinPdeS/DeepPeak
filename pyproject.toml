@@ -48,7 +48,6 @@ include = ["DeepPeak", "DeepPeak.*"]
 "*" = ["*.h5", "**/*.h5"]
 
 [tool.setuptools_scm]
-write_to = "DeepPeak/_version.py"
 version_scheme = "only-version"
 local_scheme = "no-local-version"
 
