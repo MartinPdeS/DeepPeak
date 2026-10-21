@@ -55,7 +55,7 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/MartinPdeS/DeepPeak/documentation_page/version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'latest';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.5.3';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
@@ -63,11 +63,11 @@
     <link rel="icon" href="_static/thumbnail.png"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="API stability policy" href="api_stability.html" />
-    <link rel="prev" title="Webinar showcase" href="showcase.html" />
+    <link rel="next" title="Resources" href="resources.html" />
+    <link rel="prev" title="Neural model workflow" href="neural_workflow.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="latest" />
+  <meta name="docsearch:version" content="" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -176,85 +176,19 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="benchmarks.html">
-    Scientific benchmarks
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="model_card.html">
-    Model cards
-  </a>
-</li>
-
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button"
-                data-bs-toggle="dropdown" aria-expanded="false"
-                aria-controls="pst-nav-more-links">
-                    More
-                </button>
-                <ul id="pst-nav-more-links" class="dropdown-menu">
-                    
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="showcase.html">
-    Webinar showcase
-  </a>
-</li>
-
-
-<li class=" current active">
-  <a class="nav-link dropdown-item nav-internal" href="#">
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
     API reference
   </a>
 </li>
 
 
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="api_stability.html">
-    API stability policy
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="resources.html">
+    Resources
   </a>
 </li>
 
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="migration.html">
-    Migration guide
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="testing.html">
-    Testing and reproducibility
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="gallery/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="theory.html">
-    Theory
-  </a>
-</li>
-
-
-<li class=" ">
-  <a class="nav-link dropdown-item nav-internal" href="references.html">
-    References
-  </a>
-</li>
-
-                </ul>
-            </li>
-            
   </ul>
 </nav></div>
       
@@ -398,27 +332,6 @@
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="benchmarks.html">
-    Scientific benchmarks
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="model_card.html">
-    Model cards
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="showcase.html">
-    Webinar showcase
-  </a>
-</li>
-
-
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
     API reference
@@ -427,43 +340,8 @@
 
 
 <li class="nav-item ">
-  <a class="nav-link nav-internal" href="api_stability.html">
-    API stability policy
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="migration.html">
-    Migration guide
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="testing.html">
-    Testing and reproducibility
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="gallery/index.html">
-    Examples
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="theory.html">
-    Theory
-  </a>
-</li>
-
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="references.html">
-    References
+  <a class="nav-link nav-internal" href="resources.html">
+    Resources
   </a>
 </li>
 
@@ -611,221 +489,6 @@
 <p>This document provides the API documentation for the DeepPeak package.</p>
 <section id="analysis-api">
 <h2>Analysis API<a class="headerlink" href="#analysis-api" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.StandardDilutionSeries">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">StandardDilutionSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trigger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_concentration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zscore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_sampling_rate_hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">125000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilution_parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/dilution_series.html#StandardDilutionSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.StandardDilutionSeries" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseDilutionSeries</span></code></p>
-<p>Dilution-series workflow specialized for the standard detector.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>files</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em> | </em><em>Path</em><em>, </em><em>float</em><em>]</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>trigger</strong> (<a class="reference internal" href="#DeepPeak.analysis.BasePeakTrigger" title="DeepPeak.detection.triggers.BasePeakTrigger"><em>BasePeakTrigger</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>folder</strong> (<em>Path</em><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>water_file</strong> (<em>Path</em><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>initial_concentration</strong> (<em>float</em>)</p></li>
-<li><p><strong>nrows</strong> (<em>int</em>)</p></li>
-<li><p><strong>low_pass</strong> (<em>float</em>)</p></li>
-<li><p><strong>sequence_length</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>signal_normalization</strong> (<em>str</em>)</p></li>
-<li><p><strong>prediction_sampling_rate_hz</strong> (<em>float</em>)</p></li>
-<li><p><strong>dilution_parser</strong> (<em>Callable</em><em>[</em><em>[</em><em>Path</em><em>]</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.SeriesConfig" title="DeepPeak.core.config.SeriesConfig"><em>SeriesConfig</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.FlashDilutionSeries">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">FlashDilutionSeries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trigger</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">water_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_concentration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zscore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_sampling_rate_hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">125000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_low_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude_sigma_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude_cluster_radius_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amplitude_baseline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dilution_parser</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/dilution_series.html#FlashDilutionSeries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.FlashDilutionSeries" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseDilutionSeries</span></code></p>
-<p>Dilution-series workflow specialized for FLASH detection.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>files</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>str</em><em> | </em><em>Path</em><em>, </em><em>float</em><em>]</em><em>]</em>)</p></li>
-<li><p><strong>trigger</strong> (<a class="reference internal" href="#DeepPeak.analysis.BasePeakTrigger" title="DeepPeak.detection.triggers.BasePeakTrigger"><em>BasePeakTrigger</em></a>)</p></li>
-<li><p><strong>wavenet</strong> (<em>Any</em>)</p></li>
-<li><p><strong>folder</strong> (<em>Path</em><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>water_file</strong> (<em>Path</em><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>initial_concentration</strong> (<em>float</em>)</p></li>
-<li><p><strong>nrows</strong> (<em>int</em>)</p></li>
-<li><p><strong>low_pass</strong> (<em>float</em>)</p></li>
-<li><p><strong>sequence_length</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>signal_normalization</strong> (<em>str</em>)</p></li>
-<li><p><strong>prediction_sampling_rate_hz</strong> (<em>float</em>)</p></li>
-<li><p><strong>prediction_low_pass</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>amplitude_sigma_samples</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>amplitude_cluster_radius_sigma</strong> (<em>float</em>)</p></li>
-<li><p><strong>amplitude_baseline</strong> (<em>float</em><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>dilution_parser</strong> (<em>Callable</em><em>[</em><em>[</em><em>Path</em><em>]</em><em>, </em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.SeriesConfig" title="DeepPeak.core.config.SeriesConfig"><em>SeriesConfig</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.TraceAnalyzer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">TraceAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wavenet</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_trigger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_trigger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zscore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_sampling_rate_hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">125000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_low_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_amplitude_sigma_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_amplitude_cluster_radius_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cnn_amplitude_baseline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/wavenet_trace.html#TraceAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.TraceAnalyzer" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseTraceAnalyzer</span></code></p>
-<p>High-level analyzer for direct and neural peak-detection branches.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>wavenet</strong> (<em>Any</em>)</p></li>
-<li><p><strong>std_trigger</strong> (<a class="reference internal" href="#DeepPeak.analysis.BasePeakTrigger" title="DeepPeak.detection.triggers.BasePeakTrigger"><em>BasePeakTrigger</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>cnn_trigger</strong> (<a class="reference internal" href="#DeepPeak.analysis.BasePeakTrigger" title="DeepPeak.detection.triggers.BasePeakTrigger"><em>BasePeakTrigger</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>sequence_length</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>signal_normalization</strong> (<em>str</em>)</p></li>
-<li><p><strong>prediction_sampling_rate_hz</strong> (<em>float</em>)</p></li>
-<li><p><strong>cnn_low_pass</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>cnn_amplitude_sigma_samples</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>cnn_amplitude_cluster_radius_sigma</strong> (<em>float</em>)</p></li>
-<li><p><strong>cnn_amplitude_baseline</strong> (<em>float</em><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.DetectionConfig" title="DeepPeak.core.config.DetectionConfig"><em>DetectionConfig</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.StandardTraceAnalyzer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">StandardTraceAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">std_trigger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavenet</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zscore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_sampling_rate_hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">125000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/wavenet_trace.html#StandardTraceAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.StandardTraceAnalyzer" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_BaseTraceAnalyzer</span></code></p>
-<p>Analyze one processed trace with the standard peak detector only.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>std_trigger</strong> (<a class="reference internal" href="#DeepPeak.analysis.BasePeakTrigger" title="DeepPeak.detection.triggers.BasePeakTrigger"><em>BasePeakTrigger</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>sequence_length</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>wavenet</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>signal_normalization</strong> (<em>str</em>)</p></li>
-<li><p><strong>prediction_sampling_rate_hz</strong> (<em>float</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.DetectionConfig" title="DeepPeak.core.config.DetectionConfig"><em>DetectionConfig</em></a><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.TraceComparisonAnalyzer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">TraceComparisonAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">standard_trigger</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolved_trigger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">signal_normalization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'zscore'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_sampling_rate_hz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">125000000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolved_low_pass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolved_amplitude_sigma_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolved_amplitude_cluster_radius_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolved_amplitude_baseline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/comparison.html#TraceComparisonAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.TraceComparisonAnalyzer" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Run direct detection and optional neural deconvolution side by side.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>standard_trigger</strong> (<a class="reference internal" href="#DeepPeak.analysis.BasePeakTrigger" title="DeepPeak.analysis.BasePeakTrigger"><em>BasePeakTrigger</em></a>) – Trigger used on the original signal.</p></li>
-<li><p><strong>deconvolver</strong> (<em>object</em><em>, </em><em>optional</em>) – Model exposing <code class="docutils literal notranslate"><span class="pre">predict(signal=...)</span></code>.  CNN, WaveNet, and U-Net model
-wrappers are supported.  If omitted, only the standard branch runs.</p></li>
-<li><p><strong>deconvolved_trigger</strong> (<a class="reference internal" href="#DeepPeak.analysis.BasePeakTrigger" title="DeepPeak.analysis.BasePeakTrigger"><em>BasePeakTrigger</em></a><em>, </em><em>optional</em>) – Trigger applied to the deconvolved signal. Defaults to the standard
-trigger.</p></li>
-<li><p><strong>sequence_length</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>signal_normalization</strong> (<em>str</em>)</p></li>
-<li><p><strong>prediction_sampling_rate_hz</strong> (<em>float</em>)</p></li>
-<li><p><strong>deconvolved_low_pass</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>deconvolved_amplitude_sigma_samples</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>deconvolved_amplitude_cluster_radius_sigma</strong> (<em>float</em>)</p></li>
-<li><p><strong>deconvolved_amplitude_baseline</strong> (<em>float</em><em> | </em><em>str</em><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.TraceComparisonResult">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">TraceComparisonResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">standard</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolved</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deconvolved_signal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/comparison.html#TraceComparisonResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.TraceComparisonResult" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Direct and optional deconvolved detection results for one trace.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>trace</strong> (<a class="reference internal" href="#DeepPeak.core.Trace" title="DeepPeak.core.types.Trace"><em>Trace</em></a>)</p></li>
-<li><p><strong>standard</strong> (<a class="reference internal" href="#DeepPeak.core.DetectionResult" title="DeepPeak.core.types.DetectionResult"><em>DetectionResult</em></a>)</p></li>
-<li><p><strong>deconvolved</strong> (<a class="reference internal" href="#DeepPeak.core.DetectionResult" title="DeepPeak.core.types.DetectionResult"><em>DetectionResult</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>deconvolved_signal</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>metadata</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.SeriesComparisonResult">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SeriesComparisonResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/comparison.html#SeriesComparisonResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.SeriesComparisonResult" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Aggregate distribution comparisons over an ordered trace collection.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>records</strong> (<em>list</em><em>[</em><a class="reference internal" href="#DeepPeak.analysis.TraceComparisonResult" title="DeepPeak.analysis.comparison.TraceComparisonResult"><em>TraceComparisonResult</em></a><em>]</em>)</p></li>
-<li><p><strong>metadata</strong> (<em>dict</em><em>[</em><em>str</em><em>, </em><em>Any</em><em>]</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.BasePeakTrigger">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">BasePeakTrigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hysteresis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pulse_polarity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'positive'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">holdoff_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_samples_above_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_samples_below_hysteresis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/detection/triggers.html#BasePeakTrigger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.BasePeakTrigger" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Shared trigger configuration independent of threshold semantics.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>hysteresis</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>pulse_polarity</strong> (<em>str</em>)</p></li>
-<li><p><strong>holdoff_samples</strong> (<em>int</em>)</p></li>
-<li><p><strong>required_samples_above_threshold</strong> (<em>int</em>)</p></li>
-<li><p><strong>required_samples_below_hysteresis</strong> (<em>int</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.NoiseAnalyzer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NoiseAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/noise_analysis.html#NoiseAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.NoiseAnalyzer" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Analyze noise-only regions in traces.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>signal</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>]</em>)</p></li>
-<li><p><strong>sampling_rate</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>time</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>dx</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.analysis.PulseShapeAnalyzer">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">PulseShapeAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_rate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/analysis/pulse_shape.html#PulseShapeAnalyzer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.analysis.PulseShapeAnalyzer" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Inspect detected peaks as aligned windows and summarize their shapes.</p>
-<p>The class is designed for notebook workflows:</p>
-<ol class="arabic simple">
-<li><p>create an analyzer from a <code class="xref py py-class docutils literal notranslate"><span class="pre">CsvTrace</span></code> or raw arrays</p></li>
-<li><p>detect or select peaks</p></li>
-<li><p>extract baseline-corrected windows around those peaks</p></li>
-<li><p>inspect per-pulse and aggregate shape diagnostics</p></li>
-</ol>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>signal</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>]</em>)</p></li>
-<li><p><strong>sampling_rate</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>time</strong> (<em>ndarray</em><em> | </em><em>Sequence</em><em>[</em><em>float</em><em>] </em><em>| </em><em>None</em>)</p></li>
-<li><p><strong>dx</strong> (<em>float</em><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="core-result-api">
 <h2>Core result API<a class="headerlink" href="#core-result-api" title="Link to this heading">#</a></h2>
@@ -1102,120 +765,10 @@ processing, detection, dilution-series workflows, and plotting.</p>
 </section>
 <section id="pipeline-api">
 <h2>Pipeline API<a class="headerlink" href="#pipeline-api" title="Link to this heading">#</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.Pipeline">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analyzer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generation_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/pipeline.html#Pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.Pipeline" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Compose a generator, detector, and optional trace analyzer.</p>
-<p>The detector may be any object exposing <code class="docutils literal notranslate"><span class="pre">detect(trace)</span></code>. An analyzer may
-expose <code class="docutils literal notranslate"><span class="pre">analyze_processed_signal</span></code> (as the built-in trace analyzers do) or
-be a callable accepting a <code class="xref py py-class docutils literal notranslate"><span class="pre">Trace</span></code>. This keeps the orchestration layer
-independent of TensorFlow and compatible with custom detectors.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>generator</strong> (<a class="reference internal" href="#DeepPeak.SignalGenerator" title="DeepPeak.SignalGenerator"><em>SignalGenerator</em></a><em>, </em><em>optional</em>) – Generator used by <code class="xref py py-meth docutils literal notranslate"><span class="pre">generate()</span></code>.</p></li>
-<li><p><strong>detector</strong> (<em>object</em><em>, </em><em>optional</em>) – Detector exposing <code class="docutils literal notranslate"><span class="pre">detect</span></code>.</p></li>
-<li><p><strong>analyzer</strong> (<em>object</em><em> or </em><em>callable</em><em>, </em><em>optional</em>) – Analyzer exposing <code class="docutils literal notranslate"><span class="pre">analyze_processed_signal</span></code> or accepting a
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Trace</span></code>.</p></li>
-<li><p><strong>generation_config</strong> (<a class="reference internal" href="#DeepPeak.core.GenerationConfig" title="DeepPeak.core.GenerationConfig"><em>GenerationConfig</em></a><em>, </em><em>optional</em>) – Default generation settings.</p></li>
-<li><p><strong>analysis_config</strong> (<a class="reference internal" href="#DeepPeak.core.AnalysisConfig" title="DeepPeak.core.AnalysisConfig"><em>AnalysisConfig</em></a><em>, </em><em>optional</em>) – Default analysis settings.</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">HeightPeakTrigger</span><span class="p">,</span> <span class="n">StandardTraceAnalyzer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">detector</span> <span class="o">=</span> <span class="n">StandardTraceAnalyzer</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">std_trigger</span><span class="o">=</span><span class="n">HeightPeakTrigger</span><span class="p">(</span><span class="n">height</span><span class="o">=</span><span class="mf">0.5</span><span class="p">),</span> <span class="n">sequence_length</span><span class="o">=</span><span class="mi">3</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.PipelineResult">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">PipelineResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/pipeline.html#PipelineResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.PipelineResult" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Canonical output of one pipeline analysis.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>trace</strong> (<a class="reference internal" href="#DeepPeak.core.Trace" title="DeepPeak.core.Trace"><em>Trace</em></a>) – Input trace analyzed by the pipeline.</p></li>
-<li><p><strong>detection</strong> (<a class="reference internal" href="#DeepPeak.core.DetectionResult" title="DeepPeak.core.DetectionResult"><em>DetectionResult</em></a>) – Canonical peak-detection result.</p></li>
-<li><p><strong>record</strong> (<em>object</em><em>, </em><em>optional</em>) – Full analyzer-specific record, when an analyzer was used.</p></li>
-<li><p><strong>dataset</strong> (<em>DataSet</em><em>, </em><em>optional</em>) – Source generated dataset, when returned by <code class="docutils literal notranslate"><span class="pre">generate_and_run</span></code>.</p></li>
-<li><p><strong>metadata</strong> (<em>dict</em><em>, </em><em>optional</em>) – Per-result metadata.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="plotting-api">
 <h2>Plotting API<a class="headerlink" href="#plotting-api" title="Link to this heading">#</a></h2>
 <p>Plotting is kept in <code class="docutils literal notranslate"><span class="pre">DeepPeak.plotting</span></code> and returns Matplotlib figures.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="DeepPeak.plotting.standard_detection">
-<span class="sig-name descname"><span class="pre">standard_detection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/plotting/trace_record.html#standard_detection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.plotting.standard_detection" title="Link to this definition">#</a></dt>
-<dd><p>Render standard detection annotations for one trace record.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>TraceRecord</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.PlotConfig" title="DeepPeak.core.config.PlotConfig"><em>PlotConfig</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="DeepPeak.plotting.wavenet_detection">
-<span class="sig-name descname"><span class="pre">wavenet_detection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/plotting/trace_record.html#wavenet_detection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.plotting.wavenet_detection" title="Link to this definition">#</a></dt>
-<dd><p>Render CNN/WaveNet detection annotations for one trace record.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>TraceRecord</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.PlotConfig" title="DeepPeak.core.config.PlotConfig"><em>PlotConfig</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="DeepPeak.plotting.standard_detection_with_histogram">
-<span class="sig-name descname"><span class="pre">standard_detection_with_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/plotting/trace_record.html#standard_detection_with_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.plotting.standard_detection_with_histogram" title="Link to this definition">#</a></dt>
-<dd><p>Render standard detection and its amplitude histogram.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>TraceRecord</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.PlotConfig" title="DeepPeak.core.config.PlotConfig"><em>PlotConfig</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="DeepPeak.plotting.wavenet_detection_with_histogram">
-<span class="sig-name descname"><span class="pre">wavenet_detection_with_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/plotting/trace_record.html#wavenet_detection_with_histogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.plotting.wavenet_detection_with_histogram" title="Link to this definition">#</a></dt>
-<dd><p>Render CNN/WaveNet detection and its amplitude histogram.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>record</strong> (<em>TraceRecord</em>)</p></li>
-<li><p><strong>config</strong> (<a class="reference internal" href="#DeepPeak.core.PlotConfig" title="DeepPeak.core.config.PlotConfig"><em>PlotConfig</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>kwargs</strong> (<em>Any</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="neural-network-api">
 <h2>Neural-network API<a class="headerlink" href="#neural-network-api" title="Link to this heading">#</a></h2>
@@ -1565,85 +1118,6 @@ dataset stores signals as a two-dimensional array.</p>
 underlying <code class="docutils literal notranslate"><span class="pre">clean_signals</span></code> target available: constant or linearly varying
 noise, baseline offsets and drift, finite instrument responses, saturation,
 and quantization.</p>
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.SignalGenerator">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">SignalGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/generation/signal_generator.html#SignalGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.SignalGenerator" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Generate synthetic 1D peak signals from kernel parameter samplers.</p>
-<p class="rubric">Notes</p>
-<p>The generator supports all kernel classes derived from <code class="docutils literal notranslate"><span class="pre">BaseKernel</span></code>,
-labels discrete peak locations, and can add Gaussian noise, instrument
-response, baseline offset, saturation, and quantization. Clean pulse
-traces are retained alongside noisy observations for reconstruction-model
-training.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>sequence_length</strong> (<em>int</em>)</p></li>
-<li><p><strong>x_values</strong> (<em>ndarray</em><em> | </em><em>None</em>)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.Gaussian">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">Gaussian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amplitude</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rise_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">decay_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/generation/kernels/gaussian.html#Gaussian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.Gaussian" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseKernel</span></code></p>
-<p>Gaussian pulse model with sampled amplitude, center, and width.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>amplitude</strong> (<em>float</em><em> or </em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – Peak amplitude or inclusive sampling range for the pulse amplitude.</p></li>
-<li><p><strong>position</strong> (<em>float</em><em> or </em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – Pulse center or inclusive sampling range for the center position.</p></li>
-<li><p><strong>width</strong> (<em>float</em><em> or </em><em>tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – Standard deviation or inclusive sampling range for the Gaussian width.</p></li>
-<li><p><strong>rise_scale</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>float</em><em> | </em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>] </em><em>| </em><em>int</em>)</p></li>
-<li><p><strong>decay_scale</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>] </em><em>| </em><em>float</em><em> | </em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>] </em><em>| </em><em>int</em>)</p></li>
-</ul>
-</dd>
-</dl>
-<p class="rubric">Notes</p>
-<p>Each active pulse is evaluated as</p>
-<p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">exp(-0.5</span> <span class="pre">*</span> <span class="pre">((x</span> <span class="pre">-</span> <span class="pre">x0)</span> <span class="pre">/</span> <span class="pre">sigma)</span> <span class="pre">**</span> <span class="pre">2)</span></code>.</p>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.NonstationaryGaussianNoise">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">NonstationaryGaussianNoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/generation/noises/nonstationary_gaussian.html#NonstationaryGaussianNoise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.NonstationaryGaussianNoise" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseNoise</span></code></p>
-<p>Gaussian noise with a linearly varying standard deviation.</p>
-<p><code class="docutils literal notranslate"><span class="pre">std</span></code> is the standard deviation at the start of each trace and
-<code class="docutils literal notranslate"><span class="pre">end_scale</span></code> multiplies it at the end. For example, <code class="docutils literal notranslate"><span class="pre">end_scale=2</span></code>
-produces noise whose standard deviation doubles across the acquisition.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>std</strong> (<em>float</em><em> or </em><em>tuple</em><em> of </em><em>float</em>) – Starting standard deviation or sampling range.</p></li>
-<li><p><strong>end_scale</strong> (<em>float</em><em> or </em><em>tuple</em><em> of </em><em>float</em><em>, </em><em>default=1.0</em>) – End-to-start standard-deviation ratio.</p></li>
-<li><p><strong>mean</strong> (<em>float</em><em> or </em><em>tuple</em><em> of </em><em>float</em><em>, </em><em>default=0.0</em>) – Mean or sampling range.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="DeepPeak.CorrelatedGaussianNoise">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">CorrelatedGaussianNoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">std</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/DeepPeak/generation/noises/correlated_gaussian.html#CorrelatedGaussianNoise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#DeepPeak.CorrelatedGaussianNoise" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseNoise</span></code></p>
-<p>Gaussian noise with exponentially correlated samples.</p>
-<p><code class="docutils literal notranslate"><span class="pre">correlation_length</span></code> is expressed in samples. A value of zero produces
-independent noise; larger values produce slowly varying baseline noise.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>std</strong> (<em>float</em><em> or </em><em>tuple</em><em> of </em><em>float</em>) – Standard deviation or sampling range.</p></li>
-<li><p><strong>correlation_length</strong> (<em>float</em><em>, </em><em>default=3.0</em>) – Exponential correlation length in samples.</p></li>
-<li><p><strong>mean</strong> (<em>float</em><em> or </em><em>tuple</em><em> of </em><em>float</em><em>, </em><em>default=0.0</em>) – Mean or sampling range.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 </section>
 
@@ -1670,19 +1144,7 @@ independent noise; larger values produce slowly varying baseline noise.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-api">Analysis API</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.StandardDilutionSeries"><code class="docutils literal notranslate"><span class="pre">StandardDilutionSeries</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.FlashDilutionSeries"><code class="docutils literal notranslate"><span class="pre">FlashDilutionSeries</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.TraceAnalyzer"><code class="docutils literal notranslate"><span class="pre">TraceAnalyzer</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.StandardTraceAnalyzer"><code class="docutils literal notranslate"><span class="pre">StandardTraceAnalyzer</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.TraceComparisonAnalyzer"><code class="docutils literal notranslate"><span class="pre">TraceComparisonAnalyzer</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.TraceComparisonResult"><code class="docutils literal notranslate"><span class="pre">TraceComparisonResult</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.SeriesComparisonResult"><code class="docutils literal notranslate"><span class="pre">SeriesComparisonResult</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.BasePeakTrigger"><code class="docutils literal notranslate"><span class="pre">BasePeakTrigger</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.NoiseAnalyzer"><code class="docutils literal notranslate"><span class="pre">NoiseAnalyzer</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.analysis.PulseShapeAnalyzer"><code class="docutils literal notranslate"><span class="pre">PulseShapeAnalyzer</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#analysis-api">Analysis API</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#core-result-api">Core result API</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.core.Trace"><code class="docutils literal notranslate"><span class="pre">Trace</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.core.DetectionResult"><code class="docutils literal notranslate"><span class="pre">DetectionResult</span></code></a></li>
@@ -1709,18 +1171,8 @@ independent noise; larger values produce slowly varying baseline noise.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.core.NoiseConfig"><code class="docutils literal notranslate"><span class="pre">NoiseConfig</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-api">Pipeline API</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.PipelineResult"><code class="docutils literal notranslate"><span class="pre">PipelineResult</span></code></a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-api">Plotting API</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.plotting.standard_detection"><code class="docutils literal notranslate"><span class="pre">standard_detection()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.plotting.wavenet_detection"><code class="docutils literal notranslate"><span class="pre">wavenet_detection()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.plotting.standard_detection_with_histogram"><code class="docutils literal notranslate"><span class="pre">standard_detection_with_histogram()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.plotting.wavenet_detection_with_histogram"><code class="docutils literal notranslate"><span class="pre">wavenet_detection_with_histogram()</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pipeline-api">Pipeline API</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting-api">Plotting API</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neural-network-api">Neural-network API</a><ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.models.WaveNet"><code class="docutils literal notranslate"><span class="pre">WaveNet</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.models.DenseNet"><code class="docutils literal notranslate"><span class="pre">DenseNet</span></code></a></li>
@@ -1738,13 +1190,7 @@ independent noise; larger values produce slowly varying baseline noise.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.models.plot_predictions"><code class="docutils literal notranslate"><span class="pre">plot_predictions()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#signal-generation-api">Signal-generation API</a><ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.SignalGenerator"><code class="docutils literal notranslate"><span class="pre">SignalGenerator</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.Gaussian"><code class="docutils literal notranslate"><span class="pre">Gaussian</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.NonstationaryGaussianNoise"><code class="docutils literal notranslate"><span class="pre">NonstationaryGaussianNoise</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#DeepPeak.CorrelatedGaussianNoise"><code class="docutils literal notranslate"><span class="pre">CorrelatedGaussianNoise</span></code></a></li>
-</ul>
-</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#signal-generation-api">Signal-generation API</a></li>
 </ul>
   </nav></div>
 
@@ -1752,7 +1198,7 @@ independent noise; larger values produce slowly varying baseline noise.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/MartinPdeS/DeepPeak/edit/v0.5.3/docs/source/code.rst">
+    <a href="https://github.com/MartinPdeS/DeepPeak/edit/master/docs/source/code.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
