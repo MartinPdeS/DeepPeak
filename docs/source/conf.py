@@ -30,7 +30,7 @@ globals().update(
         author=author,
         repository=repository,
         logo="_static/logo.svg",
-        favicon="_static/thumbnail.png",
+        favicon="_static/favicon.svg",
         prefer_installed_package=True,
         gallery_default_thumb=str(docs_source / "_static" / "thumbnail.png"),
         gallery_options={

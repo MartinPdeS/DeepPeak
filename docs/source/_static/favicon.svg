@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">DeepPeak icon</title>
+  <defs>
+    <linearGradient id="pulse" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff4663"/>
+      <stop offset="1" stop-color="#ff7a61"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="54" fill="#29283a"/>
+  <path d="M30 184H226" fill="none" stroke="#77758a" stroke-width="4" stroke-linecap="round" opacity=".55"/>
+  <path d="M30 184C56 184 63 182 78 182C91 182 95 169 104 143C114 111 120 68 132 68C144 68 149 139 160 164C168 181 177 184 190 184H226" fill="none" stroke="url(#pulse)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="132" cy="68" r="12" fill="#fff7f2" stroke="#ff5a62" stroke-width="6"/>
+</svg>
