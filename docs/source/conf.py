@@ -37,6 +37,7 @@ globals().update(
             "plot_gallery": os.getenv("DEEPPEAK_DOCS_EXECUTE_EXAMPLES") == "1",
             "reset_modules": reset_mpl,
         },
+        html_css_files=["layout.css"],
     )
 )
 
@@ -48,6 +49,3 @@ autodoc_mock_imports = [
     "tensorflow",
     "sklearn",
 ]
-
-html_css_files += ["layout.css"]
-html_context.update({"doc_path": "docs/source", "default_mode": "dark"})
