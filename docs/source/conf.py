@@ -1,6 +1,7 @@
 """DeepPeak documentation configuration."""
 
 import os
+from pathlib import Path
 
 import matplotlib
 
@@ -14,6 +15,7 @@ project = "DeepPeak"
 package = "DeepPeak"
 repository = "MartinPdeS/DeepPeak"
 author = "Martin Poinsinet de Sivry-Houle"
+docs_source = Path(__file__).resolve().parent
 
 
 def reset_mpl(gallery_conf, fname):
@@ -30,7 +32,7 @@ globals().update(
         logo="_static/logo.svg",
         favicon="_static/thumbnail.png",
         prefer_installed_package=True,
-        gallery_default_thumb="_static/thumbnail.png",
+        gallery_default_thumb=str(docs_source / "_static" / "thumbnail.png"),
         gallery_options={
             "plot_gallery": os.getenv("DEEPPEAK_DOCS_EXECUTE_EXAMPLES") == "1",
             "reset_modules": reset_mpl,
