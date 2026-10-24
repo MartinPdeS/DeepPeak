@@ -29,6 +29,8 @@
 !notebooks
 !notebooks/
 !notebooks/*.ipynb
+!presentation/
+!presentation/**
 !showcase
 !showcase/
 !showcase/webinar/
