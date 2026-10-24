@@ -8,5 +8,5 @@ authors:
 repository-code: "https://github.com/MartinPdeS/DeepPeak"
 url: "https://martinpdes.github.io/DeepPeak/"
 license: MIT
-version: 0.2.0
+version: "0.5.6"
 date-released: 2026-09-22

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=40.8.0", "wheel", "setuptools_scm[toml]>=8.0"]
+requires = ["setuptools>=40.8.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -47,13 +47,8 @@ include = ["DeepPeak", "DeepPeak.*"]
 [tool.setuptools.exclude-package-data]
 "*" = ["*.h5", "**/*.h5"]
 
-[tool.setuptools_scm]
-version_scheme = "only-version"
-local_scheme = "no-local-version"
-
-
-
 [project.optional-dependencies]
+release = ["martinpdes-maintenance==0.2.2"]
 ml = [
     "tensorflow>=2.16",
     "scikit-learn>=1.4",
@@ -77,3 +72,9 @@ dev = [
 
 [tool.ruff]
 extend-exclude = ["DeepPeak/_version.py"]
+
+[tool.mps-maintenance]
+version-file = "DeepPeak/_version.py"
+version-method = "literal"
+conda-recipe = "conda.recipe/meta.yaml"
+citation = "CITATION.cff"

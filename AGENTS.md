@@ -132,7 +132,7 @@ limitations; do not describe skipped ML checks as a full test-suite pass.
 ## Releases
 
 - Change versions and publish releases only within an explicit release task.
-  `_version.py` is generated; use the existing release tooling for coordinated
+  `_version.py` is maintained by martinpdes-maintenance; use it for coordinated
   metadata updates.
 - `make release-check` checks metadata consistency. In the current Makefile,
   `make release patch`, `make release minor`, and `make release major` create a

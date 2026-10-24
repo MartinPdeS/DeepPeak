@@ -15,7 +15,6 @@ requirements:
     - python {{ PY_VER }}*
     - setuptools >=40.8.0
     - wheel
-    - setuptools-scm >=8.0
   run:
     - numpy
     - pandas
