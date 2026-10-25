@@ -31,7 +31,7 @@ focused on the requested behavior and grounded in the current implementation.
 | `docs/source/`, `docs/examples/` | Sphinx documentation and executable examples |
 | `notebooks/` | Research and demonstration workflows |
 | `showcase/webinar/` | Native Keynote deck, presenter notes, figures, and logo sources |
-| `tools/`, `conda.recipe/` | Benchmark/release tooling and Conda packaging |
+| `tools/`, `conda.recipe/` | Benchmark tooling and Conda packaging |
 
 ## Code and scientific behavior
 
