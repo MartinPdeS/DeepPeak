@@ -1,0 +1,7 @@
+/* Preserve the logo colors and the contrast of its navy wordmark. */
+.bd-header .navbar-brand img.logo__image {
+    filter: none;
+    background: #f8fafc;
+    border-radius: 0.5rem;
+    padding: 0.4rem 0.6rem;
+}

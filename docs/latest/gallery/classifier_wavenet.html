@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>WaveNet Deconvolver: Reconstructing Clean Pulse Traces &#8212; DeepPeak  documentation</title>
+    <title>WaveNet Deconvolver: Reconstructing Clean Pulse Traces &#8212; DeepPeak 0.5.7 documentation</title>
   
   
   
@@ -37,7 +37,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/default.css?v=e1b40498" />
     <link rel="stylesheet" type="text/css" href="../_static/martinpdes_layout.css?v=a8cc01cd" />
-    <link rel="stylesheet" type="text/css" href="../_static/layout.css?v=dc96f8db" />
+    <link rel="stylesheet" type="text/css" href="../_static/branding.css?v=d0eda7f7" />
   
   <!-- So that users can add custom icons -->
   <script defer src="../_static/scripts/fontawesome.js?digest=18bd87630a240e9c25be"></script>
@@ -45,7 +45,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=18bd87630a240e9c25be" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=18bd87630a240e9c25be" />
 
-    <script src="../_static/documentation_options.js?v=8a448e45"></script>
+    <script src="../_static/documentation_options.js?v=98db6b99"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
@@ -54,12 +54,12 @@
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.23.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://raw.githubusercontent.com/MartinPdeS/DeepPeak/documentation_page/version_switcher.json';
-        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'v0.5.6';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = '0.5.7';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             true;
         </script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
-    <link rel="icon" href="../_static/favicon.svg"/>
+    <link rel="icon" href="../_static/favicon.png"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Core Result Objects: Trace, DetectionResult, and MetricResult" href="core_result_objects.html" />
@@ -67,7 +67,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="color-scheme" content="light dark"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="" />
+  <meta name="docsearch:version" content="0.5.7" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -137,11 +137,9 @@
     
     
     
-    <img src="../_static/logo.svg" class="logo__image only-dark" alt=""/>
-    <img src="../_static/logo.svg" class="logo__image only-light pst-js-only" alt=""/>
+    <img src="../_static/logo.png" class="logo__image only-dark" alt="DeepPeak 0.5.7 documentation - Home"/>
+    <img src="../_static/logo.png" class="logo__image only-light pst-js-only" alt="DeepPeak 0.5.7 documentation - Home"/>
   
-  
-    <p class="title logo__title">DeepPeak</p>
   
 </a></div>
     
@@ -226,6 +224,21 @@
     role="listbox" aria-labelledby="pst-version-switcher-button-2">
     <!-- dropdown will be populated by javascript on page load -->
   </div>
+</div></div>
+      
+        <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
 </div></div>
       
         <div class="navbar-item"><ul class="navbar-icon-links"
@@ -373,6 +386,21 @@
     role="listbox" aria-labelledby="pst-version-switcher-button-3">
     <!-- dropdown will be populated by javascript on page load -->
   </div>
+</div></div>
+        
+          <div class="navbar-item">
+
+<div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+    <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
+  </button>
+  <ul class="dropdown-menu dropdown-menu-end">
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+  </ul>
 </div></div>
         
           <div class="navbar-item"><ul class="navbar-icon-links"
@@ -538,9 +566,9 @@ to download the full example code.</p>
 <h2>Imports and reproducibility<a class="headerlink" href="#imports-and-reproducibility" title="Link to this heading">#</a></h2>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="w">
 </span><span class="w">
-</span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="nn">.</span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-DeepPeak-models sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../code.html#DeepPeak.models.TrainingConfig" title="DeepPeak.models.TrainingConfig"><span class="n">TrainingConfig</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-DeepPeak-models sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../code.html#DeepPeak.models.WaveNet" title="DeepPeak.models.WaveNet"><span class="n">WaveNet</span></a><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="nn">.</span><span class="nn">models</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingConfig</span><span class="p">,</span> <span class="n">WaveNet</span><span class="w">
 </span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="nn">.</span><span class="nn">generation</span><span class="w"> </span><span class="kn">import</span> <span class="n">SignalGenerator</span><span class="w">
-</span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <span class="n">Gaussian</span><span class="p">,</span> <span class="n">UniformCount</span><span class="w">
+</span><span class="kn">from</span><span class="w"> </span><span class="nn">DeepPeak</span><span class="w"> </span><span class="kn">import</span> <a class="sphx-glr-backref-module-DeepPeak sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../code.html#DeepPeak.Gaussian" title="DeepPeak.Gaussian"><span class="n">Gaussian</span></a><span class="p">,</span> <span class="n">UniformCount</span><span class="w">
 </span><span class="w">
 </span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
@@ -550,7 +578,7 @@ to download the full example code.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">NUM_PEAKS</span> <span class="o">=</span> <span class="mi">3</span><span class="w">
 </span><span class="n">SEQUENCE_LENGTH</span> <span class="o">=</span> <span class="mi">200</span><span class="w">
 </span><span class="w">
-</span><span class="n">pulse_kernel</span> <span class="o">=</span> <span class="n">Gaussian</span><span class="p">(</span><span class="w">
+</span><span class="n">pulse_kernel</span> <span class="o">=</span> <a class="sphx-glr-backref-module-DeepPeak sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../code.html#DeepPeak.Gaussian" title="DeepPeak.Gaussian"><span class="n">Gaussian</span></a><span class="p">(</span><span class="w">
 </span>    <span class="n">amplitude</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span><span class="p">,</span><span class="w">
 </span>    <span class="n">position</span><span class="o">=</span><span class="p">(</span><span class="mf">0.1</span> <span class="o">*</span> <span class="n">SEQUENCE_LENGTH</span><span class="p">,</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">SEQUENCE_LENGTH</span><span class="p">)</span><span class="p">,</span><span class="w">
 </span>    <span class="n">width</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span><span class="p">,</span><span class="w">
@@ -578,7 +606,7 @@ to download the full example code.</p>
 </section>
 <section id="build-and-summarize-the-wavenet-deconvolver">
 <h2>Build and summarize the WaveNet deconvolver<a class="headerlink" href="#build-and-summarize-the-wavenet-deconvolver" title="Link to this heading">#</a></h2>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">wavenet</span> <span class="o">=</span> <a class="sphx-glr-backref-module-DeepPeak-models sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../code.html#DeepPeak.models.WaveNet" title="DeepPeak.models.WaveNet"><span class="n">WaveNet</span></a><span class="p">(</span><span class="w">
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">wavenet</span> <span class="o">=</span> <span class="n">WaveNet</span><span class="p">(</span><span class="w">
 </span>    <span class="n">sequence_length</span><span class="o">=</span><span class="n">SEQUENCE_LENGTH</span><span class="p">,</span><span class="w">
 </span>    <span class="n">num_filters</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span><span class="w">
 </span>    <span class="n">num_dilation_layers</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="w">
@@ -597,7 +625,7 @@ to download the full example code.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="n">history</span> <span class="o">=</span> <span class="n">wavenet</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="w">
 </span>    <span class="n">dataset</span><span class="o">.</span><span class="n">signals</span><span class="p">,</span><span class="w">
 </span>    <span class="n">dataset</span><span class="o">.</span><span class="n">clean_signals</span><span class="p">[</span><span class="o">.</span><span class="o">.</span><span class="o">.</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span><span class="p">,</span><span class="w">
-</span>    <span class="n">config</span><span class="o">=</span><a class="sphx-glr-backref-module-DeepPeak-models sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../code.html#DeepPeak.models.TrainingConfig" title="DeepPeak.models.TrainingConfig"><span class="n">TrainingConfig</span></a><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span><span class="p">,</span><span class="w">
+</span>    <span class="n">config</span><span class="o">=</span><span class="n">TrainingConfig</span><span class="p">(</span><span class="n">epochs</span><span class="o">=</span><span class="mi">40</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span><span class="p">,</span><span class="w">
 </span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 </section>
@@ -626,6 +654,30 @@ to download the full example code.</p>
               
               
               
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="classifier_dense.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">DenseNet Deconvolver: Reconstructing Clean Pulse Traces</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="core_result_objects.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Core Result Objects: Trace, DetectionResult, and MetricResult</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
               
             </div>
             
@@ -656,7 +708,7 @@ to download the full example code.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/MartinPdeS/DeepPeak/edit/v0.5.6/docs/source/gallery/classifier_wavenet.rst">
+    <a href="https://github.com/MartinPdeS/DeepPeak/edit/v0.5.7/docs/source/gallery/classifier_wavenet.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
@@ -711,23 +763,6 @@ to download the full example code.</p>
     </div>
   
   
-  
-    <div class="footer-items__end">
-      
-        <div class="footer-item">
-
-  <p class="sphinx-version">
-    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.0.4.
-  </p>
-</div>
-      
-        <div class="footer-item">
-<p class="theme-version">
-  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.23.0.
-</p></div>
-      
-    </div>
   
 </div>
 
