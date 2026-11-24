@@ -26,10 +26,10 @@ jobs:
       - run: python -c "import DeepPeak; assert 'tensorflow' not in __import__('sys').modules"
       - run: >-
           python -m pytest -q
-          --ignore=tests/test_classifiers.py
-          --ignore=tests/test_model_evaluation.py
-          --ignore=tests/test_model_plotting.py
-          --ignore=tests/test_training_config.py
+          --ignore=tests/api/test_classifiers.py
+          --ignore=tests/api/test_model_evaluation.py
+          --ignore=tests/api/test_model_plotting.py
+          --ignore=tests/api/test_training_config.py
 
   ml:
     runs-on: ubuntu-latest

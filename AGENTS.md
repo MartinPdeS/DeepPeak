@@ -72,10 +72,10 @@ shared behavior. The core CI lane avoids these optional ML test files:
 
 ```sh
 MPLBACKEND=Agg python -m pytest -q \
-  --ignore=tests/test_classifiers.py \
-  --ignore=tests/test_model_evaluation.py \
-  --ignore=tests/test_model_plotting.py \
-  --ignore=tests/test_training_config.py
+  --ignore=tests/api/test_classifiers.py \
+  --ignore=tests/api/test_model_evaluation.py \
+  --ignore=tests/api/test_model_plotting.py \
+  --ignore=tests/api/test_training_config.py
 ```
 
 With the ML extra installed, run the full suite for model or shared ML changes:
