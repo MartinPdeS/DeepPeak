@@ -57,3 +57,7 @@ docs/source/gallery/
 
 # Large experimental inputs are kept outside Git.
 data/
+
+!/readme.yml
+
+!/USAGE.rst

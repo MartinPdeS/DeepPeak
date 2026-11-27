@@ -1,320 +1,192 @@
-|logo|
+DeepPeak
+========
+
+.. image:: https://raw.githubusercontent.com/MartinPdeS/DeepPeak/HEAD/docs/images/logo.svg
+   :alt: DeepPeak logo
+   :width: 100%
 
 .. list-table::
+   :width: 100%
    :widths: 35 65
    :header-rows: 1
 
    * - Badge
      - Status
    * - Python versions
-     - |python|
+     - |mps-python|
    * - Documentation
-     - |docs|
-   * - Continuous integration
-     - |ci/cd|
-   * - Test coverage
-     - |coverage|
-   * - Google Colab
-     - |colab|
-   * - PyPI package
-     - |PyPI|
-   * - PyPI downloads
-     - |PyPI_download|
-   * - Anaconda package
-     - |anaconda|
-   * - Anaconda downloads
-     - |anaconda_download|
-   * - Latest Anaconda release
-     - |anaconda_date|
+     - |mps-docs|
+   * - Tests
+     - |mps-ci| |mps-coverage|
+   * - PyPI
+     - |mps-pypi| |mps-downloads|
+   * - Conda
+     - |mps-conda| |mps-conda-downloads| |mps-conda-release|
 
+Peak detection, trace analysis, and dilution-series tooling for 1D signals.
 
-DeepPeak
-========
+Locate peaks in noisy one-dimensional traces and compare detections with known
+positions in synthetic data. Start with the classical pipeline before comparing it
+with a trained deconvolution model.
 
-DeepPeak is a Python package for generating, detecting, and analyzing peaks in
-one-dimensional signals. Its central workflow is to compare direct peak
-detection with optional neural deconvolution followed by peak detection. It
-also provides classical signal-processing methods, trainable neural-network
-models, synthetic signal generation, and dilution-series analysis.
-
-It is designed for researchers and engineers working with pulse-like traces,
-event streams, and other sparse one-dimensional signals.
-
-Key Features
-------------
-- **Classical peak detection**: Height, sigma, prominence, zero-crossing, and
-  non-maximum-suppression methods.
-- **Optional neural deconvolution**: CNN, WaveNet, and 1D U-Net models can
-  reconstruct a cleaner pulse signal before peak detection.
-- **Synthetic data generation**: Gaussian, Lorentzian, square, Dirac, custom,
-  and two-lobe kernels with configurable noise and peak-count models.
-- **Trace analysis**: Arrival-time, amplitude, width, pulse-shape, noise, and
-  dead-time analysis.
-- **Direct-versus-deconvolved evaluation**: Compare event counts,
-  time-of-arrival, amplitude, and width distributions on the same traces.
-- **Dilution-series workflows**: Standard and flash dilution-series analysis
-  with detector-specific metrics and plots.
-- **Plotting and diagnostics**: Figures are returned as Matplotlib objects so
-  they can be customized, saved, or embedded in notebooks.
+See the `usage guide <https://github.com/MartinPdeS/DeepPeak/blob/HEAD/USAGE.rst>`__ for further examples and implementation details.
+Open the `project notebook in Colab <https://colab.research.google.com/github/MartinPdeS/DeepPeak/blob/master/notebooks/wavenet_training.ipynb>`__.
 
 Installation
 ------------
 
-Install the released package from PyPI:
+Requires Python ``>=3.10``.
 
 .. code-block:: console
 
-   pip install DeepPeak
+   $ python -m pip install DeepPeak
 
-The classical signal-processing and generation APIs do not require TensorFlow.
-Install the optional neural-network stack when using the models package:
+Install from the ``martinpdes`` Conda channel:
 
 .. code-block:: console
 
-   pip install "DeepPeak[ml]"
+   $ conda install -c martinpdes deeppeak
 
-For development, install the repository and its test/documentation tools in
-your preferred virtual environment.
+For an editable source installation:
 
-Quickstart: generate a signal
------------------------------
+.. code-block:: console
 
-The generation API can create reproducible training and evaluation data:
+   $ git clone https://github.com/MartinPdeS/DeepPeak.git
+   $ cd DeepPeak
+   $ python -m pip install -e .
 
-.. code-block:: python
-
-   from DeepPeak import Gaussian, SignalGenerator, UniformCount
-
-   generator = SignalGenerator(sequence_length=1_000)
-   dataset = generator.generate(
-       n_samples=128,
-       kernel=Gaussian(
-           amplitude=(1.0, 10.0),
-           position=(0.1, 0.9),
-           width=(0.02, 0.05),
-       ),
-       peak_count=UniformCount(bounds=(1, 4)),
-       seed=42,
-       noise_std=0.05,
-   )
-
-   signals = dataset.signals
-
-Analysis quickstart
--------------------
-
-For standard dilution-series analysis, provide trace files as
-``(filename, dilution)`` pairs and run the configured workflow:
+Detect peaks in a synthetic trace
+---------------------------------
 
 .. code-block:: python
 
-   from DeepPeak.analysis import HeightPeakTrigger, StandardDilutionSeries
+   """
+   Classical Detection Pipeline with Stable Results
+   =================================================
 
-   series = StandardDilutionSeries(
-       folder="path/to/traces",
-       files=[
-           ("path/to/traces/trace_1.csv", 1.0),
-           ("path/to/traces/trace_2.csv", 10.0),
-       ],
-       trigger=HeightPeakTrigger(height=0.05, hysteresis=0.03),
-       initial_concentration=1.0,
-       nrows=100_000,
-   )
+   Generate a noisy synthetic signal, run the classical detector, wrap its raw
+   output in a stable ``DetectionResult``, and visualize the result.
+   """
 
-   result = series.run()
-   series.plot.standard_detection(index=0)
-
-   series.poisson.plot.expected_histogram(
-       index=0,
-       base_index=0,
-       detector="standard",
-       x_axis="time",
-   )
-
-   series.amplitude.plot.histogram(index=0, detector="standard")
-   series.width.plot.histogram(index=0, detector="standard", x_axis="time")
-
-For reusable settings, prefer the typed configuration objects exposed by
-``DeepPeak.core``. They validate values at construction time and can be passed
-to analyzers, dilution-series workflows, and plotting helpers:
-
-.. code-block:: python
-
+   # %%
+   # Generate a trace
+   # ----------------
+   import matplotlib.pyplot as plt
    import numpy as np
 
-   from DeepPeak.core import DetectionConfig, PlotConfig, Trace
-   from DeepPeak.detection import HeightPeakTrigger
-   from DeepPeak.analysis import StandardTraceAnalyzer
+   from DeepPeak.core import DetectionResult, Trace
+   from DeepPeak.detection import find_peaks_standard
+   from DeepPeak.generation import Gaussian, SignalGenerator, UniformCount
 
-   detection_config = DetectionConfig(
-       sequence_length=1_000,
-       normalization="zscore",
-       trigger=HeightPeakTrigger(height=0.05),
+   sequence_length = 500
+   generator = SignalGenerator(sequence_length=sequence_length)
+   dataset = generator.generate(
+       n_samples=1,
+       kernel=Gaussian(
+           amplitude=(4.0, 8.0),
+           position=(80.0, 420.0),
+           width=8.0,
+       ),
+       peak_count=UniformCount(bounds=(3, 3)),
+       noise_std=0.15,
+       seed=42,
    )
-   analyzer = StandardTraceAnalyzer(config=detection_config)
-   signal = np.zeros(1_000)
-   signal[500] = 1.0
-   detection = analyzer.detect(Trace(signal=signal, dx=1.0))
-   record = analyzer.analyze_processed_signal(signal, dx=1.0)
+   trace = Trace(signal=dataset.signals[0], dx=1.0)
 
-   figure = record.plot_standard_detection(
-       config=PlotConfig(show=False, close=False, dpi=150),
+   # %%
+   # Detect peaks and create a stable result object
+   # -----------------------------------------------
+   peak_indices, properties = find_peaks_standard(
+       trace.signal,
+       height=1.0,
+       hysteresis=0.5,
+       holdoff_samples=10,
    )
+   detection = DetectionResult(
+       peaks=peak_indices,
+       properties=properties,
+       detection_kwargs={
+           "height": 1.0,
+           "hysteresis": 0.5,
+           "holdoff_samples": 10,
+       },
+       threshold=1.0,
+   )
+   print(f"Detected {detection.peak_count} peaks at {detection.peaks.tolist()}")
 
-The plotting API always returns figures. Set ``show=False`` for scripts and
-tests, and set ``close=True`` when a figure should be closed automatically after
-it is created.
-
-The detector-specific classes ``StandardDilutionSeries`` and
-``FlashDilutionSeries`` are also available when a workflow should expose only
-one detector mode. Use ``FlashDilutionSeries`` with a trained neural model for
-CNN-based workflows.
-
-Direct versus deconvolved comparison
--------------------------------------
-
-The neural model is an optional deconvolution stage. The same peak-detection
-concept can therefore be evaluated directly on the raw trace and after neural
-deconvolution:
-
-.. code-block:: text
-
-   raw trace ────────────────> detector ──> direct result
-       │
-       └─ optional CNN/WaveNet/U-Net ──> detector ──> deconvolved result
-
-Use ``TraceComparisonAnalyzer`` to compare the two branches. The result
-provides arrival-time, amplitude, and width distributions, together with
-summary statistics and distribution differences. Set ``deconvolver=None`` to
-run only the direct branch.
-
-.. code-block:: python
-
-   from DeepPeak.analysis import TraceComparisonAnalyzer
-   from DeepPeak.core import Trace
-   from DeepPeak.detection import HeightPeakTrigger
-
-   comparison = TraceComparisonAnalyzer(
-       standard_trigger=HeightPeakTrigger(height=0.05),
-       deconvolver=trained_model,  # optional CNN, WaveNet, or U-Net wrapper
-   ).compare(Trace(signal=signal, dx=1e-9))
-
-   arrival_comparison = comparison.compare_distribution("arrival")
-   amplitude_comparison = comparison.compare_distribution("amplitude")
-   width_comparison = comparison.compare_distribution("width")
-
-The same comparison can be run over multiple traces with ``compare_many``.
-This makes it possible to quantify changes in event counts, time-of-arrival
-distributions, retrieved amplitudes, widths, and distribution distances.
-
-For this workflow, the neural model must be trained as a reconstruction model:
-its target should be a clean or deconvolved pulse trace. For example, a
-WaveNet model should use a linear output head and a regression loss when it is
-trained to predict pulse amplitudes.
-
-Architecture
-------------
-
-DeepPeak is being organized around clear domain boundaries:
-
-.. code-block:: text
-
-   DeepPeak/
-   ├── core/          shared types, protocols, configuration, exceptions
-   ├── generation/    synthetic signals, kernels, noise, datasets
-   ├── detection/     classical and neural detection algorithms
-   ├── models/        trainable neural-network architectures and losses
-   ├── analysis/      trace and dilution-series workflows
-   ├── metrics/       numerical diagnostics and distribution summaries
-   ├── plotting/      visualization of traces, detections, and metrics
-   └── io/            trace loading and result serialization
-
-The intended dependency direction is:
-
-.. code-block:: text
-
-   core
-     ↓
-   generation / detection / models
-     ↓
-   analysis
-     ↓
-   metrics / plotting / io
-
-This separation keeps numerical analysis independent from plotting and keeps
-TensorFlow-specific code isolated from the core signal-processing API. The
-domain namespaces are the supported public API for new code.
-
-Public API guide
-----------------
-
-Use these namespaces when writing new code:
-
-``DeepPeak.analysis``
-   Trace analyzers, dilution-series workflows, triggers, and analysis results.
-
-``DeepPeak.generation``
-   Synthetic datasets, kernels, noise models, and peak-count models.
-
-``DeepPeak.detection``
-   Detection algorithms, triggers, and the common detection-result type.
-
-``DeepPeak.models``
-   DenseNet, WaveNet, UNet1D, neural losses, and model utilities.
-
-``DeepPeak.metrics``
-   Detection, amplitude, width, arrival-time, and series metrics.
-
-``DeepPeak.plotting`` and ``DeepPeak.io``
-   Figure helpers and trace/file loading utilities.
-
-``DeepPeak.core``
-   Stable ``Trace``, ``DetectionResult``, ``MetricResult``, and ``SeriesResult``
-   objects, plus typed ``TraceConfig``, ``DetectionConfig``, ``SeriesConfig``,
-   and ``PlotConfig`` settings.
-
-The root ``DeepPeak`` namespace exposes the most common user-facing types for
-interactive work and notebooks.
+   # %%
+   # Plot the detector output
+   # ------------------------
+   figure, axis = plt.subplots(figsize=(10, 3.5))
+   axis.plot(trace.signal, color="black", linewidth=0.9, label="signal")
+   axis.axhline(detection.threshold, color="C1", linestyle="--", label="threshold")
+   axis.scatter(
+       detection.peaks,
+       trace.signal[detection.peaks],
+       color="C3",
+       zorder=3,
+       label="detected peaks",
+   )
+   axis.set_xlabel("Sample index")
+   axis.set_ylabel("Amplitude")
+   axis.legend()
+   figure.tight_layout()
+   figure
 
 Documentation
 -------------
 
-The full API reference, theory notes, and executable examples are available at
-`the DeepPeak documentation <https://martinpdes.github.io/DeepPeak/>`_.
+Use the `DeepPeak documentation <https://martinpdes.github.io/DeepPeak/>`__ to work through
+examples and look up the inputs and return values of individual functions.
+
+Contributing
+------------
+
+Bug reports, worked examples, and documentation corrections are welcome.
+To set up a development checkout and run the tests, follow the `contributing guide <https://github.com/MartinPdeS/DeepPeak/blob/HEAD/CONTRIBUTING.md>`__.
 
 Contact
 -------
-For questions or contributions, contact `martin.poinsinet.de.sivry@gmail.com <mailto:martin.poinsinet.de.sivry@gmail.com>`_.
 
-.. |python| image:: https://img.shields.io/pypi/pyversions/deeppeak.svg
-    :alt: Python
-    :target: https://www.python.org/
-.. |colab| image:: https://colab.research.google.com/assets/colab-badge.svg
-    :alt: Google Colab
-    :target: https://colab.research.google.com/github/MartinPdeS/DeepPeak/blob/master/notebooks/wavenet_training.ipynb
-.. |docs| image:: https://github.com/martinpdes/deeppeak/actions/workflows/deploy_documentation.yml/badge.svg
-    :target: https://martinpdes.github.io/DeepPeak/
-    :alt: Documentation Status
-.. |PyPI| image:: https://badge.fury.io/py/DeepPeak.svg
-    :alt: PyPI version
-    :target: https://badge.fury.io/py/DeepPeak
-.. |PyPI_download| image:: https://img.shields.io/pypi/dm/DeepPeak?style=plastic&label=PyPI%20downloads&labelColor=hex&color=hex
-    :alt: PyPI downloads
-    :target: https://pypistats.org/packages/deeppeak
-.. |coverage| image:: https://raw.githubusercontent.com/MartinPdeS/DeepPeak/python-coverage-comment-action-data/badge.svg
-    :alt: Unittest coverage
-    :target: https://htmlpreview.github.io/?https://github.com/MartinPdeS/DeepPeak/blob/python-coverage-comment-action-data/htmlcov/index.html
-.. |ci/cd| image:: https://github.com/martinpdes/deeppeak/actions/workflows/deploy_coverage.yml/badge.svg
-    :alt: Unittest Status
-.. |anaconda| image:: https://anaconda.org/martinpdes/deeppeak/badges/version.svg
-    :alt: Anaconda version
-    :target: https://anaconda.org/martinpdes/deeppeak
-.. |anaconda_download| image:: https://anaconda.org/martinpdes/deeppeak/badges/downloads.svg
-    :alt: Anaconda downloads
-    :target: https://anaconda.org/martinpdes/deeppeak
-.. |anaconda_date| image:: https://anaconda.org/martinpdes/deeppeak/badges/latest_release_relative_date.svg
-    :alt: Latest release date
-    :target: https://anaconda.org/martinpdes/deeppeak
-.. |logo| image:: https://github.com/MartinPdeS/DeepPeak/raw/master/docs/images/logo.png
-    :alt: DeepPeak logo
-    :width: 100%
+For questions, contact `Martin Poinsinet de Sivry-Houle <mailto:martin.poinsinet.de.sivry@gmail.com?subject=DeepPeak>`__.
+
+License
+-------
+
+See the `DeepPeak license <https://github.com/MartinPdeS/DeepPeak/blob/HEAD/LICENSE>`__ for terms of use.
+
+.. |mps-python| image:: https://img.shields.io/pypi/pyversions/deeppeak.svg
+   :alt: Supported Python versions
+   :target: https://pypi.org/project/deeppeak/
+
+.. |mps-pypi| image:: https://img.shields.io/pypi/v/deeppeak.svg
+   :alt: PyPI version
+   :target: https://pypi.org/project/deeppeak/
+
+.. |mps-downloads| image:: https://img.shields.io/pypi/dm/deeppeak.svg
+   :alt: Monthly PyPI downloads
+   :target: https://pypistats.org/packages/deeppeak
+
+.. |mps-docs| image:: https://github.com/MartinPdeS/DeepPeak/actions/workflows/deploy_documentation.yml/badge.svg
+   :alt: Documentation
+   :target: https://martinpdes.github.io/DeepPeak/
+
+.. |mps-ci| image:: https://github.com/MartinPdeS/DeepPeak/actions/workflows/tests.yml/badge.svg
+   :alt: Tests
+   :target: https://github.com/MartinPdeS/DeepPeak/actions/workflows/tests.yml
+
+.. |mps-coverage| image:: https://raw.githubusercontent.com/MartinPdeS/DeepPeak/python-coverage-comment-action-data/badge.svg
+   :alt: Test coverage
+   :target: https://htmlpreview.github.io/?https://github.com/MartinPdeS/DeepPeak/blob/python-coverage-comment-action-data/htmlcov/index.html
+
+.. |mps-conda| image:: https://anaconda.org/martinpdes/deeppeak/badges/version.svg
+   :alt: Anaconda version
+   :target: https://anaconda.org/martinpdes/deeppeak
+
+.. |mps-conda-downloads| image:: https://anaconda.org/martinpdes/deeppeak/badges/downloads.svg
+   :alt: Anaconda downloads
+   :target: https://anaconda.org/martinpdes/deeppeak
+
+.. |mps-conda-release| image:: https://anaconda.org/martinpdes/deeppeak/badges/latest_release_relative_date.svg
+   :alt: Latest Anaconda release
+   :target: https://anaconda.org/martinpdes/deeppeak

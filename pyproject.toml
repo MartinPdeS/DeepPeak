@@ -70,3 +70,6 @@ version-file = "DeepPeak/_version.py"
 version-method = "literal"
 conda-recipe = "conda.recipe/meta.yaml"
 citation = "CITATION.cff"
+
+[dependency-groups]
+readme = ["martinpdes-maintenance @ git+https://github.com/MartinPdeS/MartinPdeS-maintenance.git@1f47c0ca92f8d6fd7440190aa16c7bea662cd26d"]

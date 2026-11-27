@@ -1,0 +1,10 @@
+introduction: |-
+  Locate peaks in noisy one-dimensional traces and compare detections with known
+  positions in synthetic data. Start with the classical pipeline before comparing it
+  with a trained deconvolution model.
+
+  See the `usage guide <https://github.com/MartinPdeS/DeepPeak/blob/HEAD/USAGE.rst>`__ for further examples and implementation details.
+  Open the `project notebook in Colab <https://colab.research.google.com/github/MartinPdeS/DeepPeak/blob/master/notebooks/wavenet_training.ipynb>`__.
+quickstart:
+  title: Detect peaks in a synthetic trace
+  source: docs/examples/classical_detection_pipeline.py

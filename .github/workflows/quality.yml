@@ -21,3 +21,9 @@ jobs:
             python -m pip install --upgrade pip && python -m pip install "ruff==0.11.2"
       - run: python -m ruff check DeepPeak tests
       - run: python -m ruff format --check DeepPeak tests
+
+  readme:
+    uses: MartinPdeS/MPSActions/.github/workflows/run_quality.yml@v2
+    with:
+      install-command: python -m pip install --upgrade pip && python -m pip install --group readme
+      quality-command: mps-maintenance readme --check
